@@ -22,13 +22,16 @@ FitRegFE/
     │   ├── client.ts             # Axios instance + interceptors
     │   ├── auth.ts               # Auth & profile API
     │   ├── workouts.ts           # Workout CRUD API
-    │   └── coach.ts              # Coach/student/assignment API
+    │   ├── coach.ts              # Coach/student/assignment API
+    │   ├── coaches.ts            # Coach directory, profile, achievements, ratings API
+    │   └── admin.ts              # Admin stats, users, achievement verification API
     ├── context/
     │   ├── AuthContext.tsx        # Auth state + localStorage
     │   └── RoleContext.tsx        # Role switching (athlete/coach)
     ├── components/
     │   ├── Navbar.tsx             # Role-aware navigation
     │   ├── ProtectedRoute.tsx     # Auth guard
+    │   ├── AdminRoute.tsx         # Admin guard (requires is_admin)
     │   ├── RoleSwitcher.tsx       # Athlete/Coach toggle
     │   ├── SegmentBuilder.tsx     # Workout structure editor
     │   └── SegmentDisplay.tsx     # Read-only segment view
@@ -43,7 +46,13 @@ FitRegFE/
     │   ├── CoachDashboard.tsx     # Students list, stats
     │   ├── StudentWorkouts.tsx    # View student's workouts
     │   ├── AssignWorkoutForm.tsx  # Create/edit assigned workout
-    │   └── MyAssignedWorkouts.tsx # Athlete's assignments view
+    │   ├── MyAssignedWorkouts.tsx # Athlete's assignments view
+    │   ├── CoachDirectory.tsx     # Public coach listing with search & rating filter
+    │   ├── CoachPublicProfile.tsx # Coach profile with achievements, ratings, rating form
+    │   ├── CoachProfileEdit.tsx   # Edit coach description, visibility, CRUD achievements
+    │   ├── AdminDashboard.tsx     # Platform metrics dashboard
+    │   ├── AdminUsers.tsx         # User management table with role toggles
+    │   └── AdminAchievements.tsx  # Pending achievements approve/reject
     └── i18n/
         ├── index.ts              # i18next config
         ├── es.ts                 # Spanish translations
@@ -81,6 +90,12 @@ Dev: TypeScript ~5.9.3, Vite ^7.3.1, ESLint ^9.39.1
 | /coach/assign/:studentId | AssignWorkoutForm | Protected | Assign workout |
 | /coach/assigned-workouts/:id/edit | AssignWorkoutForm | Protected | Edit assignment |
 | /my-assignments | MyAssignedWorkouts | Protected | Athlete's assignments |
+| /coaches | CoachDirectory | Protected | Coach listing with search & rating filter |
+| /coaches/:id | CoachPublicProfile | Protected | Coach profile with achievements & ratings |
+| /coach/profile | CoachProfileEdit | Protected | Edit coach description, visibility, achievements |
+| /admin | AdminDashboard | Admin | Platform metrics |
+| /admin/users | AdminUsers | Admin | User management table |
+| /admin/achievements | AdminAchievements | Admin | Pending achievement verification |
 
 ## TypeScript Types
 
@@ -90,6 +105,7 @@ interface User {
   id: number; google_id: string; email: string; name: string;
   avatar_url: string; sex: string; age: number; weight_kg: number;
   language: string; is_coach: boolean;
+  is_admin: boolean; coach_description: string; coach_public: boolean;
   created_at: string; updated_at: string;
 }
 ```
@@ -138,6 +154,69 @@ interface WorkoutSegment {
 }
 ```
 
+### CoachAchievement
+```typescript
+interface CoachAchievement {
+  id: number; coach_id: number; event_name: string; event_date: string;
+  distance_km: number; result_time: string; position: number | null;
+  is_verified: boolean; verified_by: number | null; verified_at: string | null;
+  created_at: string;
+}
+```
+
+### CoachRating
+```typescript
+interface CoachRating {
+  id: number; coach_id: number; student_id: number;
+  rating: number; comment: string;
+  student_name: string; student_avatar: string;
+  created_at: string; updated_at: string;
+}
+```
+
+### CoachListItem
+```typescript
+interface CoachListItem {
+  id: number; name: string; avatar_url: string;
+  coach_description: string; avg_rating: number; achievement_count: number;
+}
+```
+
+### CoachPublicProfile
+```typescript
+interface CoachPublicProfile {
+  id: number; name: string; avatar_url: string; coach_description: string;
+  avg_rating: number; achievements: CoachAchievement[]; ratings: CoachRating[];
+}
+```
+
+### AdminUser
+```typescript
+interface AdminUser {
+  id: number; email: string; name: string; avatar_url: string;
+  is_coach: boolean; is_admin: boolean; created_at: string;
+  workout_count: number; student_count: number;
+}
+```
+
+### AdminStats
+```typescript
+interface AdminStats {
+  total_users: number; total_coaches: number;
+  total_students: number; total_workouts: number;
+  total_assigned_workouts: number; pending_achievements: number;
+}
+```
+
+### PendingAchievement
+```typescript
+interface PendingAchievement {
+  id: number; coach_id: number; coach_name: string; coach_avatar: string;
+  event_name: string; event_date: string; distance_km: number;
+  result_time: string; position: number | null; created_at: string;
+}
+```
+
 ### AuthResponse
 ```typescript
 interface AuthResponse { token: string; user: User; }
@@ -145,7 +224,7 @@ interface AuthResponse { token: string; user: User; }
 
 ## API Client
 
-**Base URL:** `http://localhost:8080/api`
+**Base URL:** `VITE_API_URL` env var (defaults to `http://localhost:8080`) + `/api`
 
 **Interceptors:**
 - Request: Adds `Authorization: Bearer {token}` from localStorage
@@ -176,6 +255,25 @@ interface AuthResponse { token: string; user: User; }
 - `getMyAssignedWorkouts()` → GET /my-assigned-workouts → { data: AssignedWorkout[] }
 - `updateAssignedWorkoutStatus(id, status)` → PUT /my-assigned-workouts/:id/status
 
+### Coaches API (coaches.ts)
+- `listCoaches(search?)` → GET /coaches → CoachListItem[]
+- `getCoachProfile(id)` → GET /coaches/:id → CoachPublicProfile
+- `updateCoachProfile(data)` → PUT /coach/profile
+- `listMyAchievements()` → GET /coach/achievements → CoachAchievement[]
+- `createAchievement(data)` → POST /coach/achievements
+- `updateAchievement(id, data)` → PUT /coach/achievements/:id
+- `deleteAchievement(id)` → DELETE /coach/achievements/:id
+- `upsertRating(coachId, data)` → POST /coaches/:id/ratings
+- `getRatings(coachId)` → GET /coaches/:id/ratings → CoachRating[]
+
+### Admin API (admin.ts)
+- `getStats()` → GET /admin/stats → AdminStats
+- `listUsers()` → GET /admin/users → AdminUser[]
+- `updateUser(id, data)` → PUT /admin/users/:id
+- `getPendingAchievements()` → GET /admin/achievements/pending → PendingAchievement[]
+- `verifyAchievement(id)` → PUT /admin/achievements/:id/verify
+- `rejectAchievement(id)` → PUT /admin/achievements/:id/reject
+
 ## Context Providers
 
 ### AuthContext
@@ -198,7 +296,7 @@ interface AuthResponse { token: string; user: User; }
 - **Available:** Spanish (es), English (en)
 - **Detection:** Browser language detector
 - **User preference:** Stored in user profile, synced on login
-- **150+ translation keys** covering: navigation, login, workouts, types, fields, forms, profile, roles, coach, assignments, segments, units, intensities, home
+- **200+ translation keys** covering: navigation, login, workouts, types, fields, forms, profile, roles, coach, assignments, segments, units, intensities, home, coach directory, coach profiles, achievements, ratings, admin
 
 ### Translation Key Categories
 - `app_*` - App branding
@@ -216,15 +314,25 @@ interface AuthResponse { token: string; user: User; }
 - `unit_*` - Distance/time units
 - `intensity_*` - Intensity levels
 - `home_*` - Home page
+- `coach_directory_*` - Coach directory page
+- `coach_profile_*` - Coach profile pages
+- `achievement_*` - Achievements
+- `rating_*` - Ratings
+- `admin_*` - Admin panel
 
 ## Component Details
 
 ### Navbar
 - Role-aware: shows different links for athlete vs coach
-- Athlete links: Home, Workouts, New Workout, My Assignments
-- Coach links: Home (Coach Dashboard)
+- Athlete links: Home, Workouts, New Workout, My Assignments, Coaches (directory)
+- Coach links: Home (Coach Dashboard), My Coach Profile, Coaches (directory)
+- Admin link: Admin (visible only if user.is_admin)
 - Shows RoleSwitcher if user.is_coach is true
 - User avatar + name link to profile
+
+### AdminRoute
+- Route guard component that checks `user.is_admin`
+- Redirects to `/` if user is not an admin
 
 ### RoleSwitcher
 - Pill-style toggle: Athlete ↔ Coach
@@ -266,6 +374,36 @@ interface AuthResponse { token: string; user: User; }
 - Complete/Skip buttons for pending workouts
 - Shows coach name and segment details
 
+### CoachDirectory
+- Lists public coaches with search by name
+- Coach cards: avatar, name, description, avg rating, achievement count
+- Links to CoachPublicProfile
+
+### CoachPublicProfile
+- Displays coach info, description, achievements (with verified badges), ratings
+- Rating form: range slider 1-10 + optional comment textarea
+- Rating form only visible if current user is a student of that coach
+- Upsert: modifies existing rating if one exists
+
+### CoachProfileEdit
+- Edit coach description (textarea)
+- Toggle public visibility (checkbox)
+- Inline CRUD for achievements: add/edit/delete
+- Edit blocked for verified achievements
+
+### AdminDashboard
+- Stats cards: total users, coaches, students, workouts, pending achievements
+- Navigation links to AdminUsers and AdminAchievements
+
+### AdminUsers
+- Table with all users: name, email, is_coach, is_admin, workout count
+- Checkbox toggles for is_coach and is_admin roles
+
+### AdminAchievements
+- Table of pending (unverified) achievements
+- Coach name, event name, date, distance, time, position
+- Approve/Reject buttons per achievement
+
 ## Styling
 
 CSS classes follow BEM-like conventions. Key class families:
@@ -295,3 +433,12 @@ npm run build    # Production build → /dist
 npm run lint     # ESLint
 npm run preview  # Preview production build
 ```
+
+## Deployment
+
+- **Platform:** Vercel
+- **Branch:** `main` (auto-deploy)
+- **Framework:** Vite (auto-detected)
+- **SPA routing:** `vercel.json` with rewrite rule `{ "source": "/(.*)", "destination": "/index.html" }`
+- **Registry override:** `.npmrc` forces `registry=https://registry.npmjs.org/` (avoids private registry conflicts)
+- **Env vars (Vercel dashboard):** `VITE_API_URL` = production API URL (e.g., `https://fitreg-api-production.up.railway.app`)
