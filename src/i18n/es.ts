@@ -148,6 +148,59 @@ export default {
     home_see_all: 'Ver todos',
     home_see_all_assignments: 'Ver todas las asignaciones',
 
+    // Coach directory
+    coach_directory: 'Directorio de Entrenadores',
+    coach_directory_search: 'Buscar entrenador...',
+    coach_directory_empty: 'No hay entrenadores disponibles.',
+    coach_directory_rating: 'Valoración',
+    coach_directory_achievements: 'logros verificados',
+
+    // Coach profile
+    coach_profile_title: 'Mi Perfil de Entrenador',
+    coach_profile_description: 'Descripción',
+    coach_profile_description_placeholder: 'Contá sobre tu experiencia como entrenador...',
+    coach_profile_public: 'Visible en el directorio',
+    coach_profile_view: 'Ver perfil',
+
+    // Achievements
+    achievement_title: 'Logros',
+    achievement_add: 'Agregar Logro',
+    achievement_event_name: 'Nombre del evento',
+    achievement_event_date: 'Fecha',
+    achievement_distance: 'Distancia (km)',
+    achievement_result_time: 'Tiempo (HH:MM:SS)',
+    achievement_position: 'Posición',
+    achievement_verified: 'Verificado',
+    achievement_pending: 'Pendiente de verificación',
+    achievement_no_achievements: 'No hay logros cargados.',
+    achievement_cannot_edit_verified: 'No se puede editar un logro verificado',
+
+    // Ratings
+    rating_title: 'Valoraciones',
+    rating_your_rating: 'Tu valoración',
+    rating_leave_rating: 'Dejá tu valoración',
+    rating_comment: 'Comentario (opcional)',
+    rating_submit: 'Enviar valoración',
+    rating_avg: 'Valoración promedio',
+    rating_count: 'valoraciones',
+    rating_no_ratings: 'Sin valoraciones aún.',
+    rating_must_be_student: 'Solo los alumnos pueden valorar a su entrenador.',
+
+    // Admin
+    admin_title: 'Panel de Administración',
+    admin_users: 'Usuarios',
+    admin_achievements: 'Logros Pendientes',
+    admin_stats: 'Estadísticas',
+    admin_total_users: 'Total usuarios',
+    admin_total_coaches: 'Total entrenadores',
+    admin_total_ratings: 'Total valoraciones',
+    admin_pending_achievements: 'Logros pendientes',
+    admin_verify: 'Aprobar',
+    admin_reject: 'Rechazar',
+    admin_role_coach: 'Entrenador',
+    admin_role_admin: 'Admin',
+    admin_no_pending: 'No hay logros pendientes.',
+
     // Common
     loading: 'Cargando...',
     error: 'Error',

@@ -132,6 +132,59 @@ export default {
     home_see_all: 'See all',
     home_see_all_assignments: 'See all assignments',
 
+    // Coach directory
+    coach_directory: 'Coach Directory',
+    coach_directory_search: 'Search coach...',
+    coach_directory_empty: 'No coaches available.',
+    coach_directory_rating: 'Rating',
+    coach_directory_achievements: 'verified achievements',
+
+    // Coach profile
+    coach_profile_title: 'My Coach Profile',
+    coach_profile_description: 'Description',
+    coach_profile_description_placeholder: 'Tell about your coaching experience...',
+    coach_profile_public: 'Visible in directory',
+    coach_profile_view: 'View profile',
+
+    // Achievements
+    achievement_title: 'Achievements',
+    achievement_add: 'Add Achievement',
+    achievement_event_name: 'Event name',
+    achievement_event_date: 'Date',
+    achievement_distance: 'Distance (km)',
+    achievement_result_time: 'Time (HH:MM:SS)',
+    achievement_position: 'Position',
+    achievement_verified: 'Verified',
+    achievement_pending: 'Pending verification',
+    achievement_no_achievements: 'No achievements yet.',
+    achievement_cannot_edit_verified: 'Cannot edit a verified achievement',
+
+    // Ratings
+    rating_title: 'Ratings',
+    rating_your_rating: 'Your rating',
+    rating_leave_rating: 'Leave your rating',
+    rating_comment: 'Comment (optional)',
+    rating_submit: 'Submit rating',
+    rating_avg: 'Average rating',
+    rating_count: 'ratings',
+    rating_no_ratings: 'No ratings yet.',
+    rating_must_be_student: 'Only students can rate their coach.',
+
+    // Admin
+    admin_title: 'Admin Panel',
+    admin_users: 'Users',
+    admin_achievements: 'Pending Achievements',
+    admin_stats: 'Statistics',
+    admin_total_users: 'Total users',
+    admin_total_coaches: 'Total coaches',
+    admin_total_ratings: 'Total ratings',
+    admin_pending_achievements: 'Pending achievements',
+    admin_verify: 'Approve',
+    admin_reject: 'Reject',
+    admin_role_coach: 'Coach',
+    admin_role_admin: 'Admin',
+    admin_no_pending: 'No pending achievements.',
+
     loading: 'Loading...',
     error: 'Error',
     delete: 'Delete',

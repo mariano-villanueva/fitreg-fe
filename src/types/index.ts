@@ -24,6 +24,9 @@ export interface User {
   weight_kg: number;
   language: string;
   is_coach: boolean;
+  is_admin: boolean;
+  coach_description: string;
+  coach_public: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -69,6 +72,81 @@ export interface WorkoutSegment {
   rest_value: number;
   rest_unit: 'km' | 'm' | 'min' | 'sec';
   rest_intensity: 'easy' | 'moderate' | 'fast' | 'sprint';
+}
+
+export interface CoachAchievement {
+  id: number;
+  coach_id: number;
+  event_name: string;
+  event_date: string;
+  distance_km: number;
+  result_time: string;
+  position: number;
+  is_verified: boolean;
+  verified_by: number;
+  verified_at: string;
+  created_at: string;
+}
+
+export interface CoachRating {
+  id: number;
+  coach_id: number;
+  student_id: number;
+  rating: number;
+  comment: string;
+  student_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CoachListItem {
+  id: number;
+  name: string;
+  avatar_url: string;
+  coach_description: string;
+  avg_rating: number;
+  rating_count: number;
+  verified_achievements: number;
+}
+
+export interface CoachPublicProfile {
+  id: number;
+  name: string;
+  avatar_url: string;
+  coach_description: string;
+  avg_rating: number;
+  rating_count: number;
+  achievements: CoachAchievement[];
+  ratings: CoachRating[];
+}
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  name: string;
+  avatar_url: string;
+  is_coach: boolean;
+  is_admin: boolean;
+  created_at: string;
+}
+
+export interface AdminStats {
+  total_users: number;
+  total_coaches: number;
+  total_ratings: number;
+  pending_achievements: number;
+}
+
+export interface PendingAchievement {
+  id: number;
+  coach_id: number;
+  event_name: string;
+  event_date: string;
+  distance_km: number;
+  result_time: string;
+  position: number;
+  created_at: string;
+  coach_name: string;
 }
 
 export interface AuthResponse {
