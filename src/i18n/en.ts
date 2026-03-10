@@ -154,8 +154,11 @@ export default {
     coach_profile_title: 'My Coach Profile',
     coach_profile_description: 'Description',
     coach_profile_description_placeholder: 'Tell about your coaching experience...',
-    coach_profile_public: 'Visible in directory',
+    coach_profile_public: 'Open to proposals',
     coach_profile_view: 'View profile',
+    coach_public_modal_title: 'Public profile',
+    coach_public_modal_body: 'By selecting this option, you will be visible in the coach directory and will be able to receive student requests. Your coach profile will also be public.',
+    coach_public_modal_confirm: 'Accept',
 
     // Achievements
     achievement_title: 'Achievements',

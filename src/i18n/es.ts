@@ -170,8 +170,11 @@ export default {
     coach_profile_title: 'Mi Perfil de Entrenador',
     coach_profile_description: 'Descripción',
     coach_profile_description_placeholder: 'Contá sobre tu experiencia como entrenador...',
-    coach_profile_public: 'Visible en el directorio',
+    coach_profile_public: 'Abierto a propuestas',
     coach_profile_view: 'Ver perfil',
+    coach_public_modal_title: 'Perfil público',
+    coach_public_modal_body: 'Al seleccionar esta opción, estarás visible en el listado de entrenadores y podrás recibir solicitudes de alumnos. Además, tu perfil de entrenador será público.',
+    coach_public_modal_confirm: 'Aceptar',
 
     // Achievements
     achievement_title: 'Logros',

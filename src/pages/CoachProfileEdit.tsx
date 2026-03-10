@@ -12,6 +12,7 @@ export default function CoachProfileEdit() {
   const [isPublic, setIsPublic] = useState(user?.coach_public || false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [showPublicModal, setShowPublicModal] = useState(false);
 
   const [achievements, setAchievements] = useState<CoachAchievement[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -78,7 +79,19 @@ export default function CoachProfileEdit() {
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={5} placeholder={t('coach_profile_description_placeholder')} />
         </div>
         <div className="form-group">
-          <label><input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />{' '}{t('coach_profile_public')}</label>
+          <label>
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setShowPublicModal(true);
+                } else {
+                  setIsPublic(false);
+                }
+              }}
+            />{' '}{t('coach_profile_public')}
+          </label>
         </div>
         <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? t('form_saving') : t('form_save')}</button>
         {msg && <p className="success-msg">{msg}</p>}
@@ -153,6 +166,29 @@ export default function CoachProfileEdit() {
           </div>
         )}
       </div>
+
+      {showPublicModal && (
+        <div className="modal-overlay" onClick={() => setShowPublicModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>{t('coach_public_modal_title')}</h3>
+            <p>{t('coach_public_modal_body')}</p>
+            <div className="form-actions">
+              <button
+                className="btn btn-primary"
+                onClick={() => { setIsPublic(true); setShowPublicModal(false); }}
+              >
+                {t('coach_public_modal_confirm')}
+              </button>
+              <button
+                className="btn"
+                onClick={() => setShowPublicModal(false)}
+              >
+                {t('cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
