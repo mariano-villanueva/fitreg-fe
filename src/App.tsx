@@ -21,6 +21,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminAchievements from "./pages/AdminAchievements";
 import AdminRoute from "./components/AdminRoute";
+import Onboarding from "./pages/Onboarding";
 import "./App.css";
 
 const GOOGLE_CLIENT_ID = "1022083787469-g78j2i0b1shlrdd26ttb8jsham44fbcq.apps.googleusercontent.com";
@@ -35,6 +36,7 @@ function App() {
             <main className="container">
               <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
                 <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                 <Route path="/workouts" element={<ProtectedRoute><WorkoutList /></ProtectedRoute>} />
                 <Route path="/workouts/new" element={<ProtectedRoute><WorkoutForm /></ProtectedRoute>} />

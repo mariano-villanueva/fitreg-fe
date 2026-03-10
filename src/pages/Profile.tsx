@@ -9,8 +9,9 @@ export default function Profile() {
 
   const [name, setName] = useState(user?.name ?? "");
   const [sex, setSex] = useState(user?.sex ?? "");
-  const [age, setAge] = useState(user?.age ?? 0);
+  const [birthDate, setBirthDate] = useState(user?.birth_date ?? "");
   const [weightKg, setWeightKg] = useState(user?.weight_kg ?? 0);
+  const [heightCm, setHeightCm] = useState(user?.height_cm ?? 0);
   const [language, setLanguage] = useState(user?.language ?? "es");
   const [isCoach, setIsCoach] = useState(user?.is_coach ?? false);
   const [saving, setSaving] = useState(false);
@@ -24,7 +25,7 @@ export default function Profile() {
     setSaving(true);
 
     try {
-      const res = await updateProfile({ name, sex, age, weight_kg: weightKg, language, is_coach: isCoach });
+      const res = await updateProfile({ name, sex, birth_date: birthDate, weight_kg: weightKg, height_cm: heightCm, language, is_coach: isCoach, onboarding_completed: user?.onboarding_completed ?? true });
       setUser(res.data);
       i18n.changeLanguage(language);
       setSuccess(t('profile_saved'));
@@ -78,16 +79,19 @@ export default function Profile() {
             </select>
           </div>
           <div className="form-group">
-            <label htmlFor="profile-age">{t('profile_age')}</label>
+            <label htmlFor="profile-birthdate">{t('profile_birth_date')}</label>
             <input
-              id="profile-age"
-              type="number"
-              min={0}
-              max={120}
-              value={age}
-              onChange={(e) => setAge(Number(e.target.value))}
+              id="profile-birthdate"
+              type="date"
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
             />
+            {user?.age ? (
+              <small className="form-hint">{t('profile_age')}: {user.age}</small>
+            ) : null}
           </div>
+        </div>
+        <div className="form-row">
           <div className="form-group">
             <label htmlFor="profile-weight">{t('profile_weight')}</label>
             <input
@@ -97,6 +101,17 @@ export default function Profile() {
               step={0.1}
               value={weightKg}
               onChange={(e) => setWeightKg(Number(e.target.value))}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="profile-height">{t('profile_height')}</label>
+            <input
+              id="profile-height"
+              type="number"
+              min={0}
+              max={250}
+              value={heightCm}
+              onChange={(e) => setHeightCm(Number(e.target.value))}
             />
           </div>
         </div>

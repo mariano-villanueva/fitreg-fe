@@ -20,13 +20,16 @@ export interface User {
   name: string;
   avatar_url: string;
   sex: string;
+  birth_date: string;
   age: number;
   weight_kg: number;
+  height_cm: number;
   language: string;
   is_coach: boolean;
   is_admin: boolean;
   coach_description: string;
   coach_public: boolean;
+  onboarding_completed: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -6,5 +6,13 @@ export const googleLogin = (credential: string) =>
 
 export const getMe = () => client.get<User>('/me');
 
-export const updateProfile = (data: { name: string; sex: string; age: number; weight_kg: number; language: string; is_coach: boolean }) =>
-  client.put<User>('/me', data);
+export const updateProfile = (data: {
+  name: string;
+  sex: string;
+  birth_date: string;
+  weight_kg: number;
+  height_cm: number;
+  language: string;
+  is_coach: boolean;
+  onboarding_completed: boolean;
+}) => client.put<User>('/me', data);

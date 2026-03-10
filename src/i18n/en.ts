@@ -58,12 +58,23 @@ export default {
     profile_sex_m: 'Male',
     profile_sex_f: 'Female',
     profile_sex_other: 'Other',
+    profile_birth_date: 'Date of birth',
+    profile_height: 'Height (cm)',
     profile_age: 'Age',
     profile_weight: 'Weight (kg)',
     profile_save: 'Save changes',
     profile_saving: 'Saving...',
     profile_saved: 'Profile updated successfully',
     profile_is_coach: 'Enable coach mode',
+
+    // Onboarding
+    onboarding_title: 'Complete your profile',
+    onboarding_subtitle: 'We need some basic info to personalize your experience.',
+    onboarding_birth_date: 'Date of birth',
+    onboarding_birth_date_hint: 'Used to calculate your age',
+    onboarding_height: 'Height (cm)',
+    onboarding_continue: 'Continue',
+    onboarding_saving: 'Saving...',
 
     language: 'Language',
     lang_es: 'Español',
