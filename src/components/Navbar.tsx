@@ -17,9 +17,12 @@ export default function Navbar() {
       {isAuthenticated ? (
         <div className="navbar-links">
           {user?.is_coach && <RoleSwitcher />}
+          {user?.is_admin && <Link to="/admin">{t('admin_title')}</Link>}
           {isCoachMode ? (
             <>
               <Link to="/">{t('coach_dashboard')}</Link>
+              <Link to="/coach/profile">{t('coach_profile_title')}</Link>
+              <Link to="/coaches">{t('coach_directory')}</Link>
             </>
           ) : (
             <>
@@ -27,6 +30,7 @@ export default function Navbar() {
               <Link to="/workouts">{t('workouts_title')}</Link>
               <Link to="/workouts/new">{t('workouts_new')}</Link>
               <Link to="/my-assignments">{t('assigned_my')}</Link>
+              <Link to="/coaches">{t('coach_directory')}</Link>
             </>
           )}
           <Link to="/profile" className="navbar-user">
