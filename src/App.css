@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1.25rem;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -11,27 +11,39 @@
   z-index: 100;
 }
 
-.navbar-brand a {
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-hamburger {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.navbar-hamburger:hover {
+  background: var(--bg-primary);
+}
+
+.navbar-brand-link {
   font-size: 1.4rem;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--accent);
 }
 
-.navbar-links {
+.navbar-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-}
-
-.navbar-links a {
-  color: var(--text-secondary);
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.navbar-links a:hover {
-  color: var(--accent);
+  gap: 1rem;
 }
 
 .navbar-tagline {
@@ -39,17 +51,220 @@
   font-size: 0.9rem;
 }
 
-.navbar-user {
+/* ---- Feedback Toast ---- */
+.feedback-container {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 0.5rem;
+  pointer-events: none;
+  width: 90%;
+  max-width: 480px;
 }
 
-.navbar-avatar {
-  width: 28px;
-  height: 28px;
+.feedback-toast {
+  pointer-events: auto;
+  padding: 0.7rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  animation: feedbackIn 0.25s ease, feedbackOut 0.3s ease 3.7s forwards;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.feedback-success {
+  background: rgba(0, 212, 170, 0.15);
+  border: 1px solid rgba(0, 212, 170, 0.4);
+  color: #00d4aa;
+}
+
+.feedback-error {
+  background: rgba(255, 77, 106, 0.15);
+  border: 1px solid rgba(255, 77, 106, 0.4);
+  color: #ff4d6a;
+}
+
+.feedback-warning {
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  color: #ffc107;
+}
+
+@keyframes feedbackIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes feedbackOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ---- Sidebar ---- */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  z-index: 201;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-open {
+  transform: translateX(0);
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
+}
+
+.sidebar-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar-user-info strong {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-email {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-role-switcher {
+  display: flex;
+  margin: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.sidebar-role-btn {
+  flex: 1;
+  padding: 0.4rem 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 18px;
+  transition: all 0.2s;
+}
+
+.sidebar-role-btn.active {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0.5rem 0;
+}
+
+.sidebar-section {
+  padding: 0.25rem 0;
+}
+
+.sidebar-section-title {
+  padding: 0.5rem 1rem 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar-link:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.sidebar-link.active {
+  color: var(--accent);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.sidebar-link svg {
+  flex-shrink: 0;
+}
+
+.sidebar-bottom {
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 0;
+}
+
+.sidebar-logout {
+  color: var(--danger, #ef4444);
+}
+
+.sidebar-logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger, #ef4444);
 }
 
 /* ---- Layout ---- */
@@ -533,36 +748,6 @@
 }
 
 /* ---- Role Switcher ---- */
-.role-switcher {
-  display: inline-flex;
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 2px;
-  gap: 0;
-}
-
-.role-switcher-option {
-  padding: 0.3rem 0.75rem;
-  border: none;
-  border-radius: 18px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.role-switcher-option.active {
-  background: var(--accent);
-  color: var(--bg-primary);
-}
-
-.role-switcher-option:hover:not(.active) {
-  color: var(--text-primary);
-}
-
 /* ---- Coach Dashboard ---- */
 .coach-dashboard {
   display: flex;
@@ -995,29 +1180,414 @@
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  /* Navbar */
   .navbar {
-    padding: 0.75rem 1rem;
+    padding: 0.6rem 0.75rem;
   }
 
+  /* Layout */
   .container {
-    padding: 1.25rem 1rem;
+    padding: 1rem 0.75rem;
+  }
+
+  .page {
+    padding: 0;
   }
 
   .page-header {
     flex-direction: column;
+    gap: 0.75rem;
   }
 
-  .form-row {
-    grid-template-columns: 1fr 1fr;
+  .page-header h1 {
+    font-size: 1.35rem;
   }
 
+  .page-header-actions {
+    width: 100%;
+  }
+
+  .page-header-actions .btn {
+    flex: 1;
+  }
+
+  /* Workout grid → single column */
+  .workout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workout-card {
+    padding: 1rem;
+  }
+
+  /* Run stats → wrap */
   .run-stats {
     flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .run-stat {
+    min-width: 40%;
+  }
+
+  /* Detail page */
+  .detail-card {
+    padding: 1rem;
   }
 
   .detail-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .detail-value {
+    font-size: 1.1rem;
+  }
+
+  /* Forms */
+  .workout-form {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .duration-inputs {
+    flex-wrap: wrap;
+  }
+
+  .duration-field input {
+    width: 60px;
+  }
+
+  /* Login */
+  .login-page {
+    padding: 1rem;
+  }
+
+  .login-card {
+    padding: 2rem 1.25rem;
+  }
+
+  .login-title {
+    font-size: 2rem;
+  }
+
+  /* Profile */
+  .profile-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  /* Modals */
+  .modal {
+    padding: 1.25rem;
+    width: 95%;
+    max-height: 85vh;
+  }
+
+  .modal-lg {
+    max-width: 95%;
+  }
+
+  .modal .form-actions,
+  .modal .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal .form-actions .btn,
+  .modal .modal-actions .btn {
+    width: 100%;
+  }
+
+  .time-inputs {
+    flex-wrap: wrap;
+  }
+
+  /* Coach dashboard */
+  .coach-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .coach-stat-card {
+    min-width: unset;
+    padding: 1rem;
+  }
+
+  .coach-stat-value {
+    font-size: 1.5rem;
+  }
+
+  /* Student grid → single column */
+  .student-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-card {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Add student form */
+  .add-student-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-student-form input {
+    width: 100%;
+  }
+
+  /* Student header */
+  .student-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Assigned workout cards */
+  .assigned-workout-card {
+    padding: 1rem;
+  }
+
+  .assigned-details {
+    font-size: 0.82rem;
+  }
+
+  /* Tables → horizontal scroll */
+  .assignments-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.82rem;
+  }
+
+  .assignments-table th,
+  .assignments-table td {
+    padding: 0.5rem;
+    white-space: nowrap;
+  }
+
+  /* Segment builder table → horizontal scroll */
+  .segment-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.82rem;
+  }
+
+  .segment-table th,
+  .segment-table td {
+    padding: 0.4rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  /* Segment builder buttons */
+  .segment-buttons {
+    flex-direction: column;
+  }
+
+  .segment-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Coach directory */
+  .coach-filters-row {
+    flex-direction: column;
+  }
+
+  .coach-filter-input,
+  .coach-filter-select {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .coach-filter-select {
+    max-width: unset;
+  }
+
+  .coach-filters-actions {
+    flex-direction: column;
+  }
+
+  .coach-filters-actions .btn {
+    width: 100%;
+  }
+
+  .coach-list-item {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .coach-list-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .coach-list-meta {
+    display: none;
+  }
+
+  /* Coach public profile */
+  .coach-public-page {
+    max-width: 100%;
+  }
+
+  .coach-hero {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 1rem;
+    gap: 1rem;
+  }
+
+  .coach-hero-avatar {
+    width: 72px;
+    height: 72px;
+  }
+
+  .coach-hero-info h1 {
+    font-size: 1.3rem;
+  }
+
+  .coach-hero-rating {
+    justify-content: center;
+  }
+
+  .coach-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .coach-stat-card {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .coach-stat-value {
+    font-size: 1.25rem;
+  }
+
+  .coach-stat-label {
+    font-size: 0.7rem;
+    text-align: center;
+  }
+
+  .coach-rating-form-card {
+    padding: 1rem;
+  }
+
+  .coach-review-card {
+    padding: 0.75rem;
+  }
+
+  /* Coach profile edit */
+  .coach-profile-form {
+    padding: 1rem;
+  }
+
+  .coach-achievement-modal {
+    max-width: 95%;
+  }
+
+  /* Achievement detail */
+  .achievement-detail-card {
+    padding: 1.25rem;
+    max-width: 100%;
+  }
+
+  .achievement-detail-actions {
+    flex-direction: column;
+  }
+
+  .achievement-detail-actions .btn {
+    width: 100%;
+  }
+
+  /* Achievement modal items */
+  .coach-achievement-modal-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .coach-achievement-modal-img {
+    width: 100%;
+    height: 120px;
+  }
+
+  /* Image upload */
+  .image-upload-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Notification page */
+  .notifications-header {
+    flex-wrap: wrap;
+  }
+  .notification-card {
+    padding: 12px;
+    gap: 10px;
+  }
+  .notification-card-top {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .notification-avatar,
+  .notification-emoji {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  /* Athlete home */
+  .next-workout-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .next-workout-card {
+    padding: 1rem;
+  }
+
+  /* Pagination */
+  .pagination {
+    gap: 0.5rem;
+  }
+
+  .pagination .btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  /* General typography */
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  h2 {
+    font-size: 1.15rem;
+  }
+
+  /* Invitations */
+  .invitation-card {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .invitation-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 
@@ -1087,9 +1657,12 @@
 }
 
 .next-workout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--border);
 }
 
 .home-stats {
@@ -1098,14 +1671,22 @@
 }
 
 .home-stat-card {
-  background: var(--card-bg, #1e1e2e);
-  border: 1px solid #333;
-  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.2s;
+  text-decoration: none;
+  color: inherit;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 140px;
+}
+
+.home-stat-card:hover {
+  border-color: var(--accent);
 }
 
 .home-stat-value {
@@ -1147,6 +1728,8 @@
   padding: 2rem;
   max-width: 460px;
   width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal h3 {
@@ -1273,56 +1856,145 @@
   padding: 0 4px;
 }
 
+/* Notifications Page */
+.notifications-page {
+  max-width: 700px;
+}
+
+.notifications-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.notifications-header h1 {
+  margin-bottom: 0;
+}
+
+.notifications-new-badge {
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.notifications-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+
+.notifications-empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.5;
+}
+
 /* Notification List */
 .notification-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 10px;
 }
 
-.notification-item {
+.notification-card {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   padding: 16px;
-  border-bottom: 1px solid #eee;
-  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s;
 }
 
-.notification-unread {
-  background: #f0f7ff;
+.notification-card:hover {
+  border-color: var(--text-secondary);
 }
 
-.notification-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.notification-card--new {
+  border-left: 3px solid var(--accent);
+}
+
+.notification-card-icon {
+  position: relative;
   flex-shrink: 0;
 }
 
-.notification-content {
+.notification-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.notification-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  font-size: 1.3rem;
+  background: var(--bg-secondary);
+  border-radius: 50%;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 2px solid var(--bg-card);
+}
+
+.notification-card-body {
   flex: 1;
   min-width: 0;
 }
 
-.notification-item-title {
-  font-size: 0.95rem;
+.notification-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 4px;
 }
 
-.notification-body {
-  font-size: 0.85rem;
-  color: #555;
-  margin: 4px 0;
+.notification-card-title {
+  font-size: 0.9rem;
+  line-height: 1.3;
 }
 
-.notification-time {
+.notification-card-time {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.notification-actions {
+.notification-card-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notification-card-actions {
   display: flex;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
+}
+
+.notifications-toggle-read {
+  text-align: center;
+  margin-top: 1.5rem;
 }
 
 /* Invitation cards */
@@ -1862,5 +2534,327 @@
   color: #ff4d6a;
   margin-top: 0.25rem;
   font-style: italic;
+}
+
+/* Image Upload */
+.image-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.image-upload-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius, 8px);
+  background: var(--bg-secondary, #f0f0f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.image-upload-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-upload-placeholder {
+  font-size: 24px;
+  opacity: 0.5;
+}
+
+.image-upload-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--bg-secondary, #e0e0e0);
+  border-top-color: var(--accent, #3b82f6);
+  border-radius: 50%;
+  animation: img-upload-spin 0.8s linear infinite;
+}
+
+@keyframes img-upload-spin {
+  to { transform: rotate(360deg); }
+}
+
+.image-upload-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.image-upload-hint {
+  font-size: 12px;
+  color: var(--text-secondary, #888);
+}
+
+.image-upload-error {
+  color: var(--danger, #ef4444);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.detail-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: var(--radius, 8px);
+  margin-top: 8px;
+  object-fit: contain;
+}
+
+.achievement-detail-card {
+  background: var(--card-bg, #1e1e1e);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+}
+
+.achievement-detail-coach {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.achievement-detail-image {
+  margin-top: 1.5rem;
+}
+
+.achievement-detail-image h3 {
+  margin-bottom: 0.5rem;
+}
+
+.achievement-detail-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 2rem;
+}
+
+/* Coach Public Profile */
+.coach-public-page {
+  max-width: 700px;
+}
+
+.coach-hero {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  background: var(--card-bg, #1e1e1e);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.coach-hero-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.coach-hero-info h1 {
+  margin: 0 0 0.25rem;
+}
+
+.coach-hero-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.coach-hero-stars {
+  color: #f59e0b;
+  font-size: 1.1rem;
+}
+
+.coach-hero-rating-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.coach-hero-description {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.coach-hero-actions {
+  margin-top: 0.5rem;
+}
+
+.coach-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.coach-stat-card {
+  background: var(--card-bg, #1e1e1e);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.coach-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.coach-stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #999);
+}
+
+.coach-stat-clickable {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.coach-stat-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modal-lg {
+  max-width: 640px;
+}
+
+.coach-achievement-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.coach-achievement-modal-item {
+  display: flex;
+  gap: 1rem;
+  background: var(--bg, #121212);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.coach-achievement-modal-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.coach-public-section {
+  margin-bottom: 2rem;
+}
+
+.coach-public-section h2 {
+  margin-bottom: 1rem;
+}
+
+.coach-section-count {
+  color: var(--text-secondary);
+  font-weight: normal;
+  font-size: 0.9rem;
+}
+
+.coach-achievement-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.coach-achievement-item {
+  background: var(--card-bg, #1e1e1e);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.coach-achievement-img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.coach-achievement-body {
+  padding: 1rem;
+}
+
+.coach-achievement-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.coach-achievement-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.coach-achievement-extra {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.coach-rating-form-card {
+  background: var(--card-bg, #1e1e1e);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.coach-rating-form-card h3 {
+  margin: 0 0 1rem;
+}
+
+.coach-rating-hint {
+  color: var(--text-secondary, #999);
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.coach-rating-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.coach-reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.coach-review-card {
+  background: var(--card-bg, #1e1e1e);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.coach-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.coach-review-score {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.coach-review-comment {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
 }
 

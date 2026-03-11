@@ -4,13 +4,14 @@ import { listStudents, listAssignedWorkouts } from "../api/coach";
 import { createInvitation, listInvitations, cancelInvitation } from "../api/invitations";
 import type { Student, AssignedWorkout, Invitation } from "../types";
 import { useTranslation } from "react-i18next";
+import { useFeedback } from "../context/FeedbackContext";
 
 export default function CoachDashboard() {
   const { t } = useTranslation();
+  const { showSuccess, showError } = useFeedback();
   const [students, setStudents] = useState<Student[]>([]);
   const [assignedWorkouts, setAssignedWorkouts] = useState<AssignedWorkout[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [adding, setAdding] = useState(false);
@@ -34,7 +35,7 @@ export default function CoachDashboard() {
       setAssignedWorkouts(Array.isArray(raw) ? raw : raw.data);
       setPendingInvitations(invRes.data);
     } catch {
-      setError("Failed to load dashboard data.");
+      showError("Failed to load dashboard data.");
     } finally {
       setLoading(false);
     }
@@ -44,15 +45,15 @@ export default function CoachDashboard() {
     e.preventDefault();
     if (!newEmail.trim()) return;
     setAdding(true);
-    setError("");
     try {
       await createInvitation({ type: 'coach_invite', receiver_email: newEmail.trim(), message: newMessage.trim() || undefined });
+      showSuccess(t('invitation_sent'));
       setNewEmail("");
       setNewMessage("");
       setShowAddForm(false);
       loadData();
     } catch {
-      setError(t('error'));
+      showError(t('error'));
     } finally {
       setAdding(false);
     }
@@ -61,9 +62,10 @@ export default function CoachDashboard() {
   async function handleCancelInvitation(id: number) {
     try {
       await cancelInvitation(id);
+      showSuccess(t('invitation_cancelled'));
       setPendingInvitations((prev) => prev.filter((i) => i.id !== id));
     } catch {
-      setError(t('error'));
+      showError(t('error'));
     }
   }
 
@@ -74,8 +76,6 @@ export default function CoachDashboard() {
   return (
     <div className="page coach-dashboard">
       <h1>{t('coach_dashboard')}</h1>
-
-      {error && <div className="error">{error}</div>}
 
       <div className="coach-stats">
         <div className="coach-stat-card">

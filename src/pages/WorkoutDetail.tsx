@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { getWorkout, deleteWorkout } from "../api/workouts";
 import type { Workout } from "../types";
 import { useTranslation } from "react-i18next";
+import { useFeedback } from "../context/FeedbackContext";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -13,8 +14,10 @@ function formatDuration(seconds: number): string {
 
 export default function WorkoutDetail() {
   const { t } = useTranslation();
+  const { showSuccess, showError } = useFeedback();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const workoutId = Number(id);
 
   const TYPE_LABELS: Record<string, string> = {
@@ -28,7 +31,16 @@ export default function WorkoutDetail() {
 
   const [workout, setWorkout] = useState<Workout | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
+  const feedbackShown = useRef(false);
+  useEffect(() => {
+    const state = location.state as { feedback?: string } | null;
+    if (state?.feedback && !feedbackShown.current) {
+      feedbackShown.current = true;
+      showSuccess(state.feedback);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   useEffect(() => {
     loadData();
@@ -40,7 +52,7 @@ export default function WorkoutDetail() {
       const w = await getWorkout(workoutId);
       setWorkout(w);
     } catch {
-      setError("Failed to load run.");
+      showError("Failed to load run.");
     } finally {
       setLoading(false);
     }
@@ -52,12 +64,11 @@ export default function WorkoutDetail() {
       await deleteWorkout(workoutId);
       navigate("/");
     } catch {
-      setError("Failed to delete run.");
+      showError("Failed to delete run.");
     }
   }
 
   if (loading) return <div className="loading">{t('loading')}</div>;
-  if (error) return <div className="error">{error}</div>;
   if (!workout) return <div className="error">{t('error')}</div>;
 
   return (
@@ -109,6 +120,12 @@ export default function WorkoutDetail() {
             <div className="detail-item detail-heart-rate">
               <span className="detail-label">{t('field_heart_rate')}</span>
               <span className="detail-value">{workout.avg_heart_rate} {t('field_heart_rate_unit')}</span>
+            </div>
+          )}
+          {workout.feeling != null && (
+            <div className="detail-item">
+              <span className="detail-label">{t('workout_feeling')}</span>
+              <span className="detail-value">{workout.feeling}/10</span>
             </div>
           )}
         </div>

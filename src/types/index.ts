@@ -8,6 +8,7 @@ export interface Workout {
   avg_pace: string;
   calories: number;
   avg_heart_rate: number;
+  feeling: number | null;
   type: 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'other';
   notes: string;
   created_at: string;
@@ -60,6 +61,8 @@ export interface AssignedWorkout {
   result_distance_km: number | null;
   result_heart_rate: number | null;
   result_feeling: number | null;
+  image_file_id: number | null;
+  image_url: string | null;
   status: 'pending' | 'completed' | 'skipped';
   due_date: string;
   created_at: string;
@@ -95,6 +98,9 @@ export interface CoachAchievement {
   result_time: string;
   position: number;
   extra_info: string;
+  image_file_id: number | null;
+  image_url: string | null;
+  is_public: boolean;
   is_verified: boolean;
   rejection_reason: string;
   verified_by: number;
@@ -132,6 +138,9 @@ export interface CoachPublicProfile {
   coach_description: string;
   avg_rating: number;
   rating_count: number;
+  student_count: number;
+  verified_achievement_count: number;
+  is_my_coach: boolean;
   achievements: CoachAchievement[];
   ratings: CoachRating[];
 }
@@ -162,6 +171,8 @@ export interface PendingAchievement {
   result_time: string;
   position: number;
   extra_info: string;
+  image_file_id: number | null;
+  image_url: string | null;
   created_at: string;
   coach_name: string;
 }
@@ -209,4 +220,14 @@ export interface NotificationPreferences {
   user_id: number;
   workout_assigned: boolean;
   workout_completed_or_skipped: boolean;
+}
+
+export interface FileResponse {
+  id: number;
+  uuid: string;
+  original_name: string;
+  content_type: string;
+  size_bytes: number;
+  url: string;
+  created_at: string;
 }

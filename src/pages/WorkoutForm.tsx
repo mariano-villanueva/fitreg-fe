@@ -2,11 +2,15 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getWorkout, createWorkout, updateWorkout } from "../api/workouts";
 import { useTranslation } from "react-i18next";
+import { useFeedback } from "../context/FeedbackContext";
+import SegmentBuilder from "../components/SegmentBuilder";
+import type { WorkoutSegment } from "../types";
 
-type RunType = 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'other';
+type RunType = 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'fartlek' | 'other';
 
 export default function WorkoutForm() {
   const { t } = useTranslation();
+  const { showError } = useFeedback();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
@@ -17,20 +21,28 @@ export default function WorkoutForm() {
     { value: "intervals", label: t('type_intervals') },
     { value: "long_run", label: t('type_long_run') },
     { value: "race", label: t('type_race') },
+    { value: "fartlek", label: t('type_fartlek') },
     { value: "other", label: t('type_other') },
   ];
 
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  // Basic info
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [type, setType] = useState<RunType>("easy");
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [notes, setNotes] = useState("");
+  const [segments, setSegments] = useState<WorkoutSegment[]>([]);
+
+  // Results
   const [distanceKm, setDistanceKm] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [calories, setCalories] = useState(0);
   const [avgHeartRate, setAvgHeartRate] = useState(0);
-  const [notes, setNotes] = useState("");
+  const [feeling, setFeeling] = useState<number | null>(null);
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const durationSeconds = useMemo(
     () => hours * 3600 + minutes * 60 + seconds,
@@ -56,7 +68,7 @@ export default function WorkoutForm() {
       setLoading(true);
       const workout = await getWorkout(workoutId);
       setDate(workout.date.slice(0, 10));
-      setType(workout.type);
+      setType(workout.type as RunType);
       setDistanceKm(workout.distance_km);
       const total = workout.duration_seconds;
       setHours(Math.floor(total / 3600));
@@ -64,9 +76,10 @@ export default function WorkoutForm() {
       setSeconds(total % 60);
       setCalories(workout.calories);
       setAvgHeartRate(workout.avg_heart_rate || 0);
+      setFeeling(workout.feeling);
       setNotes(workout.notes);
     } catch {
-      setError("Failed to load run.");
+      showError("Failed to load workout.");
     } finally {
       setLoading(false);
     }
@@ -74,7 +87,6 @@ export default function WorkoutForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
 
     const payload = {
       date,
@@ -83,19 +95,20 @@ export default function WorkoutForm() {
       duration_seconds: durationSeconds,
       calories,
       avg_heart_rate: avgHeartRate,
+      feeling: feeling,
       notes,
     };
 
     try {
       if (isEdit && id) {
         await updateWorkout(Number(id), payload);
-        navigate(`/workouts/${id}`);
+        navigate(`/workouts/${id}`, { state: { feedback: t('workout_saved') } });
       } else {
         const workout = await createWorkout(payload);
-        navigate(`/workouts/${workout.id}`);
+        navigate(`/workouts/${workout.id}`, { state: { feedback: t('workout_created') } });
       }
     } catch {
-      setError("Failed to save run.");
+      showError("Failed to save workout.");
     }
   }
 
@@ -108,9 +121,8 @@ export default function WorkoutForm() {
       </Link>
       <h1>{isEdit ? t('form_edit_title') : t('form_new_title')}</h1>
 
-      {error && <div className="error">{error}</div>}
-
       <form className="workout-form" onSubmit={handleSubmit}>
+        {/* Basic info section */}
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="workout-date">{t('field_date')}</label>
@@ -139,6 +151,22 @@ export default function WorkoutForm() {
         </div>
 
         <div className="form-group">
+          <label htmlFor="workout-notes">{t('field_notes')}</label>
+          <textarea
+            id="workout-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+          />
+        </div>
+
+        {/* Workout structure */}
+        <SegmentBuilder segments={segments} onChange={setSegments} />
+
+        {/* Results section */}
+        <h3>{t('workout_results_title')}</h3>
+
+        <div className="form-group">
           <label htmlFor="workout-distance">{t('field_distance')}</label>
           <input
             id="workout-distance"
@@ -147,7 +175,6 @@ export default function WorkoutForm() {
             step={0.01}
             value={distanceKm}
             onChange={(e) => setDistanceKm(Number(e.target.value))}
-            required
           />
         </div>
 
@@ -187,46 +214,48 @@ export default function WorkoutForm() {
         </div>
 
         <div className="form-group">
-          <label>{t('field_pace')} (calculated)</label>
+          <label>{t('field_pace')}</label>
           <div className="pace-display">{avgPace}</div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="workout-calories">{t('field_calories')}</label>
-          <input
-            id="workout-calories"
-            type="number"
-            min={0}
-            value={calories}
-            onChange={(e) => setCalories(Number(e.target.value))}
-          />
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="workout-calories">{t('field_calories')}</label>
+            <input
+              id="workout-calories"
+              type="number"
+              min={0}
+              value={calories}
+              onChange={(e) => setCalories(Number(e.target.value))}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="workout-heart-rate">{t('field_heart_rate')} ({t('field_heart_rate_unit')})</label>
+            <input
+              id="workout-heart-rate"
+              type="number"
+              min={0}
+              max={250}
+              value={avgHeartRate}
+              onChange={(e) => setAvgHeartRate(Number(e.target.value))}
+            />
+          </div>
         </div>
 
         <div className="form-group">
-          <label htmlFor="workout-heart-rate">{t('field_heart_rate')} ({t('field_heart_rate_unit')})</label>
+          <label>{t('workout_feeling')}: <strong>{feeling != null ? `${feeling}/10` : '—'}</strong></label>
           <input
-            id="workout-heart-rate"
-            type="number"
-            min={0}
-            max={250}
-            value={avgHeartRate}
-            onChange={(e) => setAvgHeartRate(Number(e.target.value))}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="workout-notes">{t('field_notes')}</label>
-          <textarea
-            id="workout-notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={4}
+            type="range"
+            min={1}
+            max={10}
+            value={feeling ?? 5}
+            onChange={(e) => setFeeling(Number(e.target.value))}
           />
         </div>
 
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">
-            {isEdit ? t('form_save') : t('form_save')}
+            {t('form_save')}
           </button>
           <Link
             to={isEdit && id ? `/workouts/${id}` : "/"}

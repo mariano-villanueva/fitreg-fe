@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useFeedback } from "../context/FeedbackContext";
 import { updateProfile, requestCoach, getCoachRequestStatus } from "../api/auth";
 import { getNotificationPreferences, updateNotificationPreferences } from "../api/notifications";
 import { useTranslation } from "react-i18next";
@@ -8,6 +9,7 @@ import type { NotificationPreferences } from "../types";
 export default function Profile() {
   const { user, setUser } = useAuth();
   const { t, i18n } = useTranslation();
+  const { showSuccess, showError } = useFeedback();
 
   const [name, setName] = useState(user?.name ?? "");
   const [sex, setSex] = useState(user?.sex ?? "");
@@ -16,8 +18,6 @@ export default function Profile() {
   const [heightCm, setHeightCm] = useState(user?.height_cm ?? 0);
   const [language, setLanguage] = useState(user?.language ?? "es");
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences | null>(null);
   const [coachRequestStatus, setCoachRequestStatus] = useState<'none' | 'pending' | 'approved'>('none');
   const [showCoachModal, setShowCoachModal] = useState(false);
@@ -43,24 +43,24 @@ export default function Profile() {
         workout_assigned: updated.workout_assigned,
         workout_completed_or_skipped: updated.workout_completed_or_skipped,
       });
+      showSuccess(t('preferences_saved'));
     } catch {
+      showError(t('error'));
       setNotifPrefs(notifPrefs);
     }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
     setSaving(true);
 
     try {
       const res = await updateProfile({ name, sex, birth_date: birthDate, weight_kg: weightKg, height_cm: heightCm, language, onboarding_completed: user?.onboarding_completed ?? true });
       setUser(res.data);
       i18n.changeLanguage(language);
-      setSuccess(t('profile_saved'));
+      showSuccess(t('profile_saved'));
     } catch {
-      setError("Failed to update profile.");
+      showError("Failed to update profile.");
     } finally {
       setSaving(false);
     }
@@ -77,10 +77,11 @@ export default function Profile() {
     setRequestingCoach(true);
     try {
       await requestCoach({ locality: coachLocality.trim(), level: coachLevels });
+      showSuccess(t('coach_request_sent'));
       setCoachRequestStatus('pending');
       setShowCoachModal(false);
     } catch {
-      setError(t('error'));
+      showError(t('error'));
     } finally {
       setRequestingCoach(false);
     }
@@ -99,9 +100,6 @@ export default function Profile() {
           <p className="profile-email">{user.email}</p>
         </div>
       </div>
-
-      {error && <div className="error">{error}</div>}
-      {success && <div className="success">{success}</div>}
 
       <form className="workout-form" onSubmit={handleSubmit}>
         <div className="form-group">

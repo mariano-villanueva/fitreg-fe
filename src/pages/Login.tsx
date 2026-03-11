@@ -1,19 +1,19 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { googleLogin } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
+import { useFeedback } from "../context/FeedbackContext";
 import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { t } = useTranslation();
-  const [error, setError] = useState("");
+  const { showError } = useFeedback();
 
   async function handleGoogleSuccess(credentialResponse: { credential?: string }) {
     if (!credentialResponse.credential) {
-      setError("Google login failed. No credential received.");
+      showError("Google login failed. No credential received.");
       return;
     }
 
@@ -22,7 +22,7 @@ export default function Login() {
       login(res.data.token, res.data.user);
       navigate("/");
     } catch {
-      setError("Login failed. Please try again.");
+      showError("Login failed. Please try again.");
     }
   }
 
@@ -36,11 +36,10 @@ export default function Login() {
         <p className="login-description">
           {t('login_feature_1')}. {t('login_feature_2')}. {t('login_feature_3')}.
         </p>
-        {error && <div className="error">{error}</div>}
         <div className="login-button-wrapper">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
-            onError={() => setError("Google login failed.")}
+            onError={() => showError("Google login failed.")}
             theme="filled_black"
             size="large"
             width="300"

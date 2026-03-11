@@ -1,32 +1,31 @@
-import { useState, useEffect } from "react";
-import { getPendingAchievements, verifyAchievement, rejectAchievement } from "../api/admin";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { getPendingAchievements } from "../api/admin";
 import { useTranslation } from "react-i18next";
+import { useFeedback } from "../context/FeedbackContext";
 import type { PendingAchievement } from "../types";
 
 export default function AdminAchievements() {
   const { t } = useTranslation();
+  const { showSuccess } = useFeedback();
+  const location = useLocation();
   const [achievements, setAchievements] = useState<PendingAchievement[]>([]);
-  const [rejectId, setRejectId] = useState<number | null>(null);
-  const [rejectReason, setRejectReason] = useState("");
+
+  const feedbackShown = useRef(false);
+  useEffect(() => {
+    const state = location.state as { feedback?: string } | null;
+    if (state?.feedback && !feedbackShown.current) {
+      feedbackShown.current = true;
+      showSuccess(state.feedback);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   useEffect(() => { loadAchievements(); }, []);
 
   async function loadAchievements() {
     try { const res = await getPendingAchievements(); setAchievements(res.data); }
     catch { setAchievements([]); }
-  }
-
-  async function handleVerify(id: number) {
-    await verifyAchievement(id);
-    loadAchievements();
-  }
-
-  async function handleRejectConfirm() {
-    if (rejectId === null) return;
-    await rejectAchievement(rejectId, rejectReason);
-    setRejectId(null);
-    setRejectReason("");
-    loadAchievements();
   }
 
   return (
@@ -43,8 +42,6 @@ export default function AdminAchievements() {
               <th>{t('achievement_event_date')}</th>
               <th>{t('achievement_distance')}</th>
               <th>{t('achievement_result_time')}</th>
-              <th>{t('achievement_position')}</th>
-              <th>{t('achievement_extra_info')}</th>
               <th></th>
             </tr>
           </thead>
@@ -56,41 +53,15 @@ export default function AdminAchievements() {
                 <td>{a.event_date}</td>
                 <td>{a.distance_km > 0 ? `${a.distance_km} km` : '—'}</td>
                 <td>{a.result_time || '—'}</td>
-                <td>{a.position > 0 ? `#${a.position}` : '—'}</td>
-                <td className="achievement-extra-info-cell">{a.extra_info || '—'}</td>
                 <td>
-                  <div className="achievement-actions">
-                    <button className="btn btn-primary btn-sm" onClick={() => handleVerify(a.id)}>{t('admin_verify')}</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => { setRejectId(a.id); setRejectReason(""); }}>{t('admin_reject')}</button>
-                  </div>
+                  <Link to={`/admin/achievements/${a.id}`} className="btn btn-primary btn-sm">
+                    {t('admin_review_achievement')}
+                  </Link>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      )}
-
-      {rejectId !== null && (
-        <div className="modal-overlay" onClick={() => setRejectId(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{t('admin_reject')}</h3>
-            <div className="form-group">
-              <label>{t('admin_reject_reason')}</label>
-              <textarea
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value.slice(0, 200))}
-                rows={3}
-                placeholder={t('admin_reject_reason_placeholder')}
-                maxLength={200}
-              />
-              <small style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{rejectReason.length}/200</small>
-            </div>
-            <div className="form-actions">
-              <button className="btn" onClick={() => setRejectId(null)}>{t('form_cancel')}</button>
-              <button className="btn btn-danger" onClick={handleRejectConfirm}>{t('admin_reject_confirm')}</button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { getMyAssignedWorkouts, updateAssignedWorkoutStatus } from "../api/coach";
 import { listWorkouts } from "../api/workouts";
-import type { AssignedWorkout, Workout } from "../types";
+import type { AssignedWorkout, Workout, FileResponse } from "../types";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
+import { useFeedback } from "../context/FeedbackContext";
 import SegmentDisplay from "../components/SegmentDisplay";
+import ImageUpload from "../components/ImageUpload";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -17,6 +19,8 @@ function formatDuration(seconds: number): string {
 export default function AthleteHome() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { showSuccess, showError, showWarning } = useFeedback();
+  const location = useLocation();
   const [nextWorkout, setNextWorkout] = useState<AssignedWorkout | null>(null);
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
@@ -29,7 +33,7 @@ export default function AthleteHome() {
   const [resultDistance, setResultDistance] = useState("");
   const [distanceUnit, setDistanceUnit] = useState<'km' | 'm'>('km');
   const [resultHeartRate, setResultHeartRate] = useState("");
-  const [error, setError] = useState("");
+  const [resultImage, setResultImage] = useState<FileResponse | null>(null);
 
   const TYPE_LABELS: Record<string, string> = {
     easy: t('type_easy'),
@@ -40,6 +44,16 @@ export default function AthleteHome() {
     fartlek: t('type_fartlek'),
     other: t('type_other'),
   };
+
+  const feedbackShown = useRef(false);
+  useEffect(() => {
+    const state = location.state as { feedback?: string } | null;
+    if (state?.feedback && !feedbackShown.current) {
+      feedbackShown.current = true;
+      showSuccess(state.feedback);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   useEffect(() => {
     loadData();
@@ -91,7 +105,7 @@ export default function AthleteHome() {
     setTimeH(""); setTimeM(""); setTimeS("");
     setResultDistance(""); setDistanceUnit('km');
     setResultHeartRate("");
-    setError("");
+    setResultImage(null);
     setConfirmModal({ status, workout });
   }
 
@@ -117,22 +131,23 @@ export default function AthleteHome() {
 
     if (status === 'completed') {
       if (resultFeeling < 1) {
-        setError(t('assigned_feeling_required'));
+        showWarning(t('assigned_feeling_required'));
         return;
       }
       data.result_feeling = resultFeeling;
       if (fields.includes('time')) data.result_time_seconds = getTimeSeconds();
       if (fields.includes('distance')) data.result_distance_km = getDistanceKm();
       if (fields.includes('heart_rate') && resultHeartRate) data.result_heart_rate = Number(resultHeartRate);
+      if (resultImage) data.image_file_id = resultImage.id;
     }
 
     try {
       await updateAssignedWorkoutStatus(workout.id, data as Parameters<typeof updateAssignedWorkoutStatus>[1]);
+      showSuccess(t('assigned_status_updated'));
       setConfirmModal(null);
-      setError("");
       await loadData();
     } catch {
-      setError("Failed to update status.");
+      showError("Failed to update status.");
     }
   }
 
@@ -193,14 +208,14 @@ export default function AthleteHome() {
       {pendingCount > 0 && (
         <section className="home-section">
           <div className="home-stats">
-            <div className="home-stat-card">
+            <Link to="/my-assignments" className="home-stat-card">
               <span className="home-stat-value">{pendingCount}</span>
               <span className="home-stat-label">{t('home_pending_workouts')}</span>
-            </div>
-            <div className="home-stat-card">
+            </Link>
+            <Link to="/workouts" className="home-stat-card">
               <span className="home-stat-value">{recentWorkouts.length}</span>
               <span className="home-stat-label">{t('home_recent_workouts')}</span>
-            </div>
+            </Link>
           </div>
         </section>
       )}
@@ -251,8 +266,6 @@ export default function AthleteHome() {
               <h3>{confirmModal.status === 'completed' ? t('assigned_confirm_complete_title') : t('assigned_confirm_skip_title')}</h3>
               <p>{confirmModal.status === 'completed' ? t('assigned_confirm_complete_msg') : t('assigned_confirm_skip_msg')}</p>
 
-              {error && <div className="error" style={{ marginBottom: '1rem' }}>{error}</div>}
-
               {confirmModal.status === 'completed' && (
                 <div className="modal-result-fields">
                   {fields.includes('time') && (
@@ -300,6 +313,10 @@ export default function AthleteHome() {
                         >{v}</button>
                       ))}
                     </div>
+                  </div>
+                  <div className="form-group">
+                    <label>{t('workout_image')}</label>
+                    <ImageUpload value={resultImage} onChange={setResultImage} />
                   </div>
                 </div>
               )}

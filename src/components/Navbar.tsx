@@ -1,55 +1,43 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useRole } from "../context/RoleContext";
 import { useTranslation } from "react-i18next";
-import RoleSwitcher from "./RoleSwitcher";
 import NotificationBadge from "./NotificationBadge";
+import Sidebar from "./Sidebar";
 
 export default function Navbar() {
-  const { isAuthenticated, user, logout } = useAuth();
-  const { isCoachMode } = useRole();
+  const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">
-        <Link to="/">{t('app_name')}</Link>
-      </div>
-      {isAuthenticated ? (
-        <div className="navbar-links">
-          {user?.is_coach && <RoleSwitcher />}
-          {user?.is_admin && <Link to="/admin">{t('admin_title')}</Link>}
-          {isCoachMode ? (
-            <>
-              <Link to="/">{t('coach_dashboard')}</Link>
-              <Link to="/coach/profile">{t('coach_profile_title')}</Link>
-              <Link to="/coaches">{t('coach_directory')}</Link>
-            </>
-          ) : (
-            <>
-              <Link to="/">{t('home_title')}</Link>
-              <Link to="/workouts">{t('workouts_title')}</Link>
-              <Link to="/workouts/new">{t('workouts_new')}</Link>
-              <Link to="/my-assignments">{t('assigned_my')}</Link>
-              <Link to="/coaches">{t('coach_directory')}</Link>
-            </>
+    <>
+      <nav className="navbar">
+        <div className="navbar-left">
+          {isAuthenticated && (
+            <button className="navbar-hamburger" onClick={() => setSidebarOpen(true)} aria-label="Menu">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
           )}
-          <NotificationBadge />
-          <Link to="/profile" className="navbar-user">
-            {user?.avatar_url && (
-              <img src={user.avatar_url} alt="" className="navbar-avatar" />
-            )}
-            <span>{user?.name}</span>
-          </Link>
-          <button className="btn btn-sm" onClick={logout}>
-            {t('logout')}
-          </button>
+          <Link to="/" className="navbar-brand-link">{t('app_name')}</Link>
         </div>
-      ) : (
-        <div className="navbar-links">
-          <span className="navbar-tagline">{t('app_tagline')}</span>
-        </div>
+        {isAuthenticated ? (
+          <div className="navbar-right">
+            <NotificationBadge />
+          </div>
+        ) : (
+          <div className="navbar-right">
+            <span className="navbar-tagline">{t('app_tagline')}</span>
+          </div>
+        )}
+      </nav>
+      {isAuthenticated && (
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       )}
-    </nav>
+    </>
   );
 }

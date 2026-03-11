@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { listAdminUsers, updateAdminUser } from "../api/admin";
 import { useTranslation } from "react-i18next";
+import { useFeedback } from "../context/FeedbackContext";
 import type { AdminUser } from "../types";
 
 export default function AdminUsers() {
   const { t } = useTranslation();
+  const { showSuccess, showError } = useFeedback();
   const [users, setUsers] = useState<AdminUser[]>([]);
 
   useEffect(() => { loadUsers(); }, []);
@@ -15,8 +17,11 @@ export default function AdminUsers() {
   }
 
   async function toggleRole(userId: number, field: 'is_coach' | 'is_admin', currentValue: boolean) {
-    await updateAdminUser(userId, { [field]: !currentValue });
-    loadUsers();
+    try {
+      await updateAdminUser(userId, { [field]: !currentValue });
+      showSuccess(t('role_updated'));
+      loadUsers();
+    } catch { showError(t('error')); }
   }
 
   return (
