@@ -26,8 +26,6 @@ export default function WorkoutForm() {
   ];
 
   // Basic info
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [type, setType] = useState<RunType>("easy");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState("");

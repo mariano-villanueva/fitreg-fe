@@ -47,7 +47,7 @@ export default function CoachDashboard() {
     setAdding(true);
     try {
       await createInvitation({ type: 'coach_invite', receiver_email: newEmail.trim(), message: newMessage.trim() || undefined });
-      showSuccess(t('invitation_sent'));
+      showSuccess(t('invitation_sent_success'));
       setNewEmail("");
       setNewMessage("");
       setShowAddForm(false);
@@ -62,7 +62,7 @@ export default function CoachDashboard() {
   async function handleCancelInvitation(id: number) {
     try {
       await cancelInvitation(id);
-      showSuccess(t('invitation_cancelled'));
+      showSuccess(t('invitation_cancelled_success'));
       setPendingInvitations((prev) => prev.filter((i) => i.id !== id));
     } catch {
       showError(t('error'));
