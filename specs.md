@@ -114,7 +114,7 @@ interface User {
   weight_kg: number; height_cm: number; language: string;
   is_coach: boolean; is_admin: boolean;
   coach_description: string; coach_public: boolean;
-  onboarding_completed: boolean;
+  onboarding_completed: boolean; has_coach: boolean;
   created_at: string; updated_at: string;
 }
 ```
@@ -203,7 +203,7 @@ Student, WorkoutSegment, CoachAchievement, CoachRating, CoachPublicProfile, Admi
 - `googleLogin(credential)` → POST /auth/google → AuthResponse
 - `getMe()` → GET /me → User
 - `updateProfile(data)` → PUT /me → User (no is_coach field)
-- `requestCoach({ locality, level })` → POST /coach-request
+- `requestCoach({ locality, level: string[] })` → POST /coach-request (level is array of selected levels)
 - `getCoachRequestStatus()` → GET /coach-request → `{ status }`
 
 ### Workouts API (workouts.ts)
@@ -266,7 +266,7 @@ Student, WorkoutSegment, CoachAchievement, CoachRating, CoachPublicProfile, Admi
 - **State:** user, token, isAuthenticated
 - **Methods:** login(token, user), logout(), setUser(user)
 - **Persistence:** localStorage (token, user)
-- **Behavior:** Auto-loads user on mount via getMe(), syncs i18n language from user preference, redirects to /onboarding if not completed
+- **Behavior:** Auto-loads user on mount via getMe(), syncs i18n language from user preference, redirects to /onboarding if not completed. User object includes `has_coach` (computed by backend from coach_students table).
 - **Hook:** `useAuth()`
 
 ### RoleContext
@@ -324,8 +324,8 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 
 ### Navbar
 - Role-aware: shows different links for athlete vs coach
-- Athlete links: Home, Workouts, Log Workout, Assignments, Coaches
-- Coach links: Home (Coach Dashboard), My Coach Profile, Coaches
+- Athlete links: Home, Entrenamientos, Registrar Entrenamiento, Asignaciones, Entrenadores
+- Coach links: Home (Coach Dashboard), Mi Perfil Coach, Entrenadores
 - Admin link: Admin (visible only if user.is_admin)
 - NotificationBadge: shows unread count, links to /notifications
 - Shows RoleSwitcher if user.is_coach is true
@@ -345,7 +345,8 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 - Standard profile fields (name, sex, birth_date, weight, height, language)
 - Coach request section:
   - If not coach and no request: green "Quiero ser entrenador" button → opens modal
-  - Modal asks for locality (text) and training level (select: beginner/intermediate/advanced/competitive)
+  - Modal asks for locality (text) and training levels (checkboxes: beginner/intermediate/advanced/competitive — multiple allowed)
+  - Sends `level` as `string[]` to API
   - If pending: yellow badge "Solicitud pendiente de aprobación"
   - If approved: green badge "Sos entrenador"
 - Notification preferences section
@@ -360,11 +361,13 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 - Displays last 3 personal workouts (links to detail, edit/delete hidden for assigned)
 
 ### MyAssignedWorkouts
+- Always accessible from nav (handles empty state gracefully — shows "no assignments" instead of error)
 - Split into pending (cards) and finished (table) sections
 - Table columns: Title, Type, Date, Status, Feeling, Detail link
 - Detail modal with full workout info + results section when completed
 - Completion modal: feeling always visible with required marker
 - Reloads all data after status update (not partial merge)
+- If API fails (e.g. network error), silently shows empty state instead of error message
 
 ### StudentWorkouts (Coach view)
 - Pending: max 4 cards + "Ver más (N)" button that reveals full table
@@ -376,7 +379,8 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 - Does NOT auto-load coaches on page load — shows hint message
 - Filters: search (name + description), locality, level, sort order
 - Sort options: best rated (default), alphabetical, newest, oldest
-- Results shown as list (not cards): avatar, name, level badge, locality, description, star rating
+- Results shown as list (not cards): avatar, name, level badges (multiple per coach), locality, description, star rating
+- Level badges split from comma-separated `coach_level` string (e.g. "beginner,advanced" → 2 badges)
 - Paginated (12/page)
 
 ### WorkoutDetail
