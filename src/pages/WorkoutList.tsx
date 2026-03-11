@@ -53,7 +53,6 @@ export default function WorkoutList() {
   }
 
   if (loading) return <div className="loading">{t('loading')}</div>;
-  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="page">
@@ -63,6 +62,8 @@ export default function WorkoutList() {
           + {t('workouts_new')}
         </Link>
       </div>
+
+      {error && <div className="error">{error}</div>}
 
       {workouts.length === 0 ? (
         <div className="empty-state">

@@ -46,7 +46,7 @@ export default function MyAssignedWorkouts() {
       const res = await getMyAssignedWorkouts();
       setWorkouts(res.data);
     } catch {
-      setError("Failed to load assigned workouts.");
+      setWorkouts([]);
     } finally {
       setLoading(false);
     }
