@@ -30,7 +30,8 @@ export default function CoachDashboard() {
         listInvitations({ status: 'pending', direction: 'sent' }),
       ]);
       setStudents(studentsRes.data);
-      setAssignedWorkouts(assignedRes.data);
+      const raw = assignedRes.data;
+      setAssignedWorkouts(Array.isArray(raw) ? raw : raw.data);
       setPendingInvitations(invRes.data);
     } catch {
       setError("Failed to load dashboard data.");
