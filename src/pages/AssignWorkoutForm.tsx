@@ -3,7 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { createAssignedWorkout, getAssignedWorkout, updateAssignedWorkout } from "../api/coach";
 import { useTranslation } from "react-i18next";
 import SegmentBuilder from "../components/SegmentBuilder";
-import type { WorkoutSegment } from "../types";
+import type { WorkoutSegment, ExpectedField } from "../types";
+
+const EXPECTED_FIELD_OPTIONS: ExpectedField[] = ['time', 'distance', 'heart_rate', 'feeling'];
 
 export default function AssignWorkoutForm() {
   const { studentId, id } = useParams<{ studentId?: string; id?: string }>();
@@ -17,6 +19,7 @@ export default function AssignWorkoutForm() {
   const [segments, setSegments] = useState<WorkoutSegment[]>([]);
   const [dueDate, setDueDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [expectedFields, setExpectedFields] = useState<ExpectedField[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -42,6 +45,9 @@ export default function AssignWorkoutForm() {
       if (aw.segments && aw.segments.length > 0) {
         setSegments(aw.segments);
       }
+      if (aw.expected_fields) {
+        setExpectedFields(aw.expected_fields);
+      }
     } catch {
       setError("Failed to load workout.");
     } finally {
@@ -62,6 +68,7 @@ export default function AssignWorkoutForm() {
       distance_km: 0,
       duration_seconds: 0,
       notes,
+      expected_fields: expectedFields,
       due_date: dueDate,
       segments,
     };
@@ -148,6 +155,27 @@ export default function AssignWorkoutForm() {
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
           />
+        </div>
+
+        <div className="form-group">
+          <label><strong>{t('expected_fields_label')}</strong></label>
+          <p className="form-hint">{t('expected_fields_hint')}</p>
+          {EXPECTED_FIELD_OPTIONS.map((field) => (
+            <label key={field} className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={expectedFields.includes(field)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setExpectedFields([...expectedFields, field]);
+                  } else {
+                    setExpectedFields(expectedFields.filter((f) => f !== field));
+                  }
+                }}
+              />
+              <span>{t(`expected_field_${field}`)}</span>
+            </label>
+          ))}
         </div>
 
         <div className="form-actions">

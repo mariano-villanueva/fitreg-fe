@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { listStudents, addStudent, removeStudent, listAssignedWorkouts } from "../api/coach";
-import type { Student, AssignedWorkout } from "../types";
+import { listStudents, listAssignedWorkouts } from "../api/coach";
+import { createInvitation, listInvitations, cancelInvitation } from "../api/invitations";
+import type { Student, AssignedWorkout, Invitation } from "../types";
 import { useTranslation } from "react-i18next";
 
 export default function CoachDashboard() {
@@ -13,6 +14,8 @@ export default function CoachDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [adding, setAdding] = useState(false);
+  const [pendingInvitations, setPendingInvitations] = useState<Invitation[]>([]);
+  const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
     loadData();
@@ -21,12 +24,15 @@ export default function CoachDashboard() {
   async function loadData() {
     try {
       setLoading(true);
-      const [studentsRes, assignedRes] = await Promise.all([
+      const [studentsRes, assignedRes, invRes] = await Promise.all([
         listStudents(),
         listAssignedWorkouts(),
+        listInvitations({ status: 'pending', direction: 'sent' }),
       ]);
       setStudents(studentsRes.data);
-      setAssignedWorkouts(assignedRes.data);
+      const raw = assignedRes.data;
+      setAssignedWorkouts(Array.isArray(raw) ? raw : raw.data);
+      setPendingInvitations(invRes.data);
     } catch {
       setError("Failed to load dashboard data.");
     } finally {
@@ -34,30 +40,30 @@ export default function CoachDashboard() {
     }
   }
 
-  async function handleAddStudent(e: React.FormEvent) {
+  async function handleInvite(e: React.FormEvent) {
     e.preventDefault();
     if (!newEmail.trim()) return;
     setAdding(true);
     setError("");
     try {
-      const res = await addStudent(newEmail.trim());
-      setStudents((prev) => [...prev, res.data]);
+      await createInvitation({ type: 'coach_invite', receiver_email: newEmail.trim(), message: newMessage.trim() || undefined });
       setNewEmail("");
+      setNewMessage("");
       setShowAddForm(false);
+      loadData();
     } catch {
-      setError("Failed to add student.");
+      setError(t('error'));
     } finally {
       setAdding(false);
     }
   }
 
-  async function handleRemoveStudent(studentId: number) {
-    if (!confirm(t('coach_remove_student'))) return;
+  async function handleCancelInvitation(id: number) {
     try {
-      await removeStudent(studentId);
-      setStudents((prev) => prev.filter((s) => s.id !== studentId));
+      await cancelInvitation(id);
+      setPendingInvitations((prev) => prev.filter((i) => i.id !== id));
     } catch {
-      setError("Failed to remove student.");
+      setError(t('error'));
     }
   }
 
@@ -86,12 +92,12 @@ export default function CoachDashboard() {
         <div className="coach-section-header">
           <h2>{t('coach_students')}</h2>
           <button className="btn btn-primary btn-sm" onClick={() => setShowAddForm(!showAddForm)}>
-            + {t('coach_add_student')}
+            + {t('invitation_invite_student')}
           </button>
         </div>
 
         {showAddForm && (
-          <form className="add-student-form" onSubmit={handleAddStudent}>
+          <form className="add-student-form" onSubmit={handleInvite}>
             <input
               type="email"
               placeholder={t('coach_add_student_placeholder')}
@@ -99,13 +105,39 @@ export default function CoachDashboard() {
               onChange={(e) => setNewEmail(e.target.value)}
               required
             />
+            <input
+              type="text"
+              placeholder={t('invitation_message_placeholder')}
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
             <button type="submit" className="btn btn-primary btn-sm" disabled={adding}>
-              {t('coach_add_student_btn')}
+              {t('invitation_invite_student')}
             </button>
             <button type="button" className="btn btn-sm" onClick={() => setShowAddForm(false)}>
               {t('cancel')}
             </button>
           </form>
+        )}
+
+        {pendingInvitations.length > 0 && (
+          <div className="invitation-pending-section">
+            <h3>{t('invitation_pending')}</h3>
+            {pendingInvitations.map((inv) => (
+              <div key={inv.id} className="invitation-card">
+                <div className="invitation-card-info">
+                  {inv.receiver_avatar && <img src={inv.receiver_avatar} alt="" className="student-avatar" />}
+                  <div>
+                    <strong>{inv.receiver_name}</strong>
+                    {inv.message && <p className="invitation-message">{inv.message}</p>}
+                  </div>
+                </div>
+                <button className="btn btn-sm btn-danger" onClick={() => handleCancelInvitation(inv.id)}>
+                  {t('invitation_cancel')}
+                </button>
+              </div>
+            ))}
+          </div>
         )}
 
         {students.length === 0 ? (
@@ -131,12 +163,6 @@ export default function CoachDashboard() {
                   <Link to={`/coach/students/${student.id}`} className="btn btn-sm">
                     {t('coach_student_workouts')}
                   </Link>
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => handleRemoveStudent(student.id)}
-                  >
-                    {t('delete')}
-                  </button>
                 </div>
               </div>
             ))}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getMyAssignedWorkouts } from "../api/coach";
+import { getMyAssignedWorkouts, updateAssignedWorkoutStatus } from "../api/coach";
 import { listWorkouts } from "../api/workouts";
 import type { AssignedWorkout, Workout } from "../types";
 import { useTranslation } from "react-i18next";
@@ -21,6 +21,15 @@ export default function AthleteHome() {
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [confirmModal, setConfirmModal] = useState<{ status: string; workout: AssignedWorkout } | null>(null);
+  const [resultFeeling, setResultFeeling] = useState(0);
+  const [timeH, setTimeH] = useState("");
+  const [timeM, setTimeM] = useState("");
+  const [timeS, setTimeS] = useState("");
+  const [resultDistance, setResultDistance] = useState("");
+  const [distanceUnit, setDistanceUnit] = useState<'km' | 'm'>('km');
+  const [resultHeartRate, setResultHeartRate] = useState("");
+  const [error, setError] = useState("");
 
   const TYPE_LABELS: Record<string, string> = {
     easy: t('type_easy'),
@@ -66,8 +75,65 @@ export default function AthleteHome() {
 
   function formatDate(dateStr: string): string {
     if (!dateStr) return '';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
     const date = new Date(dateStr + 'T12:00:00');
-    return date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+    date.setHours(0, 0, 0, 0);
+    if (date.getTime() === today.getTime()) return t('date_today');
+    if (date.getTime() === tomorrow.getTime()) return t('date_tomorrow');
+    return new Date(dateStr + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  function openModal(workout: AssignedWorkout, status: string) {
+    setResultFeeling(0);
+    setTimeH(""); setTimeM(""); setTimeS("");
+    setResultDistance(""); setDistanceUnit('km');
+    setResultHeartRate("");
+    setError("");
+    setConfirmModal({ status, workout });
+  }
+
+  function getTimeSeconds(): number | null {
+    const h = Number(timeH) || 0;
+    const m = Number(timeM) || 0;
+    const s = Number(timeS) || 0;
+    if (h === 0 && m === 0 && s === 0) return null;
+    return h * 3600 + m * 60 + s;
+  }
+
+  function getDistanceKm(): number | null {
+    const val = Number(resultDistance);
+    if (!val) return null;
+    return distanceUnit === 'm' ? val / 1000 : val;
+  }
+
+  async function handleStatusUpdate() {
+    if (!confirmModal) return;
+    const { status, workout } = confirmModal;
+    const fields = workout.expected_fields || ['feeling'];
+    const data: Record<string, unknown> = { status };
+
+    if (status === 'completed') {
+      if (resultFeeling < 1) {
+        setError(t('assigned_feeling_required'));
+        return;
+      }
+      data.result_feeling = resultFeeling;
+      if (fields.includes('time')) data.result_time_seconds = getTimeSeconds();
+      if (fields.includes('distance')) data.result_distance_km = getDistanceKm();
+      if (fields.includes('heart_rate') && resultHeartRate) data.result_heart_rate = Number(resultHeartRate);
+    }
+
+    try {
+      await updateAssignedWorkoutStatus(workout.id, data as Parameters<typeof updateAssignedWorkoutStatus>[1]);
+      setConfirmModal(null);
+      setError("");
+      await loadData();
+    } catch {
+      setError("Failed to update status.");
+    }
   }
 
   if (loading) return <div className="loading">{t('loading')}</div>;
@@ -105,7 +171,13 @@ export default function AthleteHome() {
               <p className="next-workout-coach">{t('assigned_from_coach')}: {nextWorkout.coach_name}</p>
             )}
             <div className="next-workout-actions">
-              <Link to="/my-assignments" className="btn btn-primary btn-sm">
+              <button className="btn btn-sm btn-primary" onClick={() => openModal(nextWorkout!, 'completed')}>
+                {t('assigned_mark_completed')}
+              </button>
+              <button className="btn btn-sm" onClick={() => openModal(nextWorkout!, 'skipped')}>
+                {t('assigned_mark_skipped')}
+              </button>
+              <Link to="/my-assignments" className="btn btn-sm">
                 {t('home_see_all_assignments')}
               </Link>
             </div>
@@ -170,6 +242,83 @@ export default function AthleteHome() {
           </div>
         </section>
       )}
+      {/* Complete/Skip modal */}
+      {confirmModal && (() => {
+        const fields = confirmModal.workout.expected_fields || ['feeling'];
+        return (
+          <div className="modal-overlay" onClick={() => setConfirmModal(null)}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+              <h3>{confirmModal.status === 'completed' ? t('assigned_confirm_complete_title') : t('assigned_confirm_skip_title')}</h3>
+              <p>{confirmModal.status === 'completed' ? t('assigned_confirm_complete_msg') : t('assigned_confirm_skip_msg')}</p>
+
+              {error && <div className="error" style={{ marginBottom: '1rem' }}>{error}</div>}
+
+              {confirmModal.status === 'completed' && (
+                <div className="modal-result-fields">
+                  {fields.includes('time') && (
+                    <div className="form-group">
+                      <label>{t('expected_field_time')}</label>
+                      <div className="time-inputs">
+                        <input type="number" min="0" max="99" placeholder="HH" value={timeH} onChange={(e) => setTimeH(e.target.value)} />
+                        <span>:</span>
+                        <input type="number" min="0" max="59" placeholder="MM" value={timeM} onChange={(e) => setTimeM(e.target.value)} />
+                        <span>:</span>
+                        <input type="number" min="0" max="59" placeholder="SS" value={timeS} onChange={(e) => setTimeS(e.target.value)} />
+                      </div>
+                    </div>
+                  )}
+                  {fields.includes('distance') && (
+                    <div className="form-group">
+                      <label>{t('expected_field_distance')}</label>
+                      <div className="distance-input">
+                        <input type="number" step="0.01" min="0" value={resultDistance} onChange={(e) => setResultDistance(e.target.value)} />
+                        <select value={distanceUnit} onChange={(e) => setDistanceUnit(e.target.value as 'km' | 'm')}>
+                          <option value="km">km</option>
+                          <option value="m">m</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                  {fields.includes('heart_rate') && (
+                    <div className="form-group">
+                      <label>{t('expected_field_heart_rate')}</label>
+                      <div className="hr-input">
+                        <input type="number" min="30" max="250" value={resultHeartRate} onChange={(e) => setResultHeartRate(e.target.value)} />
+                        <span className="input-unit">bpm</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="form-group">
+                    <label>{t('expected_field_feeling')} *</label>
+                    <div className="feeling-selector">
+                      {[1,2,3,4,5,6,7,8,9,10].map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          className={`feeling-btn ${resultFeeling === v ? 'feeling-btn-active' : ''}`}
+                          onClick={() => setResultFeeling(v)}
+                        >{v}</button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="modal-actions">
+                <button className="btn btn-sm" onClick={() => setConfirmModal(null)}>
+                  {t('cancel')}
+                </button>
+                <button
+                  className={`btn btn-sm ${confirmModal.status === 'completed' ? 'btn-primary' : 'btn-danger'}`}
+                  onClick={handleStatusUpdate}
+                >
+                  {confirmModal.status === 'completed' ? t('assigned_mark_completed') : t('assigned_mark_skipped')}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

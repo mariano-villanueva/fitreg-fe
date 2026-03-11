@@ -1,9 +1,16 @@
 import client from './client';
 import type { CoachListItem, CoachPublicProfile, CoachAchievement, CoachRating } from '../types';
 
-export const listCoaches = (search?: string) => {
-  const params = search ? `?search=${encodeURIComponent(search)}` : '';
-  return client.get<CoachListItem[]>(`/coaches${params}`);
+export const listCoaches = (params?: { search?: string; locality?: string; level?: string; sort?: string; page?: number; limit?: number }) => {
+  const qs = new URLSearchParams();
+  if (params?.search) qs.set('search', params.search);
+  if (params?.locality) qs.set('locality', params.locality);
+  if (params?.level) qs.set('level', params.level);
+  if (params?.sort) qs.set('sort', params.sort);
+  if (params?.page) qs.set('page', String(params.page));
+  if (params?.limit) qs.set('limit', String(params.limit));
+  const q = qs.toString();
+  return client.get<{ data: CoachListItem[]; total: number }>(`/coaches${q ? `?${q}` : ''}`);
 };
 
 export const getCoachProfile = (id: number) =>

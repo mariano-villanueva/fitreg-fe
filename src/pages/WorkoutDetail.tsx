@@ -69,14 +69,16 @@ export default function WorkoutDetail() {
           </Link>
           <h1>Run - {new Date(workout.date).toLocaleDateString()}</h1>
         </div>
-        <div className="page-header-actions">
-          <Link to={`/workouts/${workout.id}/edit`} className="btn">
-            {t('detail_edit')}
-          </Link>
-          <button className="btn btn-danger" onClick={handleDeleteWorkout}>
-            {t('detail_delete')}
-          </button>
-        </div>
+        {!workout.assigned_workout_id && (
+          <div className="page-header-actions">
+            <Link to={`/workouts/${workout.id}/edit`} className="btn">
+              {t('detail_edit')}
+            </Link>
+            <button className="btn btn-danger" onClick={handleDeleteWorkout}>
+              {t('detail_delete')}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="detail-card">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getCoachProfile, upsertRating } from "../api/coaches";
+import { createInvitation } from "../api/invitations";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import type { CoachPublicProfile as CoachProfileType } from "../types";
@@ -15,6 +16,10 @@ export default function CoachPublicProfile() {
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [ratingMsg, setRatingMsg] = useState("");
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestMessage, setRequestMessage] = useState("");
+  const [requesting, setRequesting] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
 
   useEffect(() => { loadProfile(); }, [id]);
 
@@ -29,6 +34,22 @@ export default function CoachPublicProfile() {
       }
     } catch { setProfile(null); }
     finally { setLoading(false); }
+  }
+
+  async function handleRequestCoach(e: React.FormEvent) {
+    e.preventDefault();
+    if (!profile) return;
+    setRequesting(true);
+    try {
+      await createInvitation({ type: 'student_request', receiver_id: profile.id, message: requestMessage.trim() || undefined });
+      setRequestSent(true);
+      setShowRequestModal(false);
+      setRequestMessage("");
+    } catch {
+      // Error handled silently
+    } finally {
+      setRequesting(false);
+    }
   }
 
   async function handleRating(e: React.FormEvent) {
@@ -113,6 +134,43 @@ export default function CoachPublicProfile() {
           </div>
         )}
       </div>
+
+      <div style={{ marginTop: '1rem' }}>
+        {!requestSent ? (
+          <button className="btn btn-primary" onClick={() => setShowRequestModal(true)}>
+            {t('invitation_request_coach')}
+          </button>
+        ) : (
+          <span className="badge badge-pending">{t('invitation_status_pending')}</span>
+        )}
+      </div>
+
+      {showRequestModal && (
+        <div className="modal-overlay" onClick={() => setShowRequestModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>{t('invitation_request_coach')}</h3>
+            <form onSubmit={handleRequestCoach}>
+              <div className="form-group">
+                <label>{t('invitation_message')}</label>
+                <textarea
+                  value={requestMessage}
+                  onChange={(e) => setRequestMessage(e.target.value)}
+                  placeholder={t('invitation_message_placeholder')}
+                  rows={3}
+                />
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="btn btn-primary" disabled={requesting}>
+                  {requesting ? t('form_saving') : t('invitation_request_coach')}
+                </button>
+                <button type="button" className="btn" onClick={() => setShowRequestModal(false)}>
+                  {t('cancel')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
