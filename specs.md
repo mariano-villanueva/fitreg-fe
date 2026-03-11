@@ -2,7 +2,7 @@
 
 ## Overview
 
-React + TypeScript + Vite SPA for FitReg, a running workout tracking app with coach-athlete role system. Supports i18n (Spanish/English), Google OAuth login, and structured workout segments.
+React + TypeScript + Vite SPA for FitReg, a running workout tracking app with coach-athlete role system. Supports i18n (Spanish/English), Google OAuth login, structured workout segments, invitations, notifications, and admin approval flows.
 
 ## Project Structure
 
@@ -20,43 +20,48 @@ FitRegFE/
     │   └── index.ts              # All TypeScript interfaces
     ├── api/
     │   ├── client.ts             # Axios instance + interceptors
-    │   ├── auth.ts               # Auth & profile API
+    │   ├── auth.ts               # Auth, profile, coach request API
     │   ├── workouts.ts           # Workout CRUD API
     │   ├── coach.ts              # Coach/student/assignment API
     │   ├── coaches.ts            # Coach directory, profile, achievements, ratings API
+    │   ├── invitations.ts        # Invitation CRUD API
+    │   ├── notifications.ts      # Notifications, actions, preferences API
     │   └── admin.ts              # Admin stats, users, achievement verification API
     ├── context/
     │   ├── AuthContext.tsx        # Auth state + localStorage
     │   └── RoleContext.tsx        # Role switching (athlete/coach)
     ├── components/
-    │   ├── Navbar.tsx             # Role-aware navigation
+    │   ├── Navbar.tsx             # Role-aware navigation + notification badge
+    │   ├── NotificationBadge.tsx  # Unread notification count indicator
     │   ├── ProtectedRoute.tsx     # Auth guard
     │   ├── AdminRoute.tsx         # Admin guard (requires is_admin)
     │   ├── RoleSwitcher.tsx       # Athlete/Coach toggle
-    │   ├── SegmentBuilder.tsx     # Workout structure editor
+    │   ├── SegmentBuilder.tsx     # Workout structure editor (table + dropdown + edit modal)
     │   └── SegmentDisplay.tsx     # Read-only segment view
     ├── pages/
     │   ├── Login.tsx              # Google Sign-In
+    │   ├── Onboarding.tsx         # First-time user profile setup (birth_date, height)
     │   ├── Home.tsx               # Routes to AthleteHome or CoachDashboard
-    │   ├── AthleteHome.tsx        # Next workout, stats, recent activity
-    │   ├── Profile.tsx            # User profile editor
+    │   ├── AthleteHome.tsx        # Next workout, complete/skip, stats, recent activity
+    │   ├── Profile.tsx            # User profile editor + coach request button
     │   ├── WorkoutList.tsx        # Personal workout grid
-    │   ├── WorkoutDetail.tsx      # Single workout view
+    │   ├── WorkoutDetail.tsx      # Single workout view (edit/delete hidden for assigned)
     │   ├── WorkoutForm.tsx        # Create/edit personal workout
     │   ├── CoachDashboard.tsx     # Students list, stats
-    │   ├── StudentWorkouts.tsx    # View student's workouts
-    │   ├── AssignWorkoutForm.tsx  # Create/edit assigned workout
-    │   ├── MyAssignedWorkouts.tsx # Athlete's assignments view
-    │   ├── CoachDirectory.tsx     # Public coach listing with search & rating filter
+    │   ├── StudentWorkouts.tsx    # Pending cards + paginated finished table
+    │   ├── AssignWorkoutForm.tsx  # Create/edit assigned workout with expected fields
+    │   ├── MyAssignedWorkouts.tsx # Pending cards + finished table with detail modal
+    │   ├── CoachDirectory.tsx     # Coach list with filters, pagination, search-on-demand
     │   ├── CoachPublicProfile.tsx # Coach profile with achievements, ratings, rating form
     │   ├── CoachProfileEdit.tsx   # Edit coach description, visibility, CRUD achievements
+    │   ├── Notifications.tsx      # Notification list with action buttons
     │   ├── AdminDashboard.tsx     # Platform metrics dashboard
     │   ├── AdminUsers.tsx         # User management table with role toggles
     │   └── AdminAchievements.tsx  # Pending achievements approve/reject
     └── i18n/
         ├── index.ts              # i18next config
-        ├── es.ts                 # Spanish translations
-        └── en.ts                 # English translations
+        ├── es.ts                 # Spanish translations (~320 keys)
+        └── en.ts                 # English translations (~320 keys)
 ```
 
 ## Dependencies
@@ -79,20 +84,22 @@ Dev: TypeScript ~5.9.3, Vite ^7.3.1, ESLint ^9.39.1
 | Path | Component | Access | Description |
 |------|-----------|--------|-------------|
 | /login | Login | Public | Google Sign-In |
+| /onboarding | Onboarding | Protected | First-time profile setup |
 | / | Home → AthleteHome or CoachDashboard | Protected | Role-based home |
 | /workouts | WorkoutList | Protected | Personal workout list |
 | /workouts/new | WorkoutForm | Protected | Create workout |
 | /workouts/:id | WorkoutDetail | Protected | View workout |
 | /workouts/:id/edit | WorkoutForm | Protected | Edit workout |
-| /profile | Profile | Protected | Edit user profile |
+| /profile | Profile | Protected | Edit user profile + coach request |
 | /coach | CoachDashboard | Protected | Coach dashboard |
-| /coach/students/:id | StudentWorkouts | Protected | Student's workouts |
+| /coach/students/:id | StudentWorkouts | Protected | Student's assignments |
 | /coach/assign/:studentId | AssignWorkoutForm | Protected | Assign workout |
 | /coach/assigned-workouts/:id/edit | AssignWorkoutForm | Protected | Edit assignment |
 | /my-assignments | MyAssignedWorkouts | Protected | Athlete's assignments |
-| /coaches | CoachDirectory | Protected | Coach listing with search & rating filter |
+| /coaches | CoachDirectory | Protected | Coach listing with filters |
 | /coaches/:id | CoachPublicProfile | Protected | Coach profile with achievements & ratings |
 | /coach/profile | CoachProfileEdit | Protected | Edit coach description, visibility, achievements |
+| /notifications | Notifications | Protected | Notification list |
 | /admin | AdminDashboard | Admin | Platform metrics |
 | /admin/users | AdminUsers | Admin | User management table |
 | /admin/achievements | AdminAchievements | Admin | Pending achievement verification |
@@ -103,9 +110,11 @@ Dev: TypeScript ~5.9.3, Vite ^7.3.1, ESLint ^9.39.1
 ```typescript
 interface User {
   id: number; google_id: string; email: string; name: string;
-  avatar_url: string; sex: string; age: number; weight_kg: number;
-  language: string; is_coach: boolean;
-  is_admin: boolean; coach_description: string; coach_public: boolean;
+  avatar_url: string; sex: string; birth_date: string; age: number;
+  weight_kg: number; height_cm: number; language: string;
+  is_coach: boolean; is_admin: boolean;
+  coach_description: string; coach_public: boolean;
+  onboarding_completed: boolean;
   created_at: string; updated_at: string;
 }
 ```
@@ -113,64 +122,60 @@ interface User {
 ### Workout (personal)
 ```typescript
 interface Workout {
-  id: number; user_id: number; date: string;
-  distance_km: number; duration_seconds: number; avg_pace: string;
-  calories: number; avg_heart_rate: number;
+  id: number; user_id: number; assigned_workout_id: number | null;
+  date: string; distance_km: number; duration_seconds: number;
+  avg_pace: string; calories: number; avg_heart_rate: number;
   type: 'easy'|'tempo'|'intervals'|'long_run'|'race'|'other';
   notes: string; created_at: string; updated_at: string;
 }
 ```
 
-### Student
-```typescript
-interface Student {
-  id: number; name: string; email: string; avatar_url: string;
-}
-```
-
 ### AssignedWorkout
 ```typescript
+type ExpectedField = 'time' | 'distance' | 'heart_rate' | 'feeling';
+
 interface AssignedWorkout {
   id: number; coach_id: number; student_id: number;
   title: string; description: string; type: string;
-  distance_km: number; duration_seconds: number;
-  notes: string; status: 'pending'|'completed'|'skipped';
+  distance_km: number; duration_seconds: number; notes: string;
+  expected_fields: ExpectedField[] | null;
+  result_time_seconds: number | null; result_distance_km: number | null;
+  result_heart_rate: number | null; result_feeling: number | null;
+  status: 'pending'|'completed'|'skipped';
   due_date: string; student_name?: string; coach_name?: string;
   segments?: WorkoutSegment[];
   created_at: string; updated_at: string;
 }
 ```
 
-### WorkoutSegment
+### Invitation
 ```typescript
-interface WorkoutSegment {
-  id?: number; assigned_workout_id?: number;
-  order_index: number; segment_type: 'simple'|'interval';
-  repetitions: number;
-  value: number; unit: 'km'|'m'|'min'|'sec';
-  intensity: 'easy'|'moderate'|'fast'|'sprint';
-  work_value: number; work_unit: string; work_intensity: string;
-  rest_value: number; rest_unit: string; rest_intensity: string;
-}
-```
-
-### CoachAchievement
-```typescript
-interface CoachAchievement {
-  id: number; coach_id: number; event_name: string; event_date: string;
-  distance_km: number; result_time: string; position: number | null;
-  is_verified: boolean; verified_by: number | null; verified_at: string | null;
-  created_at: string;
-}
-```
-
-### CoachRating
-```typescript
-interface CoachRating {
-  id: number; coach_id: number; student_id: number;
-  rating: number; comment: string;
-  student_name: string; student_avatar: string;
+interface Invitation {
+  id: number; type: 'coach_invite' | 'student_request';
+  sender_id: number; receiver_id: number; message: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  sender_name: string; sender_avatar: string;
+  receiver_name: string; receiver_avatar: string;
   created_at: string; updated_at: string;
+}
+```
+
+### AppNotification
+```typescript
+interface NotificationAction { key: string; label: string; style: 'primary' | 'danger' | 'default'; }
+
+interface AppNotification {
+  id: number; user_id: number; type: string;
+  title: string; body: string;
+  metadata: Record<string, unknown>;
+  actions: NotificationAction[] | null;
+  is_read: boolean; created_at: string;
+}
+
+interface NotificationPreferences {
+  id: number; user_id: number;
+  workout_assigned: boolean;
+  workout_completed_or_skipped: boolean;
 }
 ```
 
@@ -178,49 +183,13 @@ interface CoachRating {
 ```typescript
 interface CoachListItem {
   id: number; name: string; avatar_url: string;
-  coach_description: string; avg_rating: number; achievement_count: number;
+  coach_description: string; coach_locality: string; coach_level: string;
+  avg_rating: number; rating_count: number; verified_achievements: number;
 }
 ```
 
-### CoachPublicProfile
-```typescript
-interface CoachPublicProfile {
-  id: number; name: string; avatar_url: string; coach_description: string;
-  avg_rating: number; achievements: CoachAchievement[]; ratings: CoachRating[];
-}
-```
-
-### AdminUser
-```typescript
-interface AdminUser {
-  id: number; email: string; name: string; avatar_url: string;
-  is_coach: boolean; is_admin: boolean; created_at: string;
-  workout_count: number; student_count: number;
-}
-```
-
-### AdminStats
-```typescript
-interface AdminStats {
-  total_users: number; total_coaches: number;
-  total_students: number; total_workouts: number;
-  total_assigned_workouts: number; pending_achievements: number;
-}
-```
-
-### PendingAchievement
-```typescript
-interface PendingAchievement {
-  id: number; coach_id: number; coach_name: string; coach_avatar: string;
-  event_name: string; event_date: string; distance_km: number;
-  result_time: string; position: number | null; created_at: string;
-}
-```
-
-### AuthResponse
-```typescript
-interface AuthResponse { token: string; user: User; }
-```
+### Other types
+Student, WorkoutSegment, CoachAchievement, CoachRating, CoachPublicProfile, AdminUser, AdminStats, PendingAchievement, AuthResponse — see `src/types/index.ts` for full definitions.
 
 ## API Client
 
@@ -233,7 +202,9 @@ interface AuthResponse { token: string; user: User; }
 ### Auth API (auth.ts)
 - `googleLogin(credential)` → POST /auth/google → AuthResponse
 - `getMe()` → GET /me → User
-- `updateProfile(data)` → PUT /me → User
+- `updateProfile(data)` → PUT /me → User (no is_coach field)
+- `requestCoach({ locality, level })` → POST /coach-request
+- `getCoachRequestStatus()` → GET /coach-request → `{ status }`
 
 ### Workouts API (workouts.ts)
 - `listWorkouts()` → GET /workouts → Workout[]
@@ -247,16 +218,16 @@ interface AuthResponse { token: string; user: User; }
 - `addStudent(email)` → POST /coach/students
 - `removeStudent(id)` → DELETE /coach/students/:id
 - `getStudentWorkouts(id)` → GET /coach/students/:id/workouts → Workout[]
-- `listAssignedWorkouts(studentId?)` → GET /coach/assigned-workouts → AssignedWorkout[]
+- `listAssignedWorkouts(studentId?, status?, page?, limit?)` → GET /coach/assigned-workouts → AssignedWorkout[] | { data, total }
 - `createAssignedWorkout(data)` → POST /coach/assigned-workouts
 - `getAssignedWorkout(id)` → GET /coach/assigned-workouts/:id → AssignedWorkout
 - `updateAssignedWorkout(id, data)` → PUT /coach/assigned-workouts/:id
 - `deleteAssignedWorkout(id)` → DELETE /coach/assigned-workouts/:id
-- `getMyAssignedWorkouts()` → GET /my-assigned-workouts → { data: AssignedWorkout[] }
-- `updateAssignedWorkoutStatus(id, status)` → PUT /my-assigned-workouts/:id/status
+- `getMyAssignedWorkouts()` → GET /my-assigned-workouts → AssignedWorkout[]
+- `updateAssignedWorkoutStatus(id, data)` → PUT /my-assigned-workouts/:id/status
 
 ### Coaches API (coaches.ts)
-- `listCoaches(search?)` → GET /coaches → CoachListItem[]
+- `listCoaches({ search?, locality?, level?, sort?, page?, limit? })` → GET /coaches → `{ data, total }`
 - `getCoachProfile(id)` → GET /coaches/:id → CoachPublicProfile
 - `updateCoachProfile(data)` → PUT /coach/profile
 - `listMyAchievements()` → GET /coach/achievements → CoachAchievement[]
@@ -265,6 +236,21 @@ interface AuthResponse { token: string; user: User; }
 - `deleteAchievement(id)` → DELETE /coach/achievements/:id
 - `upsertRating(coachId, data)` → POST /coaches/:id/ratings
 - `getRatings(coachId)` → GET /coaches/:id/ratings → CoachRating[]
+
+### Invitations API (invitations.ts)
+- `listInvitations()` → GET /invitations → Invitation[]
+- `createInvitation(data)` → POST /invitations
+- `respondInvitation(id, action)` → PUT /invitations/:id/respond
+- `cancelInvitation(id)` → DELETE /invitations/:id
+
+### Notifications API (notifications.ts)
+- `listNotifications(page?, limit?)` → GET /notifications → AppNotification[]
+- `getUnreadCount()` → GET /notifications/unread-count → `{ count }`
+- `markAsRead(id)` → PUT /notifications/:id/read
+- `markAllAsRead()` → PUT /notifications/read-all
+- `executeAction(id, action)` → POST /notifications/:id/action
+- `getNotificationPreferences()` → GET /notification-preferences → NotificationPreferences
+- `updateNotificationPreferences(data)` → PUT /notification-preferences
 
 ### Admin API (admin.ts)
 - `getStats()` → GET /admin/stats → AdminStats
@@ -280,7 +266,7 @@ interface AuthResponse { token: string; user: User; }
 - **State:** user, token, isAuthenticated
 - **Methods:** login(token, user), logout(), setUser(user)
 - **Persistence:** localStorage (token, user)
-- **Behavior:** Auto-loads user on mount via getMe(), syncs i18n language from user preference
+- **Behavior:** Auto-loads user on mount via getMe(), syncs i18n language from user preference, redirects to /onboarding if not completed
 - **Hook:** `useAuth()`
 
 ### RoleContext
@@ -296,7 +282,7 @@ interface AuthResponse { token: string; user: User; }
 - **Available:** Spanish (es), English (en)
 - **Detection:** Browser language detector
 - **User preference:** Stored in user profile, synced on login
-- **200+ translation keys** covering: navigation, login, workouts, types, fields, forms, profile, roles, coach, assignments, segments, units, intensities, home, coach directory, coach profiles, achievements, ratings, admin
+- **~320 translation keys** covering all features
 
 ### Translation Key Categories
 - `app_*` - App branding
@@ -308,101 +294,100 @@ interface AuthResponse { token: string; user: User; }
 - `detail_*` - Detail page
 - `profile_*` - Profile page
 - `role_*` - Role switching
-- `coach_*` - Coach dashboard
+- `coach_*` - Coach dashboard, directory, profile
+- `coach_request_*` - Coach request flow
+- `coach_filter_*`, `coach_sort_*` - Coach directory filters
+- `level_*` - Training levels (beginner, intermediate, advanced, competitive)
 - `assigned_*` - Assigned workouts
 - `segment_*` - Workout segments
 - `unit_*` - Distance/time units
 - `intensity_*` - Intensity levels
 - `home_*` - Home page
-- `coach_directory_*` - Coach directory page
-- `coach_profile_*` - Coach profile pages
 - `achievement_*` - Achievements
 - `rating_*` - Ratings
 - `admin_*` - Admin panel
+- `invitation_*` - Invitations
+- `notification_*` - Notifications
+- `notif_*` - Notification i18n keys (used by backend, translated by frontend)
+- `expected_field_*` - Expected student data labels
+- `date_*` - Date labels (today, tomorrow)
+- Common: loading, error, delete, edit, save, cancel
+
+### Notification i18n Pattern
+Backend stores i18n keys in notification title/body fields and dynamic data in metadata. Frontend translates with:
+```tsx
+t(n.title, { defaultValue: n.title, ...(n.metadata || {}) })
+```
+Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 
 ## Component Details
 
 ### Navbar
 - Role-aware: shows different links for athlete vs coach
-- Athlete links: Home, Workouts, New Workout, My Assignments, Coaches (directory)
-- Coach links: Home (Coach Dashboard), My Coach Profile, Coaches (directory)
+- Athlete links: Home, Workouts, Log Workout, Assignments, Coaches
+- Coach links: Home (Coach Dashboard), My Coach Profile, Coaches
 - Admin link: Admin (visible only if user.is_admin)
+- NotificationBadge: shows unread count, links to /notifications
 - Shows RoleSwitcher if user.is_coach is true
 - User avatar + name link to profile
 
-### AdminRoute
-- Route guard component that checks `user.is_admin`
-- Redirects to `/` if user is not an admin
-
-### RoleSwitcher
-- Pill-style toggle: Athlete ↔ Coach
-- Navigates to `/` on role change
+### NotificationBadge
+- Polls unread count on mount
+- Displays red badge with count when > 0
 
 ### SegmentBuilder
-- Used in AssignWorkoutForm for creating structured workouts
-- Two segment types: Simple (distance/time at intensity) and Interval (reps × work/rest)
-- Supports: add, remove, reorder (up/down)
-- Units: km, m, min, sec
-- Intensities: easy, moderate, fast, sprint
+- Table-based layout with dropdown menus per row
+- Actions: edit (opens modal), duplicate, move up/down, delete
+- Two segment types: Simple (value + unit + intensity) and Interval (reps × work/rest)
+- Add buttons above the table
 
-### SegmentDisplay
-- Read-only view of segments
-- Shows numbered list with intensity-colored badges
-- Used in AthleteHome and MyAssignedWorkouts
+### Profile
+- Standard profile fields (name, sex, birth_date, weight, height, language)
+- Coach request section:
+  - If not coach and no request: green "Quiero ser entrenador" button → opens modal
+  - Modal asks for locality (text) and training level (select: beginner/intermediate/advanced/competitive)
+  - If pending: yellow badge "Solicitud pendiente de aprobación"
+  - If approved: green badge "Sos entrenador"
+- Notification preferences section
 
 ## Page Behaviors
 
 ### AthleteHome
 - Loads assigned workouts + personal workouts in parallel
-- Shows next upcoming pending workout (by due_date)
-- Shows pending workout count and recent workout count
-- Displays last 3 personal workouts
-
-### CoachDashboard
-- Shows student count and pending assignment count
-- Add student form (by email)
-- Student grid with actions (view workouts, remove)
-
-### AssignWorkoutForm
-- Dual mode: create (from URL param studentId) or edit (loads existing)
-- Cannot edit completed assignments (backend blocks it)
-- SegmentBuilder for workout structure
-- Due date = "training day"
+- Shows next upcoming pending workout (by due_date) with Complete/Skip buttons
+- Completion modal with expected fields + always-required feeling
+- Shows pending workout count and recent activity
+- Displays last 3 personal workouts (links to detail, edit/delete hidden for assigned)
 
 ### MyAssignedWorkouts
-- Groups by status display order
-- Complete/Skip buttons for pending workouts
-- Shows coach name and segment details
+- Split into pending (cards) and finished (table) sections
+- Table columns: Title, Type, Date, Status, Feeling, Detail link
+- Detail modal with full workout info + results section when completed
+- Completion modal: feeling always visible with required marker
+- Reloads all data after status update (not partial merge)
+
+### StudentWorkouts (Coach view)
+- Pending: max 4 cards + "Ver más (N)" button that reveals full table
+- Finished: paginated table (10/page) with pagination controls
+- Detail modal with results section for completed assignments
+- Edit/delete hidden for completed assignments
 
 ### CoachDirectory
-- Lists public coaches with search by name
-- Coach cards: avatar, name, description, avg rating, achievement count
-- Links to CoachPublicProfile
+- Does NOT auto-load coaches on page load — shows hint message
+- Filters: search (name + description), locality, level, sort order
+- Sort options: best rated (default), alphabetical, newest, oldest
+- Results shown as list (not cards): avatar, name, level badge, locality, description, star rating
+- Paginated (12/page)
 
-### CoachPublicProfile
-- Displays coach info, description, achievements (with verified badges), ratings
-- Rating form: range slider 1-10 + optional comment textarea
-- Rating form only visible if current user is a student of that coach
-- Upsert: modifies existing rating if one exists
+### WorkoutDetail
+- Edit/Delete buttons hidden when `workout.assigned_workout_id` exists
 
-### CoachProfileEdit
-- Edit coach description (textarea)
-- Toggle public visibility (checkbox)
-- Inline CRUD for achievements: add/edit/delete
-- Edit blocked for verified achievements
-
-### AdminDashboard
-- Stats cards: total users, coaches, students, workouts, pending achievements
-- Navigation links to AdminUsers and AdminAchievements
-
-### AdminUsers
-- Table with all users: name, email, is_coach, is_admin, workout count
-- Checkbox toggles for is_coach and is_admin roles
-
-### AdminAchievements
-- Table of pending (unverified) achievements
-- Coach name, event name, date, distance, time, position
-- Approve/Reject buttons per achievement
+### Notifications
+- Lists all notifications with time-ago display
+- Renders action buttons (approve/reject/accept) from notification.actions
+- Action labels are i18n keys translated via `t(action.label)`
+- Marks all as read on page load
+- Reloads list after action execution
 
 ## Styling
 
@@ -411,12 +396,19 @@ CSS classes follow BEM-like conventions. Key class families:
 - `.navbar`, `.navbar-*` - Navigation
 - `.workout-card`, `.workout-grid` - Workout display
 - `.student-card`, `.student-grid` - Student display
-- `.segment-builder`, `.segment-card`, `.segment-display` - Segments
-- `.btn`, `.btn-primary`, `.btn-danger`, `.btn-sm` - Buttons
-- `.type-badge`, `.status-badge` - Badges
+- `.segment-table`, `.segment-dropdown`, `.segment-edit-modal` - Segment builder
+- `.segment-display` - Read-only segments
+- `.btn`, `.btn-primary`, `.btn-danger`, `.btn-sm`, `.btn-coach-request` - Buttons
+- `.type-badge`, `.status-badge`, `.coach-level-badge` - Badges
 - `.home-section`, `.home-stats`, `.home-stat-card` - Home page
 - `.role-switcher` - Role toggle
 - `.form-group`, `.form-row`, `.form-actions` - Forms
+- `.coach-filters`, `.coach-list`, `.coach-list-item` - Coach directory
+- `.notification-list`, `.notification-item`, `.notification-badge` - Notifications
+- `.modal-overlay`, `.modal`, `.modal-actions` - Modals
+- `.assignments-table`, `.pagination` - Tables & pagination
+- `.coach-status-badge`, `.coach-status-pending`, `.coach-status-approved` - Coach request status
+- `.detail-card`, `.detail-grid`, `.detail-item` - Detail views
 
 ## Google OAuth
 
@@ -437,7 +429,7 @@ npm run preview  # Preview production build
 ## Deployment
 
 - **Platform:** Vercel
-- **Branch:** `main` (auto-deploy)
+- **Branch:** `master` (auto-deploy)
 - **Framework:** Vite (auto-detected)
 - **SPA routing:** `vercel.json` with rewrite rule `{ "source": "/(.*)", "destination": "/index.html" }`
 - **Registry override:** `.npmrc` forces `registry=https://registry.npmjs.org/` (avoids private registry conflicts)
