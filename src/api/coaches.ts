@@ -30,12 +30,12 @@ export const listMyAchievements = () =>
 
 export const createAchievement = (data: {
   event_name: string; event_date: string; distance_km: number;
-  result_time: string; position: number;
+  result_time: string; position: number; extra_info: string;
 }) => client.post('/coach/achievements', data);
 
 export const updateAchievement = (id: number, data: {
   event_name: string; event_date: string; distance_km: number;
-  result_time: string; position: number;
+  result_time: string; position: number; extra_info: string;
 }) => client.put(`/coach/achievements/${id}`, data);
 
 export const deleteAchievement = (id: number) =>
