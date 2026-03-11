@@ -31,6 +31,7 @@ export interface User {
   coach_description: string;
   coach_public: boolean;
   onboarding_completed: boolean;
+  has_coach: boolean;
   created_at: string;
   updated_at: string;
 }
