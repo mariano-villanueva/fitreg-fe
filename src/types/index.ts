@@ -9,7 +9,7 @@ export interface Workout {
   calories: number;
   avg_heart_rate: number;
   feeling: number | null;
-  type: 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'other';
+  type: 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'fartlek' | 'other';
   notes: string;
   created_at: string;
   updated_at: string;
