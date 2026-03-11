@@ -152,11 +152,11 @@ export default function CoachDirectory() {
                 <div className="coach-list-info">
                   <div className="coach-list-top">
                     <span className="coach-list-name">{coach.name}</span>
-                    {coach.coach_level && (
-                      <span className={`coach-level-badge level-${coach.coach_level}`}>
-                        {LEVEL_LABELS[coach.coach_level] || coach.coach_level}
+                    {coach.coach_level && coach.coach_level.split(',').map((lvl) => (
+                      <span key={lvl} className={`coach-level-badge level-${lvl}`}>
+                        {LEVEL_LABELS[lvl] || lvl}
                       </span>
-                    )}
+                    ))}
                   </div>
                   {coach.coach_locality && (
                     <span className="coach-list-locality">{coach.coach_locality}</span>

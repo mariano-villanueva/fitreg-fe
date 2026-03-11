@@ -30,7 +30,7 @@ export default function Navbar() {
               <Link to="/">{t('home_title')}</Link>
               <Link to="/workouts">{t('workouts_title')}</Link>
               <Link to="/workouts/new">{t('workouts_new')}</Link>
-              {user?.has_coach && <Link to="/my-assignments">{t('assigned_my')}</Link>}
+              <Link to="/my-assignments">{t('assigned_my')}</Link>
               <Link to="/coaches">{t('coach_directory')}</Link>
             </>
           )}
