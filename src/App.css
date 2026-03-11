@@ -1924,3 +1924,11 @@
   margin-top: 4px;
 }
 
+.detail-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: var(--radius, 8px);
+  margin-top: 8px;
+  object-fit: contain;
+}
+

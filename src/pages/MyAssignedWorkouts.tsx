@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { getMyAssignedWorkouts, updateAssignedWorkoutStatus } from "../api/coach";
-import type { AssignedWorkout } from "../types";
+import type { AssignedWorkout, FileResponse } from "../types";
 import { useTranslation } from "react-i18next";
 import SegmentDisplay from "../components/SegmentDisplay";
+import ImageUpload from "../components/ImageUpload";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -24,6 +25,7 @@ export default function MyAssignedWorkouts() {
   const [distanceUnit, setDistanceUnit] = useState<'km' | 'm'>('km');
   const [resultHeartRate, setResultHeartRate] = useState("");
   const [resultFeeling, setResultFeeling] = useState(0);
+  const [resultImage, setResultImage] = useState<FileResponse | null>(null);
   const [detailModal, setDetailModal] = useState<AssignedWorkout | null>(null);
 
   const TYPE_LABELS: Record<string, string> = {
@@ -58,6 +60,7 @@ export default function MyAssignedWorkouts() {
     setDistanceUnit('km');
     setResultHeartRate("");
     setResultFeeling(0);
+    setResultImage(null);
     setConfirmModal({ id: workout.id, status, workout });
   }
 
@@ -90,6 +93,7 @@ export default function MyAssignedWorkouts() {
       if (fields.includes('time')) data.result_time_seconds = getTimeSeconds();
       if (fields.includes('distance')) data.result_distance_km = getDistanceKm();
       if (fields.includes('heart_rate') && resultHeartRate) data.result_heart_rate = Number(resultHeartRate);
+      if (resultImage) data.image_file_id = resultImage.id;
     }
 
     try {
@@ -265,6 +269,10 @@ export default function MyAssignedWorkouts() {
                       ))}
                     </div>
                   </div>
+                  <div className="form-group">
+                    <label>{t('file_upload_button')}</label>
+                    <ImageUpload value={resultImage} onChange={setResultImage} />
+                  </div>
                 </div>
               )}
 
@@ -335,7 +343,7 @@ export default function MyAssignedWorkouts() {
             </div>
 
             {/* Results section */}
-            {detailModal.status === 'completed' && (detailModal.result_feeling || detailModal.result_time_seconds || detailModal.result_distance_km || detailModal.result_heart_rate) && (
+            {detailModal.status === 'completed' && (detailModal.result_feeling || detailModal.result_time_seconds || detailModal.result_distance_km || detailModal.result_heart_rate || detailModal.image_url) && (
               <>
                 <h4 className="detail-section-title">{t('assigned_results')}</h4>
                 <div className="detail-readonly">
@@ -361,6 +369,16 @@ export default function MyAssignedWorkouts() {
                     <div className="detail-row">
                       <span className="detail-label">{t('expected_field_feeling')}</span>
                       <span>{detailModal.result_feeling}/10</span>
+                    </div>
+                  )}
+                  {detailModal.image_url && (
+                    <div className="detail-row detail-row-block">
+                      <span className="detail-label">{t('file_upload_button')}</span>
+                      <img
+                        src={`${(import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '')}${detailModal.image_url}?token=${localStorage.getItem('token')}`}
+                        alt={detailModal.title}
+                        className="detail-image"
+                      />
                     </div>
                   )}
                 </div>

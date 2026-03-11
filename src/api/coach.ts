@@ -46,5 +46,6 @@ export const updateAssignedWorkoutStatus = (id: number, data: {
   result_distance_km?: number | null;
   result_heart_rate?: number | null;
   result_feeling?: number | null;
+  image_file_id?: number | null;
 }) =>
   client.put<AssignedWorkout>(`/my-assigned-workouts/${id}/status`, data);

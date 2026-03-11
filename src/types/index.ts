@@ -60,6 +60,8 @@ export interface AssignedWorkout {
   result_distance_km: number | null;
   result_heart_rate: number | null;
   result_feeling: number | null;
+  image_file_id: number | null;
+  image_url: string | null;
   status: 'pending' | 'completed' | 'skipped';
   due_date: string;
   created_at: string;
