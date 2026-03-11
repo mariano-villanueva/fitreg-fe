@@ -1,6 +1,7 @@
 export interface Workout {
   id: number;
   user_id: number;
+  assigned_workout_id: number | null;
   date: string;
   distance_km: number;
   duration_seconds: number;
@@ -41,6 +42,8 @@ export interface Student {
   avatar_url: string;
 }
 
+export type ExpectedField = 'time' | 'distance' | 'heart_rate' | 'feeling';
+
 export interface AssignedWorkout {
   id: number;
   coach_id: number;
@@ -51,6 +54,11 @@ export interface AssignedWorkout {
   distance_km: number;
   duration_seconds: number;
   notes: string;
+  expected_fields: ExpectedField[] | null;
+  result_time_seconds: number | null;
+  result_distance_km: number | null;
+  result_heart_rate: number | null;
+  result_feeling: number | null;
   status: 'pending' | 'completed' | 'skipped';
   due_date: string;
   created_at: string;
@@ -107,6 +115,8 @@ export interface CoachListItem {
   name: string;
   avatar_url: string;
   coach_description: string;
+  coach_locality: string;
+  coach_level: string;
   avg_rating: number;
   rating_count: number;
   verified_achievements: number;
@@ -155,4 +165,44 @@ export interface PendingAchievement {
 export interface AuthResponse {
   token: string;
   user: User;
+}
+
+export interface Invitation {
+  id: number;
+  type: 'coach_invite' | 'student_request';
+  sender_id: number;
+  receiver_id: number;
+  message: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  created_at: string;
+  updated_at: string;
+  sender_name: string;
+  sender_avatar: string;
+  receiver_name: string;
+  receiver_avatar: string;
+}
+
+export interface NotificationAction {
+  key: string;
+  label: string;
+  style: 'primary' | 'danger' | 'default';
+}
+
+export interface AppNotification {
+  id: number;
+  user_id: number;
+  type: string;
+  title: string;
+  body: string;
+  metadata: Record<string, unknown>;
+  actions: NotificationAction[] | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface NotificationPreferences {
+  id: number;
+  user_id: number;
+  workout_assigned: boolean;
+  workout_completed_or_skipped: boolean;
 }

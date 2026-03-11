@@ -13,6 +13,11 @@ export const updateProfile = (data: {
   weight_kg: number;
   height_cm: number;
   language: string;
-  is_coach: boolean;
   onboarding_completed: boolean;
 }) => client.put<User>('/me', data);
+
+export const requestCoach = (data: { locality: string; level: string }) =>
+  client.post('/coach-request', data);
+
+export const getCoachRequestStatus = () =>
+  client.get<{ status: 'none' | 'pending' | 'approved' }>('/coach-request');

@@ -6,9 +6,14 @@ export const addStudent = (email: string) => client.post<Student>('/coach/studen
 export const removeStudent = (studentId: number) => client.delete(`/coach/students/${studentId}`);
 export const getStudentWorkouts = (studentId: number) => client.get<Workout[]>(`/coach/students/${studentId}/workouts`);
 
-export const listAssignedWorkouts = (studentId?: number) => {
-  const params = studentId ? `?student_id=${studentId}` : '';
-  return client.get<AssignedWorkout[]>(`/coach/assigned-workouts${params}`);
+export const listAssignedWorkouts = (studentId?: number, status?: string, page?: number, limit?: number) => {
+  const params = new URLSearchParams();
+  if (studentId) params.set('student_id', String(studentId));
+  if (status) params.set('status', status);
+  if (page) params.set('page', String(page));
+  if (limit) params.set('limit', String(limit));
+  const qs = params.toString();
+  return client.get<AssignedWorkout[] | { data: AssignedWorkout[]; total: number }>(`/coach/assigned-workouts${qs ? `?${qs}` : ''}`);
 };
 export const createAssignedWorkout = (data: {
   student_id: number;
@@ -35,5 +40,11 @@ export const updateAssignedWorkout = (id: number, data: {
 export const deleteAssignedWorkout = (id: number) => client.delete(`/coach/assigned-workouts/${id}`);
 
 export const getMyAssignedWorkouts = () => client.get<AssignedWorkout[]>('/my-assigned-workouts');
-export const updateAssignedWorkoutStatus = (id: number, status: string) =>
-  client.put<AssignedWorkout>(`/my-assigned-workouts/${id}/status`, { status });
+export const updateAssignedWorkoutStatus = (id: number, data: {
+  status: string;
+  result_time_seconds?: number | null;
+  result_distance_km?: number | null;
+  result_heart_rate?: number | null;
+  result_feeling?: number | null;
+}) =>
+  client.put<AssignedWorkout>(`/my-assigned-workouts/${id}/status`, data);

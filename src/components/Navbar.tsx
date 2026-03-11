@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useRole } from "../context/RoleContext";
 import { useTranslation } from "react-i18next";
 import RoleSwitcher from "./RoleSwitcher";
+import NotificationBadge from "./NotificationBadge";
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -33,6 +34,7 @@ export default function Navbar() {
               <Link to="/coaches">{t('coach_directory')}</Link>
             </>
           )}
+          <NotificationBadge />
           <Link to="/profile" className="navbar-user">
             {user?.avatar_url && (
               <img src={user.avatar_url} alt="" className="navbar-avatar" />

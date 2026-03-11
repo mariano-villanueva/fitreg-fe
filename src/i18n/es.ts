@@ -16,8 +16,8 @@ export default {
     login_feature_3: 'Visualizá tu progreso',
 
     // Workout list
-    workouts_title: 'Mis Entrenamientos',
-    workouts_new: 'Nuevo Entrenamiento',
+    workouts_title: 'Entrenamientos',
+    workouts_new: 'Registrar Entrenamiento',
     workouts_empty: 'No hay entrenamientos registrados. ¡Registrá tu primera sesión!',
     workouts_delete_confirm: '¿Estás seguro de que querés eliminar este entrenamiento?',
 
@@ -73,7 +73,16 @@ export default {
     profile_save: 'Guardar cambios',
     profile_saving: 'Guardando...',
     profile_saved: 'Perfil actualizado correctamente',
-    profile_is_coach: 'Activar modo entrenador',
+    coach_request_btn: 'Quiero ser entrenador',
+    coach_request_modal_title: 'Solicitar ser entrenador',
+    coach_request_modal_body: 'Al enviar esta solicitud, un administrador deberá aprobarla para que puedas acceder a las funciones de entrenador. Recibirás una notificación cuando se resuelva.',
+    coach_request_modal_confirm: 'Enviar solicitud',
+    coach_request_pending_badge: 'Solicitud de entrenador pendiente de aprobación',
+    coach_request_approved_badge: 'Sos entrenador',
+    coach_request_locality: 'Localidad',
+    coach_request_locality_placeholder: 'Ej: Buenos Aires, CABA',
+    coach_request_level: 'Nivel de entrenamiento',
+    coach_request_level_select: 'Seleccioná un nivel',
 
     // Onboarding
     onboarding_title: 'Completá tu perfil',
@@ -118,9 +127,17 @@ export default {
     assigned_mark_skipped: 'Omitir',
     assigned_new: 'Asignar Entrenamiento',
     assigned_edit: 'Editar Entrenamiento Asignado',
-    assigned_my: 'Mis Asignaciones',
+    assigned_my: 'Asignaciones',
+    assigned_assignments: 'Asignaciones',
     assigned_no_workouts: 'No hay entrenamientos asignados.',
+    assigned_show_more: 'Ver más',
+    assigned_no_pending: 'No hay entrenamientos pendientes.',
+    assigned_history: 'Historial',
+    assigned_no_history: 'No hay entrenamientos finalizados.',
     assigned_from_coach: 'Asignado por',
+    assigned_feeling_required: 'Debés indicar cómo te sentiste (1-10) para completar el entrenamiento.',
+    assigned_detail: 'Ver detalle',
+    assigned_results: 'Resultados',
 
     // Segments
     segment_simple: 'Bloque simple',
@@ -134,7 +151,14 @@ export default {
     segment_work: 'Trabajo',
     segment_rest: 'Descanso',
     segment_structure: 'Estructura del entrenamiento',
-    segment_empty: 'Agreg\u00e1 bloques para armar el entrenamiento',
+    segment_empty: 'Agregá bloques para armar el entrenamiento',
+    segment_col_reps: 'Reps',
+    segment_col_exercise: 'Ejercicio',
+    segment_duplicate: 'Duplicar',
+    segment_move_up: 'Mover arriba',
+    segment_move_down: 'Mover abajo',
+    segment_type_label: 'Tipo de bloque',
+    segment_intensity_label: 'Intensidad',
 
     // Units
     unit_km: 'km',
@@ -160,11 +184,25 @@ export default {
     home_see_all_assignments: 'Ver todas las asignaciones',
 
     // Coach directory
-    coach_directory: 'Directorio de Entrenadores',
-    coach_directory_search: 'Buscar entrenador...',
-    coach_directory_empty: 'No hay entrenadores disponibles.',
+    coach_directory: 'Entrenadores',
+    coach_directory_search: 'Buscar por nombre...',
+    coach_directory_empty: 'No se encontraron entrenadores.',
+    coach_directory_hint: 'Usá los filtros y hacé clic en Buscar para encontrar entrenadores.',
     coach_directory_rating: 'Valoración',
     coach_directory_achievements: 'logros verificados',
+    coach_filter_locality: 'Localidad...',
+    coach_filter_level_all: 'Todos los niveles',
+    coach_filter_search: 'Buscar',
+    coach_filter_clear: 'Limpiar',
+    coach_sort_rating: 'Mejor valorados',
+    coach_sort_name: 'Alfabético',
+    coach_sort_newest: 'Más recientes',
+    coach_sort_oldest: 'Más antiguos',
+    coach_no_description: 'Sin descripción',
+    level_beginner: 'Inicial',
+    level_intermediate: 'Intermedio',
+    level_advanced: 'Avanzado',
+    level_competitive: 'Competitivo',
 
     // Coach profile
     coach_profile_title: 'Mi Perfil de Entrenador',
@@ -214,6 +252,94 @@ export default {
     admin_role_coach: 'Entrenador',
     admin_role_admin: 'Admin',
     admin_no_pending: 'No hay logros pendientes.',
+
+    // Invitations
+    invitation_invite_student: 'Invitar alumno',
+    invitation_request_coach: 'Solicitar coach',
+    invitation_accept: 'Aceptar',
+    invitation_reject: 'Rechazar',
+    invitation_cancel: 'Cancelar invitación',
+    invitation_message: 'Mensaje (opcional)',
+    invitation_message_placeholder: 'Escribí un mensaje...',
+    invitation_pending: 'Pendientes',
+    invitation_sent: 'Enviadas',
+    invitation_received: 'Recibidas',
+    invitation_no_pending: 'No hay invitaciones pendientes.',
+    invitation_status_pending: 'Pendiente',
+    invitation_status_accepted: 'Aceptada',
+    invitation_status_rejected: 'Rechazada',
+    invitation_status_cancelled: 'Cancelada',
+    invitation_coach_invite: 'Invitación de coach',
+    invitation_student_request: 'Solicitud de alumno',
+    invitation_already_sent: 'Ya hay una invitación pendiente',
+    invitation_already_connected: 'Ya están conectados',
+    invitation_cancelled: 'Esta invitación fue cancelada',
+
+    // Notifications
+    notification_title: 'Notificaciones',
+    notification_empty: 'No hay notificaciones.',
+    notification_mark_all_read: 'Marcar todas como leídas',
+    notification_just_now: 'Ahora',
+    notification_minutes_ago: 'hace {{count}} min',
+    notification_hours_ago: 'hace {{count}} h',
+    notification_days_ago: 'hace {{count}} d',
+
+    // Notification i18n
+    notif_coach_invite_title: 'Nueva invitación de coach',
+    notif_coach_invite_body: '{{sender_name}} quiere ser tu entrenador',
+    notif_student_request_title: 'Nueva solicitud de alumno',
+    notif_student_request_body: '{{sender_name}} quiere ser tu alumno',
+    notif_invitation_accepted_title: 'Invitación aceptada',
+    notif_invitation_accepted_body: '{{user_name}} aceptó tu invitación',
+    notif_invitation_rejected_title: 'Invitación rechazada',
+    notif_invitation_rejected_body: '{{user_name}} rechazó tu invitación',
+    notif_relationship_ended_title: 'Relación finalizada',
+    notif_relationship_ended_body: '{{user_name}} finalizó la relación de coaching',
+    notif_workout_assigned_title: 'Nuevo entrenamiento asignado',
+    notif_workout_assigned_body: '{{coach_name}} te asignó: {{workout_title}}',
+    notif_workout_completed_title: 'Entrenamiento completado',
+    notif_workout_completed_body: '{{student_name}} completó el entrenamiento: {{workout_title}}',
+    notif_workout_skipped_title: 'Entrenamiento omitido',
+    notif_workout_skipped_body: '{{student_name}} omitió el entrenamiento: {{workout_title}}',
+    notif_achievement_verified_title: 'Logro verificado',
+    notif_achievement_verified_body: 'Tu logro "{{event_name}}" fue verificado',
+    notif_coach_request_title: 'Nueva solicitud de entrenador',
+    notif_coach_request_body: '{{requester_name}} quiere ser entrenador',
+    notif_coach_request_approve: 'Aprobar',
+    notif_coach_request_reject: 'Rechazar',
+    notif_coach_request_approved_title: 'Solicitud aprobada',
+    notif_coach_request_approved_body: 'Tu solicitud para ser entrenador fue aprobada',
+    notif_coach_request_rejected_title: 'Solicitud rechazada',
+    notif_coach_request_rejected_body: 'Tu solicitud para ser entrenador fue rechazada',
+
+    // Notification preferences
+    notification_preferences: 'Preferencias de notificaciones',
+    notification_pref_workout_assigned: 'Nuevo entrenamiento asignado',
+    notification_pref_workout_status: 'Entrenamiento completado/omitido',
+
+    // Relationship
+    relationship_end: 'Desvincular',
+    relationship_end_confirm: '¿Estás seguro de que querés desvincular esta relación?',
+
+    // Expected fields
+    expected_fields_label: 'Datos esperados del alumno',
+    expected_fields_hint: 'Seleccioná qué datos debe completar el alumno al finalizar',
+    expected_field_time: 'Tiempo',
+    expected_field_distance: 'Distancia',
+    expected_field_heart_rate: 'Pulsaciones',
+    expected_field_feeling: 'Sensación',
+
+    // Dates
+    date_today: 'Hoy',
+    date_tomorrow: 'Mañana',
+
+    // Confirm modals
+    assigned_confirm_complete_title: 'Completar entrenamiento',
+    assigned_confirm_complete_msg: '¿Estás seguro de que querés marcar este entrenamiento como completado?',
+    assigned_confirm_skip_title: 'Omitir entrenamiento',
+    assigned_confirm_skip_msg: '¿Estás seguro de que querés omitir este entrenamiento?',
+    assigned_confirm_delete_title: 'Eliminar asignación',
+    assigned_confirm_delete_msg: '¿Estás seguro de que querés eliminar esta asignación? Esta acción no se puede deshacer.',
 
     // Common
     loading: 'Cargando...',

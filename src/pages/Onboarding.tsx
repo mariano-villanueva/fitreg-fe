@@ -30,7 +30,6 @@ export default function Onboarding() {
         weight_kg: weightKg,
         height_cm: heightCm,
         language: user?.language ?? "es",
-        is_coach: user?.is_coach ?? false,
         onboarding_completed: true,
       });
       setUser(res.data);
