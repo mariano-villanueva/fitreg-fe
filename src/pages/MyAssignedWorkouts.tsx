@@ -4,6 +4,7 @@ import type { AssignedWorkout, FileResponse } from "../types";
 import { useTranslation } from "react-i18next";
 import SegmentDisplay from "../components/SegmentDisplay";
 import ImageUpload from "../components/ImageUpload";
+import { useFeedback } from "../context/FeedbackContext";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -14,9 +15,9 @@ function formatDuration(seconds: number): string {
 
 export default function MyAssignedWorkouts() {
   const { t } = useTranslation();
+  const { showSuccess, showError, showWarning } = useFeedback();
   const [workouts, setWorkouts] = useState<AssignedWorkout[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [confirmModal, setConfirmModal] = useState<{ id: number; status: string; workout: AssignedWorkout } | null>(null);
   const [timeH, setTimeH] = useState("");
   const [timeM, setTimeM] = useState("");
@@ -86,7 +87,7 @@ export default function MyAssignedWorkouts() {
 
     if (status === 'completed') {
       if (resultFeeling < 1) {
-        setError(t('assigned_feeling_required'));
+        showWarning(t('assigned_feeling_required'));
         return;
       }
       data.result_feeling = resultFeeling;
@@ -98,10 +99,10 @@ export default function MyAssignedWorkouts() {
 
     try {
       await updateAssignedWorkoutStatus(id, data as Parameters<typeof updateAssignedWorkoutStatus>[1]);
-      setError("");
+      showSuccess(t('assigned_status_updated'));
       await loadWorkouts();
     } catch {
-      setError("Failed to update status.");
+      showError("Failed to update status.");
     } finally {
       setConfirmModal(null);
     }
@@ -115,8 +116,6 @@ export default function MyAssignedWorkouts() {
   return (
     <div className="page">
       <h1>{t('assigned_my')}</h1>
-
-      {error && <div className="error">{error}</div>}
 
       {workouts.length === 0 ? (
         <div className="empty-state">
@@ -270,7 +269,7 @@ export default function MyAssignedWorkouts() {
                     </div>
                   </div>
                   <div className="form-group">
-                    <label>{t('file_upload_button')}</label>
+                    <label>{t('workout_image')}</label>
                     <ImageUpload value={resultImage} onChange={setResultImage} />
                   </div>
                 </div>
@@ -373,7 +372,7 @@ export default function MyAssignedWorkouts() {
                   )}
                   {detailModal.image_url && (
                     <div className="detail-row detail-row-block">
-                      <span className="detail-label">{t('file_upload_button')}</span>
+                      <span className="detail-label">{t('workout_image')}</span>
                       <img
                         src={`${(import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '')}${detailModal.image_url}?token=${localStorage.getItem('token')}`}
                         alt={detailModal.title}
@@ -387,7 +386,7 @@ export default function MyAssignedWorkouts() {
 
             <div className="modal-actions">
               <button className="btn btn-sm" onClick={() => setDetailModal(null)}>
-                {t('cancel')}
+                {t('close')}
               </button>
             </div>
           </div>

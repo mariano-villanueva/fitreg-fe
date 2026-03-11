@@ -4,6 +4,7 @@ import { createAssignedWorkout, getAssignedWorkout, updateAssignedWorkout } from
 import { useTranslation } from "react-i18next";
 import SegmentBuilder from "../components/SegmentBuilder";
 import type { WorkoutSegment, ExpectedField } from "../types";
+import { useFeedback } from "../context/FeedbackContext";
 
 const EXPECTED_FIELD_OPTIONS: ExpectedField[] = ['time', 'distance', 'heart_rate', 'feeling'];
 
@@ -12,6 +13,7 @@ export default function AssignWorkoutForm() {
   const isEdit = !!id;
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { showError } = useFeedback();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -22,7 +24,6 @@ export default function AssignWorkoutForm() {
   const [expectedFields, setExpectedFields] = useState<ExpectedField[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [resolvedStudentId, setResolvedStudentId] = useState<number>(Number(studentId) || 0);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function AssignWorkoutForm() {
         setExpectedFields(aw.expected_fields);
       }
     } catch {
-      setError("Failed to load workout.");
+      showError("Failed to load workout.");
     } finally {
       setLoading(false);
     }
@@ -58,7 +59,6 @@ export default function AssignWorkoutForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError("");
 
     const payload = {
       student_id: resolvedStudentId,
@@ -79,9 +79,9 @@ export default function AssignWorkoutForm() {
       } else {
         await createAssignedWorkout(payload);
       }
-      navigate(`/coach/students/${resolvedStudentId}`);
+      navigate(`/coach/students/${resolvedStudentId}`, { state: { feedback: isEdit ? t('assigned_workout_updated') : t('assigned_workout_created') } });
     } catch {
-      setError(isEdit ? "Failed to update workout." : "Failed to assign workout.");
+      showError(isEdit ? "Failed to update workout." : "Failed to assign workout.");
     } finally {
       setSaving(false);
     }
@@ -92,8 +92,6 @@ export default function AssignWorkoutForm() {
   return (
     <div className="page">
       <h1>{isEdit ? t('assigned_edit') : t('assigned_new')}</h1>
-
-      {error && <div className="error">{error}</div>}
 
       <form className="workout-form" onSubmit={handleSubmit}>
         <div className="form-group">

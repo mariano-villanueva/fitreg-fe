@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { listWorkouts, deleteWorkout } from "../api/workouts";
 import type { Workout } from "../types";
 import { useTranslation } from "react-i18next";
+import { useFeedback } from "../context/FeedbackContext";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -13,9 +14,9 @@ function formatDuration(seconds: number): string {
 
 export default function WorkoutList() {
   const { t } = useTranslation();
+  const { showError } = useFeedback();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   const TYPE_LABELS: Record<string, string> = {
     easy: t('type_easy'),
@@ -34,9 +35,9 @@ export default function WorkoutList() {
     try {
       setLoading(true);
       const data = await listWorkouts();
-      setWorkouts(data);
+      setWorkouts(data || []);
     } catch {
-      setError("Failed to load workouts.");
+      showError("Failed to load workouts.");
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,7 @@ export default function WorkoutList() {
       await deleteWorkout(id);
       setWorkouts((prev) => prev.filter((w) => w.id !== id));
     } catch {
-      setError("Failed to delete run.");
+      showError("Failed to delete run.");
     }
   }
 
@@ -62,8 +63,6 @@ export default function WorkoutList() {
           + {t('workouts_new')}
         </Link>
       </div>
-
-      {error && <div className="error">{error}</div>}
 
       {workouts.length === 0 ? (
         <div className="empty-state">

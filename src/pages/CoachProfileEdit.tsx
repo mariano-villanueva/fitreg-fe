@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
-import { updateCoachProfile, listMyAchievements, createAchievement, updateAchievement, deleteAchievement } from "../api/coaches";
+import { updateCoachProfile, listMyAchievements, createAchievement, updateAchievement, deleteAchievement, toggleAchievementVisibility } from "../api/coaches";
 import { getMe } from "../api/auth";
-import type { CoachAchievement } from "../types";
+import type { CoachAchievement, FileResponse } from "../types";
+import ImageUpload from "../components/ImageUpload";
+import { useFeedback } from "../context/FeedbackContext";
 
 function achievementStatus(a: CoachAchievement): 'verified' | 'rejected' | 'pending' {
   if (a.is_verified) return 'verified';
@@ -14,10 +16,10 @@ function achievementStatus(a: CoachAchievement): 'verified' | 'rejected' | 'pend
 export default function CoachProfileEdit() {
   const { user, setUser } = useAuth();
   const { t } = useTranslation();
+  const { showSuccess, showError } = useFeedback();
   const [description, setDescription] = useState(user?.coach_description || "");
   const [isPublic, setIsPublic] = useState(user?.coach_public || false);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState("");
   const [showPublicModal, setShowPublicModal] = useState(false);
 
   const [achievements, setAchievements] = useState<CoachAchievement[]>([]);
@@ -29,6 +31,7 @@ export default function CoachProfileEdit() {
   const [resultTime, setResultTime] = useState("");
   const [position, setPosition] = useState(0);
   const [extraInfo, setExtraInfo] = useState("");
+  const [achievementImage, setAchievementImage] = useState<FileResponse | null>(null);
 
   useEffect(() => { loadAchievements(); }, []);
 
@@ -39,43 +42,54 @@ export default function CoachProfileEdit() {
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
-    setSaving(true); setMsg("");
+    setSaving(true);
     try {
       await updateCoachProfile({ coach_description: description, coach_public: isPublic });
       const res = await getMe();
       setUser(res.data);
-      setMsg(t('profile_saved'));
-    } catch { setMsg(t('error')); }
+      showSuccess(t('profile_saved'));
+    } catch { showError(t('error')); }
     finally { setSaving(false); }
   }
 
   function resetForm() {
     setEditId(null); setEventName(""); setEventDate("");
     setDistanceKm(0); setResultTime(""); setPosition(0);
-    setExtraInfo(""); setShowForm(false);
+    setExtraInfo(""); setAchievementImage(null); setShowForm(false);
   }
 
   function startEdit(a: CoachAchievement) {
     if (achievementStatus(a) !== 'rejected') return;
     setEditId(a.id); setEventName(a.event_name); setEventDate(a.event_date);
     setDistanceKm(a.distance_km); setResultTime(a.result_time); setPosition(a.position);
-    setExtraInfo(a.extra_info || ""); setShowForm(true);
+    setExtraInfo(a.extra_info || "");
+    setAchievementImage(a.image_file_id ? { id: a.image_file_id, uuid: '', original_name: '', content_type: '', size_bytes: 0, url: a.image_url || '', created_at: '' } : null);
+    setShowForm(true);
   }
 
   async function handleSaveAchievement(e: React.FormEvent) {
     e.preventDefault();
-    const data = { event_name: eventName, event_date: eventDate, distance_km: distanceKm, result_time: resultTime, position, extra_info: extraInfo };
+    const data = { event_name: eventName, event_date: eventDate, distance_km: distanceKm, result_time: resultTime, position, extra_info: extraInfo, image_file_id: achievementImage?.id || null };
     try {
       if (editId) { await updateAchievement(editId, data); }
       else { await createAchievement(data); }
+      showSuccess(t('achievement_saved'));
       resetForm(); loadAchievements();
-    } catch { setMsg(t('error')); }
+    } catch { showError(t('error')); }
+  }
+
+  async function handleTogglePublic(a: CoachAchievement) {
+    try {
+      await toggleAchievementVisibility(a.id, !a.is_public);
+      showSuccess(t('achievement_visibility_updated'));
+      loadAchievements();
+    } catch { showError(t('error')); }
   }
 
   async function handleDelete(id: number) {
     if (!confirm(t('workouts_delete_confirm'))) return;
-    try { await deleteAchievement(id); loadAchievements(); }
-    catch { setMsg(t('error')); }
+    try { await deleteAchievement(id); showSuccess(t('achievement_deleted')); loadAchievements(); }
+    catch { showError(t('error')); }
   }
 
   return (
@@ -106,7 +120,6 @@ export default function CoachProfileEdit() {
         <div className="form-actions">
           <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? t('form_saving') : t('form_save')}</button>
         </div>
-        {msg && <p className="success-msg">{msg}</p>}
       </form>
 
       <div className="coach-profile-section">
@@ -148,6 +161,10 @@ export default function CoachProfileEdit() {
                   <label>{t('achievement_extra_info')}</label>
                   <input type="text" value={extraInfo} onChange={(e) => setExtraInfo(e.target.value.slice(0, 500))} placeholder={t('achievement_extra_info_placeholder')} />
                 </div>
+                <div className="form-group">
+                  <label>{t('achievement_image')}</label>
+                  <ImageUpload value={achievementImage} onChange={setAchievementImage} />
+                </div>
                 <div className="form-actions">
                   <button type="button" className="btn" onClick={resetForm}>{t('form_cancel')}</button>
                   <button type="submit" className="btn btn-primary">{t('form_save')}</button>
@@ -169,6 +186,7 @@ export default function CoachProfileEdit() {
                 <th>{t('achievement_result_time')}</th>
                 <th>{t('achievement_position')}</th>
                 <th>{t('achievement_extra_info')}</th>
+                <th>{t('achievement_public')}</th>
                 <th></th>
                 <th></th>
               </tr>
@@ -184,6 +202,13 @@ export default function CoachProfileEdit() {
                     <td>{a.result_time || '—'}</td>
                     <td>{a.position > 0 ? `#${a.position}` : '—'}</td>
                     <td className="achievement-extra-info-cell">{a.extra_info || '—'}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      <input
+                        type="checkbox"
+                        checked={a.is_public}
+                        onChange={() => handleTogglePublic(a)}
+                      />
+                    </td>
                     <td>
                       {status === 'verified' && (
                         <span className="badge badge-verified">{t('achievement_verified')}</span>

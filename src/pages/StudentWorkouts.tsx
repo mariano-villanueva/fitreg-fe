@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { listAssignedWorkouts, deleteAssignedWorkout } from "../api/coach";
 import type { AssignedWorkout } from "../types";
 import { useTranslation } from "react-i18next";
+import { useFeedback } from "../context/FeedbackContext";
 import SegmentDisplay from "../components/SegmentDisplay";
 
 function formatDuration(seconds: number): string {
@@ -16,13 +17,14 @@ export default function StudentWorkouts() {
   const { id } = useParams<{ id: string }>();
   const studentId = Number(id);
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
+  const { showSuccess, showError } = useFeedback();
   const [pendingAssigned, setPendingAssigned] = useState<AssignedWorkout[]>([]);
   const [finishedAssigned, setFinishedAssigned] = useState<AssignedWorkout[]>([]);
   const [finishedTotal, setFinishedTotal] = useState(0);
   const [finishedPage, setFinishedPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [detailModal, setDetailModal] = useState<AssignedWorkout | null>(null);
   const [showAllPending, setShowAllPending] = useState(false);
@@ -38,6 +40,16 @@ export default function StudentWorkouts() {
     other: t('type_other'),
   };
 
+  const feedbackShown = useRef(false);
+  useEffect(() => {
+    const state = location.state as { feedback?: string } | null;
+    if (state?.feedback && !feedbackShown.current) {
+      feedbackShown.current = true;
+      showSuccess(state.feedback);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
+
   useEffect(() => {
     loadData();
   }, [studentId]);
@@ -50,14 +62,15 @@ export default function StudentWorkouts() {
         listAssignedWorkouts(studentId, 'finished', 1, HISTORY_LIMIT),
       ]);
       // pending returns array (no pagination)
-      setPendingAssigned(pendingRes.data as AssignedWorkout[]);
+      const pending = Array.isArray(pendingRes.data) ? pendingRes.data : [];
+      setPendingAssigned(pending as AssignedWorkout[]);
       // finished returns { data, total }
-      const fData = finishedRes.data as { data: AssignedWorkout[]; total: number };
-      setFinishedAssigned(fData.data);
-      setFinishedTotal(fData.total);
+      const fData = (finishedRes.data || {}) as { data?: AssignedWorkout[]; total?: number };
+      setFinishedAssigned(fData.data || []);
+      setFinishedTotal(fData.total || 0);
       setFinishedPage(1);
     } catch {
-      setError("Failed to load student data.");
+      showError("Failed to load student data.");
     } finally {
       setLoading(false);
     }
@@ -66,28 +79,28 @@ export default function StudentWorkouts() {
   async function loadFinishedPage(page: number) {
     try {
       const res = await listAssignedWorkouts(studentId, 'finished', page, HISTORY_LIMIT);
-      const fData = res.data as { data: AssignedWorkout[]; total: number };
-      setFinishedAssigned(fData.data);
-      setFinishedTotal(fData.total);
+      const fData = (res.data || {}) as { data?: AssignedWorkout[]; total?: number };
+      setFinishedAssigned(fData.data || []);
+      setFinishedTotal(fData.total || 0);
       setFinishedPage(page);
     } catch {
-      setError("Failed to load history.");
+      showError("Failed to load history.");
     }
   }
 
   async function handleDeleteAssigned(assignedId: number) {
     try {
       await deleteAssignedWorkout(assignedId);
+      showSuccess(t('assigned_deleted'));
       setPendingAssigned((prev) => prev.filter((a) => a.id !== assignedId));
     } catch {
-      setError("Failed to delete assigned workout.");
+      showError("Failed to delete assigned workout.");
     } finally {
       setDeleteId(null);
     }
   }
 
   if (loading) return <div className="loading">{t('loading')}</div>;
-  if (error && !pendingAssigned.length && !finishedAssigned.length) return <div className="error">{error}</div>;
 
   const studentName = pendingAssigned.length > 0 ? pendingAssigned[0].student_name : (finishedAssigned.length > 0 ? finishedAssigned[0].student_name : `Student #${studentId}`);
   const pendingCards = pendingAssigned.slice(0, 4);

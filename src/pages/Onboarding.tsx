@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useFeedback } from "../context/FeedbackContext";
 import { updateProfile } from "../api/auth";
 import { useTranslation } from "react-i18next";
 
@@ -8,6 +9,7 @@ export default function Onboarding() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { showError } = useFeedback();
 
   const [name, setName] = useState(user?.name ?? "");
   const [sex, setSex] = useState(user?.sex ?? "");
@@ -15,11 +17,9 @@ export default function Onboarding() {
   const [weightKg, setWeightKg] = useState(user?.weight_kg ?? 0);
   const [heightCm, setHeightCm] = useState(user?.height_cm ?? 0);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
     setSaving(true);
 
     try {
@@ -33,9 +33,9 @@ export default function Onboarding() {
         onboarding_completed: true,
       });
       setUser(res.data);
-      navigate("/");
+      navigate("/", { state: { feedback: t('onboarding_complete') } });
     } catch {
-      setError("Failed to save profile.");
+      showError("Failed to save profile.");
     } finally {
       setSaving(false);
     }
@@ -48,8 +48,6 @@ export default function Onboarding() {
       <div className="onboarding-container">
         <h1>{t("onboarding_title")}</h1>
         <p className="onboarding-subtitle">{t("onboarding_subtitle")}</p>
-
-        {error && <div className="error">{error}</div>}
 
         <form className="workout-form" onSubmit={handleSubmit}>
           <div className="form-group">

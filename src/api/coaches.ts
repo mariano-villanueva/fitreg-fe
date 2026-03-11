@@ -31,12 +31,17 @@ export const listMyAchievements = () =>
 export const createAchievement = (data: {
   event_name: string; event_date: string; distance_km: number;
   result_time: string; position: number; extra_info: string;
+  image_file_id?: number | null;
 }) => client.post('/coach/achievements', data);
 
 export const updateAchievement = (id: number, data: {
   event_name: string; event_date: string; distance_km: number;
   result_time: string; position: number; extra_info: string;
+  image_file_id?: number | null;
 }) => client.put(`/coach/achievements/${id}`, data);
 
 export const deleteAchievement = (id: number) =>
   client.delete(`/coach/achievements/${id}`);
+
+export const toggleAchievementVisibility = (id: number, isPublic: boolean) =>
+  client.put(`/coach/achievements/${id}/visibility`, { is_public: isPublic });

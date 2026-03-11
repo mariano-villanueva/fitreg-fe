@@ -3,7 +3,7 @@ import type { Workout } from "../types";
 
 export async function listWorkouts(): Promise<Workout[]> {
   const response = await client.get<Workout[]>("/workouts");
-  return response.data;
+  return response.data || [];
 }
 
 export async function getWorkout(id: number): Promise<Workout> {

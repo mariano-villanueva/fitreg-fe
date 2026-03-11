@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/AuthContext";
 import { RoleProvider } from "./context/RoleContext";
+import { FeedbackProvider } from "./context/FeedbackContext";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
@@ -20,6 +21,7 @@ import CoachProfileEdit from "./pages/CoachProfileEdit";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminAchievements from "./pages/AdminAchievements";
+import AdminAchievementDetail from "./pages/AdminAchievementDetail";
 import AdminRoute from "./components/AdminRoute";
 import Notifications from "./pages/Notifications";
 import Onboarding from "./pages/Onboarding";
@@ -33,6 +35,7 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <RoleProvider>
+            <FeedbackProvider>
             <Navbar />
             <main className="container">
               <Routes>
@@ -56,8 +59,10 @@ function App() {
                 <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
                 <Route path="/admin/achievements" element={<AdminRoute><AdminAchievements /></AdminRoute>} />
+                <Route path="/admin/achievements/:id" element={<AdminRoute><AdminAchievementDetail /></AdminRoute>} />
               </Routes>
             </main>
+            </FeedbackProvider>
           </RoleProvider>
         </AuthProvider>
       </BrowserRouter>
