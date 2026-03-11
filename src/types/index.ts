@@ -210,3 +210,13 @@ export interface NotificationPreferences {
   workout_assigned: boolean;
   workout_completed_or_skipped: boolean;
 }
+
+export interface FileResponse {
+  id: number;
+  uuid: string;
+  original_name: string;
+  content_type: string;
+  size_bytes: number;
+  url: string;
+  created_at: string;
+}
