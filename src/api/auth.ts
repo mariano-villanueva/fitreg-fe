@@ -16,7 +16,7 @@ export const updateProfile = (data: {
   onboarding_completed: boolean;
 }) => client.put<User>('/me', data);
 
-export const requestCoach = (data: { locality: string; level: string }) =>
+export const requestCoach = (data: { locality: string; level: string[] }) =>
   client.post('/coach-request', data);
 
 export const getCoachRequestStatus = () =>

@@ -23,7 +23,7 @@ export default function Profile() {
   const [showCoachModal, setShowCoachModal] = useState(false);
   const [requestingCoach, setRequestingCoach] = useState(false);
   const [coachLocality, setCoachLocality] = useState("");
-  const [coachLevel, setCoachLevel] = useState("");
+  const [coachLevels, setCoachLevels] = useState<string[]>([]);
 
   useEffect(() => {
     getNotificationPreferences().then((res) => setNotifPrefs(res.data)).catch(() => {});
@@ -66,11 +66,17 @@ export default function Profile() {
     }
   }
 
+  function toggleLevel(level: string) {
+    setCoachLevels((prev) =>
+      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
+    );
+  }
+
   async function handleRequestCoach() {
-    if (!coachLocality.trim() || !coachLevel) return;
+    if (!coachLocality.trim() || coachLevels.length === 0) return;
     setRequestingCoach(true);
     try {
-      await requestCoach({ locality: coachLocality.trim(), level: coachLevel });
+      await requestCoach({ locality: coachLocality.trim(), level: coachLevels });
       setCoachRequestStatus('pending');
       setShowCoachModal(false);
     } catch {
@@ -233,13 +239,18 @@ export default function Profile() {
             </div>
             <div className="form-group">
               <label>{t('coach_request_level')} *</label>
-              <select value={coachLevel} onChange={(e) => setCoachLevel(e.target.value)}>
-                <option value="">{t('coach_request_level_select')}</option>
-                <option value="beginner">{t('level_beginner')}</option>
-                <option value="intermediate">{t('level_intermediate')}</option>
-                <option value="advanced">{t('level_advanced')}</option>
-                <option value="competitive">{t('level_competitive')}</option>
-              </select>
+              <div className="level-checkboxes">
+                {['beginner', 'intermediate', 'advanced', 'competitive'].map((lvl) => (
+                  <label key={lvl} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={coachLevels.includes(lvl)}
+                      onChange={() => toggleLevel(lvl)}
+                    />
+                    <span>{t(`level_${lvl}`)}</span>
+                  </label>
+                ))}
+              </div>
             </div>
             <div className="modal-actions">
               <button className="btn" onClick={() => setShowCoachModal(false)}>
@@ -248,7 +259,7 @@ export default function Profile() {
               <button
                 className="btn btn-primary"
                 onClick={handleRequestCoach}
-                disabled={requestingCoach || !coachLocality.trim() || !coachLevel}
+                disabled={requestingCoach || !coachLocality.trim() || coachLevels.length === 0}
               >
                 {requestingCoach ? t('loading') : t('coach_request_modal_confirm')}
               </button>
