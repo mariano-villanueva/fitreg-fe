@@ -354,6 +354,16 @@ export default {
     assigned_confirm_delete_title: 'Eliminar asignación',
     assigned_confirm_delete_msg: '¿Estás seguro de que querés eliminar esta asignación? Esta acción no se puede deshacer.',
 
+    // File upload
+    file_upload_button: 'Subir imagen',
+    file_upload_hint: 'JPG, PNG o WebP — Máx 5MB',
+    file_uploading: 'Subiendo...',
+    file_delete: 'Eliminar imagen',
+    file_delete_confirm: '¿Estás seguro de que querés eliminar esta imagen?',
+    file_upload_error_size: 'La imagen es demasiado grande (máx 5MB)',
+    file_upload_error_type: 'Formato no permitido. Usá JPG, PNG o WebP',
+    file_upload_error_generic: 'Error al subir la imagen',
+
     // Common
     loading: 'Cargando...',
     error: 'Error',

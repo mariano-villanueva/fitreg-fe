@@ -335,6 +335,16 @@ export default {
     assigned_confirm_delete_title: 'Delete assignment',
     assigned_confirm_delete_msg: 'Are you sure you want to delete this assignment? This action cannot be undone.',
 
+    // File upload
+    file_upload_button: 'Upload image',
+    file_upload_hint: 'JPG, PNG or WebP — Max 5MB',
+    file_uploading: 'Uploading...',
+    file_delete: 'Remove image',
+    file_delete_confirm: 'Are you sure you want to remove this image?',
+    file_upload_error_size: 'Image is too large (max 5MB)',
+    file_upload_error_type: 'Format not allowed. Use JPG, PNG or WebP',
+    file_upload_error_generic: 'Failed to upload image',
+
     loading: 'Loading...',
     error: 'Error',
     delete: 'Delete',
