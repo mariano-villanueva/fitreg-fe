@@ -225,7 +225,10 @@ export default {
     achievement_verified: 'Verificado',
     achievement_pending: 'Pendiente de verificación',
     achievement_no_achievements: 'No hay logros cargados.',
+    achievement_rejected: 'Rechazado',
     achievement_cannot_edit_verified: 'No se puede editar un logro verificado',
+    achievement_extra_info: 'Información extra',
+    achievement_extra_info_placeholder: 'URL o información para validar el logro',
 
     // Ratings
     rating_title: 'Valoraciones',
@@ -252,6 +255,9 @@ export default {
     admin_role_coach: 'Entrenador',
     admin_role_admin: 'Admin',
     admin_no_pending: 'No hay logros pendientes.',
+    admin_reject_reason: 'Motivo del rechazo',
+    admin_reject_reason_placeholder: 'Ej: No se pudo comprobar su logro, indique fuentes para validarlo',
+    admin_reject_confirm: 'Confirmar rechazo',
 
     // Invitations
     invitation_invite_student: 'Invitar alumno',
@@ -278,6 +284,9 @@ export default {
     // Notifications
     notification_title: 'Notificaciones',
     notification_empty: 'No hay notificaciones.',
+    notification_no_new: 'No hay notificaciones nuevas.',
+    notification_show_read: 'Ver notificaciones anteriores ({{count}})',
+    notification_hide_read: 'Ocultar notificaciones anteriores',
     notification_mark_all_read: 'Marcar todas como leídas',
     notification_just_now: 'Ahora',
     notification_minutes_ago: 'hace {{count}} min',
@@ -303,6 +312,10 @@ export default {
     notif_workout_skipped_body: '{{student_name}} omitió el entrenamiento: {{workout_title}}',
     notif_achievement_verified_title: 'Logro verificado',
     notif_achievement_verified_body: 'Tu logro "{{event_name}}" fue verificado',
+    notif_achievement_rejected_title: 'Logro rechazado',
+    notif_achievement_rejected_body: 'Tu logro "{{event_name}}" fue rechazado. {{reason}}',
+    notif_achievement_pending_title: 'Nuevo logro pendiente',
+    notif_achievement_pending_body: '{{coach_name}} envió el logro "{{event_name}}" para verificación',
     notif_coach_request_title: 'Nueva solicitud de entrenador',
     notif_coach_request_body: '{{requester_name}} quiere ser entrenador',
     notif_coach_request_approve: 'Aprobar',

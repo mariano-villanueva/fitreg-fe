@@ -1782,3 +1782,85 @@
   color: #555;
 }
 
+/* ---- Coach Profile Edit ---- */
+.coach-profile-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.coach-profile-form textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.coach-profile-section {
+  margin-top: 1rem;
+}
+
+.coach-profile-section .coach-section-header {
+  margin-bottom: 1rem;
+}
+
+.coach-achievement-modal {
+  max-width: 540px;
+}
+
+.coach-achievement-modal .form-group input[type="text"],
+.coach-achievement-modal .form-group input[type="number"],
+.coach-achievement-modal .form-group input[type="date"] {
+  width: 100%;
+}
+
+.achievement-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.achievement-extra-info-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.badge-verified {
+  background: rgba(0, 212, 170, 0.15);
+  color: #00d4aa;
+}
+
+.badge-pending {
+  background: rgba(255, 193, 7, 0.15);
+  color: #f0ad00;
+}
+
+.badge-rejected {
+  background: rgba(255, 77, 106, 0.15);
+  color: #ff4d6a;
+}
+
+.achievement-row-rejected {
+  background: rgba(255, 77, 106, 0.05);
+}
+
+.achievement-rejection-reason {
+  font-size: 0.8rem;
+  color: #ff4d6a;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+

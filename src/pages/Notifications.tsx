@@ -19,7 +19,9 @@ function timeAgo(dateStr: string, t: (key: string, opts?: Record<string, unknown
 export default function Notifications() {
   const { t } = useTranslation();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [readIds, setReadIds] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [showRead, setShowRead] = useState(false);
 
   useEffect(() => {
     loadNotifications();
@@ -30,9 +32,9 @@ export default function Notifications() {
       setLoading(true);
       const res = await listNotifications();
       setNotifications(res.data);
-      markAllAsRead().then(() => {
-        setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      });
+      // Remember which were already read before marking all
+      setReadIds(new Set(res.data.filter((n: AppNotification) => n.is_read).map((n: AppNotification) => n.id)));
+      markAllAsRead();
     } catch {
       // Fail silently
     } finally {
@@ -50,6 +52,11 @@ export default function Notifications() {
     }
   }
 
+  // Use readIds to determine which were already read when page loaded
+  const newNotifications = notifications.filter((n) => !readIds.has(n.id));
+  const oldNotifications = notifications.filter((n) => readIds.has(n.id));
+  const visibleNotifications = showRead ? notifications : newNotifications;
+
   if (loading) return <div className="loading">{t('loading')}</div>;
 
   return (
@@ -61,33 +68,49 @@ export default function Notifications() {
           <p>{t('notification_empty')}</p>
         </div>
       ) : (
-        <div className="notification-list">
-          {notifications.map((n) => (
-            <div key={n.id} className={`notification-item ${!n.is_read ? 'notification-unread' : ''}`}>
-              {!!n.metadata?.sender_avatar && (
-                <img src={String(n.metadata.sender_avatar)} alt="" className="notification-avatar" />
-              )}
-              <div className="notification-content">
-                <strong className="notification-item-title">{t(n.title, { defaultValue: n.title, ...(n.metadata || {}) })}</strong>
-                <p className="notification-body">{t(n.body, { defaultValue: n.body, ...(n.metadata || {}) })}</p>
-                <span className="notification-time">{timeAgo(n.created_at, t)}</span>
-                {n.actions && n.actions.length > 0 && (
-                  <div className="notification-actions">
-                    {n.actions.map((action) => (
-                      <button
-                        key={action.key}
-                        className={`btn btn-sm ${action.style === 'primary' ? 'btn-primary' : action.style === 'danger' ? 'btn-danger' : ''}`}
-                        onClick={() => handleAction(n.id, action.key)}
-                      >
-                        {t(action.label)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+        <>
+          {visibleNotifications.length === 0 && !showRead ? (
+            <div className="empty-state">
+              <p>{t('notification_no_new')}</p>
             </div>
-          ))}
-        </div>
+          ) : (
+            <div className="notification-list">
+              {visibleNotifications.map((n) => (
+                <div key={n.id} className={`notification-item ${!n.is_read ? 'notification-unread' : ''}`}>
+                  {!!n.metadata?.sender_avatar && (
+                    <img src={String(n.metadata.sender_avatar)} alt="" className="notification-avatar" />
+                  )}
+                  <div className="notification-content">
+                    <strong className="notification-item-title">{t(n.title, { defaultValue: n.title, ...(n.metadata || {}) })}</strong>
+                    <p className="notification-body">{t(n.body, { defaultValue: n.body, ...(n.metadata || {}) })}</p>
+                    <span className="notification-time">{timeAgo(n.created_at, t)}</span>
+                    {n.actions && n.actions.length > 0 && (
+                      <div className="notification-actions">
+                        {n.actions.map((action) => (
+                          <button
+                            key={action.key}
+                            className={`btn btn-sm ${action.style === 'primary' ? 'btn-primary' : action.style === 'danger' ? 'btn-danger' : ''}`}
+                            onClick={() => handleAction(n.id, action.key)}
+                          >
+                            {t(action.label)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {oldNotifications.length > 0 && (
+            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+              <button className="btn" onClick={() => setShowRead(!showRead)}>
+                {showRead ? t('notification_hide_read') : t('notification_show_read', { count: oldNotifications.length })}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

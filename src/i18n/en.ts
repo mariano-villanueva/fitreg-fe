@@ -209,7 +209,10 @@ export default {
     achievement_verified: 'Verified',
     achievement_pending: 'Pending verification',
     achievement_no_achievements: 'No achievements yet.',
+    achievement_rejected: 'Rejected',
     achievement_cannot_edit_verified: 'Cannot edit a verified achievement',
+    achievement_extra_info: 'Extra information',
+    achievement_extra_info_placeholder: 'URL or information to validate the achievement',
 
     // Ratings
     rating_title: 'Ratings',
@@ -236,6 +239,9 @@ export default {
     admin_role_coach: 'Coach',
     admin_role_admin: 'Admin',
     admin_no_pending: 'No pending achievements.',
+    admin_reject_reason: 'Rejection reason',
+    admin_reject_reason_placeholder: 'E.g.: Could not verify your achievement, please provide sources',
+    admin_reject_confirm: 'Confirm rejection',
 
     // Invitations
     invitation_invite_student: 'Invite student',
@@ -262,6 +268,9 @@ export default {
     // Notifications
     notification_title: 'Notifications',
     notification_empty: 'No notifications.',
+    notification_no_new: 'No new notifications.',
+    notification_show_read: 'Show older notifications ({{count}})',
+    notification_hide_read: 'Hide older notifications',
     notification_mark_all_read: 'Mark all as read',
     notification_just_now: 'Just now',
     notification_minutes_ago: '{{count}} min ago',
@@ -287,6 +296,10 @@ export default {
     notif_workout_skipped_body: '{{student_name}} skipped the workout: {{workout_title}}',
     notif_achievement_verified_title: 'Achievement verified',
     notif_achievement_verified_body: 'Your achievement "{{event_name}}" has been verified',
+    notif_achievement_rejected_title: 'Achievement rejected',
+    notif_achievement_rejected_body: 'Your achievement "{{event_name}}" was rejected. {{reason}}',
+    notif_achievement_pending_title: 'New pending achievement',
+    notif_achievement_pending_body: '{{coach_name}} submitted "{{event_name}}" for verification',
     notif_coach_request_title: 'New coach request',
     notif_coach_request_body: '{{requester_name}} wants to become a coach',
     notif_coach_request_approve: 'Approve',

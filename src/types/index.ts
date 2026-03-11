@@ -94,7 +94,9 @@ export interface CoachAchievement {
   distance_km: number;
   result_time: string;
   position: number;
+  extra_info: string;
   is_verified: boolean;
+  rejection_reason: string;
   verified_by: number;
   verified_at: string;
   created_at: string;
@@ -159,6 +161,7 @@ export interface PendingAchievement {
   distance_km: number;
   result_time: string;
   position: number;
+  extra_info: string;
   created_at: string;
   coach_name: string;
 }

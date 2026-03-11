@@ -9,5 +9,5 @@ export const getPendingAchievements = () =>
   client.get<PendingAchievement[]>('/admin/achievements/pending');
 export const verifyAchievement = (id: number) =>
   client.put(`/admin/achievements/${id}/verify`, {});
-export const rejectAchievement = (id: number) =>
-  client.put(`/admin/achievements/${id}/reject`, {});
+export const rejectAchievement = (id: number, reason?: string) =>
+  client.put(`/admin/achievements/${id}/reject`, { reason: reason || '' });
