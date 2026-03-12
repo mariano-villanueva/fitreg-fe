@@ -140,7 +140,7 @@ export default function CoachProfileEdit() {
                 <div className="form-row">
                   <div className="form-group">
                     <label>{t('achievement_event_date')}</label>
-                    <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} required />
+                    <input type="date" value={eventDate} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setEventDate(e.target.value)} required />
                   </div>
                   <div className="form-group">
                     <label>{t('achievement_distance')}</label>
