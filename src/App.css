@@ -2858,3 +2858,338 @@
   margin-top: 0.25rem;
 }
 
+/* =============================================
+   MONTH CALENDAR
+   ============================================= */
+.month-calendar {
+  width: 100%;
+}
+
+.calendar-student-name {
+  color: #e0e0e0;
+  font-size: 14px;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  margin-bottom: 8px;
+}
+
+.calendar-month-label {
+  color: #e0e0e0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.calendar-loading {
+  text-align: center;
+  color: #888;
+  padding: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-header {
+  text-align: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.calendar-weekday {
+  color: #888;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.calendar-body {
+  gap: 1px;
+  background: #2a2a4a;
+}
+
+.calendar-cell {
+  background: #1a1a2e;
+  min-height: 90px;
+  padding: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+}
+
+.calendar-cell:hover {
+  background: #1e1e3a;
+}
+
+.calendar-cell-muted {
+  background: #141428;
+  cursor: default;
+}
+
+.calendar-cell-muted:hover {
+  background: #141428;
+}
+
+.calendar-cell-muted .calendar-day-number {
+  color: #555;
+}
+
+.calendar-cell-today {
+  box-shadow: inset 0 0 0 2px #6366f1;
+  border-radius: 4px;
+}
+
+.calendar-day-number {
+  color: #e0e0e0;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-today-badge {
+  font-size: 9px;
+  color: #6366f1;
+  font-weight: 700;
+}
+
+.calendar-workout {
+  margin-top: 4px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  border-left: 3px solid;
+}
+
+.calendar-workout-pending {
+  background: #1e3a5f;
+  border-left-color: #4a9eff;
+}
+
+.calendar-workout-completed {
+  background: #1a3a2a;
+  border-left-color: #4ade80;
+}
+
+.calendar-workout-skipped {
+  background: #3a2a1a;
+  border-left-color: #888;
+}
+
+.calendar-workout-title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calendar-workout-pending .calendar-workout-title { color: #4a9eff; }
+.calendar-workout-completed .calendar-workout-title { color: #4ade80; }
+.calendar-workout-skipped .calendar-workout-title { color: #888; }
+
+.calendar-workout-status {
+  color: #888;
+  font-size: 10px;
+}
+
+@media (max-width: 640px) {
+  .calendar-grid {
+    min-width: 560px;
+  }
+  .month-calendar {
+    overflow-x: auto;
+  }
+}
+
+/* =============================================
+   DAY MODAL
+   ============================================= */
+.day-modal {
+  max-width: 520px;
+  width: 95vw;
+  max-height: 90vh;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.day-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.day-modal-body {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.day-modal-weekday {
+  color: #888;
+  font-size: 12px;
+}
+
+.day-modal-date {
+  color: #e0e0e0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.day-modal-close {
+  background: #333;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #888;
+  font-size: 16px;
+  transition: background 0.15s;
+}
+
+.day-modal-close:hover {
+  background: #444;
+}
+
+.day-modal-card {
+  background: #1e1e3a;
+  border-radius: 10px;
+  padding: 16px;
+  border-left: 4px solid;
+  margin-bottom: 16px;
+}
+
+.day-modal-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.day-modal-card-title {
+  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.day-modal-card-meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+  color: #888;
+  font-size: 12px;
+}
+
+.day-modal-type-badge {
+  font-weight: 600;
+  font-size: 11px;
+  color: #4a9eff;
+}
+
+.day-modal-status {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.day-modal-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #2a2a4a;
+}
+
+.day-modal-section-label {
+  color: #888;
+  font-size: 11px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.day-modal-notes {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.day-modal-results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.day-modal-result-label {
+  color: #666;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.day-modal-result-value {
+  color: #e0e0e0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.day-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.day-modal-actions .btn {
+  flex: 1;
+}
+
+.day-modal-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.day-modal-empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.day-modal-empty p {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.day-modal-confirm {
+  padding: 8px 0;
+}
+
+.day-modal-confirm h3 {
+  margin-bottom: 8px;
+}
+
+.day-modal-confirm p {
+  color: #aaa;
+  margin-bottom: 16px;
+}
+
+.day-modal-complete h3 {
+  margin-bottom: 12px;
+}
+
+.calendar-inline-form .form-group {
+  margin-bottom: 12px;
+}
+
+.calendar-inline-form textarea {
+  resize: vertical;
+}
+

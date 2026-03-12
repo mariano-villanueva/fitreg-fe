@@ -30,6 +30,27 @@ export default {
     type_fartlek: 'Fartlek',
     type_other: 'Otro',
 
+    // Calendar
+    calendar_title: 'Calendario de Entrenamientos',
+    calendar_prev_month: '← Anterior',
+    calendar_next_month: 'Siguiente →',
+    calendar_today: 'HOY',
+    calendar_no_workout: 'No hay entrenamiento asignado para este día',
+    calendar_assign: 'Asignar entrenamiento',
+    calendar_results: 'RESULTADOS',
+    calendar_structure: 'ESTRUCTURA',
+    calendar_coach_notes: 'NOTAS DEL COACH',
+    calendar_edit: 'Editar',
+    calendar_delete: 'Eliminar',
+    calendar_confirm_delete: '¿Estás seguro de que querés eliminar este entrenamiento?',
+    weekday_sun: 'DOM',
+    weekday_mon: 'LUN',
+    weekday_tue: 'MAR',
+    weekday_wed: 'MIÉ',
+    weekday_thu: 'JUE',
+    weekday_fri: 'VIE',
+    weekday_sat: 'SÁB',
+
     // Workout fields
     field_date: 'Fecha',
     field_type: 'Tipo',
