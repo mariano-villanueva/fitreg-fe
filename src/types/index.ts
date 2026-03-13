@@ -11,6 +11,7 @@ export interface Workout {
   feeling: number | null;
   type: 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'fartlek' | 'other';
   notes: string;
+  segments?: WorkoutSegment[];
   created_at: string;
   updated_at: string;
 }
@@ -21,6 +22,7 @@ export interface User {
   email: string;
   name: string;
   avatar_url: string;
+  custom_avatar: string;
   sex: string;
   birth_date: string;
   age: number;
@@ -33,6 +35,9 @@ export interface User {
   coach_public: boolean;
   onboarding_completed: boolean;
   has_coach: boolean;
+  coach_id: number;
+  coach_name: string;
+  coach_avatar: string;
   created_at: string;
   updated_at: string;
 }
@@ -70,6 +75,7 @@ export interface AssignedWorkout {
   student_name?: string;
   coach_name?: string;
   segments?: WorkoutSegment[];
+  unread_message_count?: number;
 }
 
 export interface WorkoutSegment {
@@ -233,6 +239,18 @@ export interface NotificationPreferences {
   user_id: number;
   workout_assigned: boolean;
   workout_completed_or_skipped: boolean;
+  assignment_message: boolean;
+}
+
+export interface AssignmentMessage {
+  id: number;
+  assigned_workout_id: number;
+  sender_id: number;
+  sender_name: string;
+  sender_avatar: string;
+  body: string;
+  is_read: boolean;
+  created_at: string;
 }
 
 export interface FileResponse {
