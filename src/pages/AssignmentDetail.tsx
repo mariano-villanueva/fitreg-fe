@@ -144,19 +144,19 @@ export default function AssignmentDetail() {
         <div className="detail-grid">
           {workout.type && (
             <div className="detail-item">
-              <span className="detail-label">{t("assigned_type")}</span>
-              <span className="badge">{t(`workout_type_${workout.type}`)}</span>
+              <span className="detail-label">{t("field_type")}</span>
+              <span className="badge">{t(`type_${workout.type}`)}</span>
             </div>
           )}
           {workout.distance_km > 0 && (
             <div className="detail-item">
-              <span className="detail-label">{t("assigned_distance")}</span>
+              <span className="detail-label">{t("expected_field_distance")}</span>
               <span>{workout.distance_km} km</span>
             </div>
           )}
           {workout.duration_seconds > 0 && (
             <div className="detail-item">
-              <span className="detail-label">{t("assigned_duration")}</span>
+              <span className="detail-label">{t("field_duration")}</span>
               <span>{formatDuration(workout.duration_seconds)}</span>
             </div>
           )}
@@ -170,14 +170,14 @@ export default function AssignmentDetail() {
 
         {workout.segments && workout.segments.length > 0 && (
           <div className="day-modal-section">
-            <strong>{t("assigned_segments")}</strong>
+            <strong>{t("calendar_structure")}</strong>
             <SegmentDisplay segments={workout.segments} />
           </div>
         )}
 
         {workout.notes && (
           <div className="day-modal-section">
-            <strong>{t("assigned_notes")}</strong>
+            <strong>{t("calendar_coach_notes")}</strong>
             <p>{workout.notes}</p>
           </div>
         )}
@@ -192,29 +192,29 @@ export default function AssignmentDetail() {
         {/* Results if completed */}
         {workout.status === "completed" && (
           <div className="day-modal-section">
-            <strong>{t("assigned_results")}</strong>
+            <strong>{t("calendar_results")}</strong>
             <div className="detail-grid">
               {workout.result_time_seconds && (
                 <div className="detail-item">
-                  <span className="detail-label">{t("assigned_result_time")}</span>
+                  <span className="detail-label">{t("expected_field_time")}</span>
                   <span>{formatDuration(workout.result_time_seconds)}</span>
                 </div>
               )}
               {workout.result_distance_km && (
                 <div className="detail-item">
-                  <span className="detail-label">{t("assigned_result_distance")}</span>
+                  <span className="detail-label">{t("expected_field_distance")}</span>
                   <span>{workout.result_distance_km} km</span>
                 </div>
               )}
               {workout.result_heart_rate && (
                 <div className="detail-item">
-                  <span className="detail-label">{t("assigned_result_hr")}</span>
+                  <span className="detail-label">{t("expected_field_heart_rate")}</span>
                   <span>{workout.result_heart_rate} bpm</span>
                 </div>
               )}
               {workout.result_feeling && (
                 <div className="detail-item">
-                  <span className="detail-label">{t("assigned_result_feeling")}</span>
+                  <span className="detail-label">{t("expected_field_feeling")}</span>
                   <span>{workout.result_feeling}/10</span>
                 </div>
               )}

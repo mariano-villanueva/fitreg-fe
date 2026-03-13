@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useRole } from "../context/RoleContext";
 import { useTranslation } from "react-i18next";
+import Avatar from "./Avatar";
 
 interface SidebarProps {
   open: boolean;
@@ -40,9 +41,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       <aside className={`sidebar ${open ? 'sidebar-open' : ''}`}>
         {/* User info */}
         <div className="sidebar-user">
-          {user?.avatar_url && (
-            <img src={user.avatar_url} alt="" className="sidebar-avatar" />
-          )}
+          <Avatar src={user?.custom_avatar} name={user?.name} size={40} className="sidebar-avatar" />
           <div className="sidebar-user-info">
             <strong>{user?.name}</strong>
             <span className="sidebar-user-email">{user?.email}</span>

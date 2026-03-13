@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { listStudents, listAssignedWorkouts } from "../api/coach";
 import { createInvitation, listInvitations, cancelInvitation } from "../api/invitations";
 import type { Student, AssignedWorkout, Invitation } from "../types";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
+import Avatar from "../components/Avatar";
 
 export default function CoachDashboard() {
   const { t } = useTranslation();
@@ -52,8 +54,27 @@ export default function CoachDashboard() {
       setNewMessage("");
       setShowAddForm(false);
       loadData();
-    } catch {
-      showError(t('error'));
+    } catch (err) {
+      const msg = axios.isAxiosError(err) ? err.response?.data?.error : '';
+      switch (msg) {
+        case 'user_not_found':
+          showError(t('invitation_error_user_not_found'));
+          break;
+        case 'cannot_invite_self':
+          showError(t('invitation_error_self'));
+          break;
+        case 'invitation_already_pending':
+          showError(t('invitation_error_already_pending'));
+          break;
+        case 'already_connected':
+          showError(t('invitation_error_already_connected'));
+          break;
+        case 'student_max_coaches':
+          showError(t('invitation_error_max_coaches'));
+          break;
+        default:
+          showError(t('error'));
+      }
     } finally {
       setAdding(false);
     }
@@ -126,7 +147,7 @@ export default function CoachDashboard() {
             {pendingInvitations.map((inv) => (
               <div key={inv.id} className="invitation-card">
                 <div className="invitation-card-info">
-                  {inv.receiver_avatar && <img src={inv.receiver_avatar} alt="" className="student-avatar" />}
+                  <Avatar src={inv.receiver_avatar} name={inv.receiver_name} size={40} className="student-avatar" />
                   <div>
                     <strong>{inv.receiver_name}</strong>
                     {inv.message && <p className="invitation-message">{inv.message}</p>}
@@ -149,11 +170,7 @@ export default function CoachDashboard() {
             {students.map((student) => (
               <div key={student.id} className="student-card">
                 <div className="student-card-info">
-                  {student.avatar_url ? (
-                    <img src={student.avatar_url} alt="" className="student-avatar" />
-                  ) : (
-                    <div className="student-avatar-placeholder" />
-                  )}
+                  <Avatar src={student.avatar_url} name={student.name} size={40} className="student-avatar" />
                   <div>
                     <h3>{student.name}</h3>
                     <p className="student-email">{student.email}</p>

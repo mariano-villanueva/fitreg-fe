@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 import { getCoachProfile, upsertRating } from "../api/coaches";
 import { createInvitation } from "../api/invitations";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import type { CoachPublicProfile as CoachProfileType } from "../types";
 import { useFeedback } from "../context/FeedbackContext";
+import Avatar from "../components/Avatar";
+import ErrorState from "../components/ErrorState";
 
 export default function CoachPublicProfile() {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +17,7 @@ export default function CoachPublicProfile() {
   const { showSuccess, showError } = useFeedback();
   const [profile, setProfile] = useState<CoachProfileType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorType, setErrorType] = useState<"not_found" | "generic" | null>(null);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -34,7 +38,13 @@ export default function CoachPublicProfile() {
         setRating(myRating.rating);
         setComment(myRating.comment || "");
       }
-    } catch { setProfile(null); }
+    } catch (err) {
+      if (axios.isAxiosError(err) && (err.response?.status === 404 || err.response?.status === 403)) {
+        setErrorType("not_found");
+      } else {
+        setErrorType("generic");
+      }
+    }
     finally { setLoading(false); }
   }
 
@@ -67,7 +77,8 @@ export default function CoachPublicProfile() {
   }
 
   if (loading) return <div className="loading">{t('loading')}</div>;
-  if (!profile) return <div className="page"><p>{t('error')}</p></div>;
+  if (errorType) return <ErrorState type={errorType} backTo="/coaches" />;
+  if (!profile) return <ErrorState type="generic" backTo="/coaches" />;
 
   const verifiedAchievements = profile.achievements.filter((a) => a.is_verified);
   const myRating = profile.ratings.find((r) => r.student_id === user?.id);
@@ -79,7 +90,7 @@ export default function CoachPublicProfile() {
     <div className="page coach-public-page">
       {/* Hero section */}
       <div className="coach-hero">
-        <img src={profile.avatar_url || ''} alt={profile.name} className="coach-hero-avatar" />
+        <Avatar src={profile.avatar_url} name={profile.name} size={96} className="coach-hero-avatar" />
         <div className="coach-hero-info">
           <h1>{profile.name}</h1>
           {profile.avg_rating > 0 && (

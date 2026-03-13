@@ -21,3 +21,9 @@ export const requestCoach = (data: { locality: string; level: string[] }) =>
 
 export const getCoachRequestStatus = () =>
   client.get<{ status: 'none' | 'pending' | 'approved' }>('/coach-request');
+
+export const uploadAvatar = (image: string) =>
+  client.post('/me/avatar', { image });
+
+export const deleteAvatar = () =>
+  client.delete('/me/avatar');

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { listCoaches } from "../api/coaches";
 import { useTranslation } from "react-i18next";
+import Avatar from "../components/Avatar";
 import type { CoachListItem } from "../types";
 
 const LIMIT = 12;
@@ -148,7 +149,7 @@ export default function CoachDirectory() {
           <div className="coach-list">
             {coaches.map((coach) => (
               <Link to={`/coaches/${coach.id}`} key={coach.id} className="coach-list-item">
-                <img src={coach.avatar_url || ''} alt={coach.name} className="coach-list-avatar" />
+                <Avatar src={coach.avatar_url} name={coach.name} size={44} className="coach-list-avatar" />
                 <div className="coach-list-info">
                   <div className="coach-list-top">
                     <span className="coach-list-name">{coach.name}</span>

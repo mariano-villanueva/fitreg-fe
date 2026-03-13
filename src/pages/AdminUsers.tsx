@@ -24,7 +24,14 @@ export default function AdminUsers() {
   const [total, setTotal] = useState(0);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openMenu, setOpenMenu] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside() { setOpenMenu(null); }
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   // Debounce: update search state + reset page after 300ms of no typing
   useEffect(() => {
@@ -174,18 +181,30 @@ export default function AdminUsers() {
                 </td>
                 <td>{formatDate(u.created_at)}</td>
                 <td>
-                  <button
-                    className={`btn btn-sm${u.is_coach ? ' btn-danger' : ''}`}
-                    onClick={() => toggleRole(u.id, 'is_coach', u.is_coach)}
-                  >
-                    {u.is_coach ? '−' : '+'} {t('admin_toggle_coach')}
-                  </button>{' '}
-                  <button
-                    className={`btn btn-sm${u.is_admin ? ' btn-danger' : ''}`}
-                    onClick={() => toggleRole(u.id, 'is_admin', u.is_admin)}
-                  >
-                    {u.is_admin ? '−' : '+'} {t('admin_toggle_admin')}
-                  </button>
+                  <div className="admin-actions-menu" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="btn btn-sm admin-actions-trigger"
+                      onClick={() => setOpenMenu(openMenu === u.id ? null : u.id)}
+                    >
+                      ···
+                    </button>
+                    {openMenu === u.id && (
+                      <div className="admin-actions-dropdown">
+                        <button
+                          className={`admin-actions-item${u.is_coach ? ' admin-actions-item--danger' : ' admin-actions-item--add'}`}
+                          onClick={() => { toggleRole(u.id, 'is_coach', u.is_coach); setOpenMenu(null); }}
+                        >
+                          {u.is_coach ? `− ${t('admin_toggle_coach')}` : `+ ${t('admin_toggle_coach')}`}
+                        </button>
+                        <button
+                          className={`admin-actions-item${u.is_admin ? ' admin-actions-item--danger' : ' admin-actions-item--add'}`}
+                          onClick={() => { toggleRole(u.id, 'is_admin', u.is_admin); setOpenMenu(null); }}
+                        >
+                          {u.is_admin ? `− ${t('admin_toggle_admin')}` : `+ ${t('admin_toggle_admin')}`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

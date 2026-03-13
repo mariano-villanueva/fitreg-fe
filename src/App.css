@@ -3517,13 +3517,14 @@
 
 .admin-search-input {
   flex: 1;
-  max-width: 320px;
-  padding: 0.5rem 0.75rem;
+  max-width: 340px;
+  padding: 0.5rem 0.85rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-card);
   color: var(--text-primary);
   font-size: 0.9rem;
+  transition: border-color 0.15s;
 }
 
 .admin-search-input:focus {
@@ -3535,16 +3536,17 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .admin-role-pill {
-  padding: 0.35rem 0.85rem;
+  padding: 0.35rem 0.9rem;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--bg-card);
+  background: transparent;
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: 0.83rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -3557,8 +3559,39 @@
 .admin-role-pill--active {
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--bg-primary);
+  color: #000;
   font-weight: 600;
+}
+
+/* Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  border-bottom: 2px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .admin-table th.sortable {
@@ -3573,6 +3606,7 @@
 .admin-sort-indicator {
   margin-left: 0.25rem;
   font-size: 0.75rem;
+  opacity: 0.8;
 }
 
 .admin-user-cell {
@@ -3585,11 +3619,14 @@
   font-weight: 500;
 }
 
+/* Pagination */
 .admin-pagination {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
   font-size: 0.875rem;
   color: var(--text-secondary);
 }
@@ -3599,6 +3636,66 @@
   gap: 0.5rem;
 }
 
+/* Actions dropdown */
+.admin-actions-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.admin-actions-trigger {
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.6rem;
+  line-height: 1;
+}
+
+.admin-actions-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 100;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  min-width: 170px;
+  overflow: hidden;
+}
+
+.admin-actions-item {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.admin-actions-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-actions-item--add {
+  color: #00d4aa;
+}
+
+.admin-actions-item--add:hover {
+  background: rgba(0, 212, 170, 0.08);
+}
+
+.admin-actions-item--danger {
+  color: #ff4d6a;
+}
+
+.admin-actions-item--danger:hover {
+  background: rgba(255, 77, 106, 0.1);
+}
+
+/* Badges */
 .badge-admin {
   background: rgba(99, 102, 241, 0.15);
   color: #818cf8;
