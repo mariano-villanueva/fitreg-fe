@@ -3217,4 +3217,7 @@
 .template-card-meta { color: var(--text-secondary, #666); font-size: 0.8rem; margin: 0.5rem 0; }
 .template-card-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
 .modal-large { max-width: 700px; width: 95%; max-height: 90vh; overflow-y: auto; }
+.day-modal-assign-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.template-select-wrapper { position: relative; }
+.template-select { padding: 0.5rem 0.75rem; border: 1px solid var(--border-color, #e0e0e0); border-radius: 6px; font-size: 0.875rem; background: var(--card-bg, #fff); cursor: pointer; }
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import { deleteAssignedWorkout, updateAssignedWorkoutStatus } from "../api/coach";
-import type { AssignedWorkout, FileResponse } from "../types";
+import type { AssignedWorkout, FileResponse, WorkoutTemplate } from "../types";
 import SegmentDisplay from "./SegmentDisplay";
 import AssignWorkoutFields from "./AssignWorkoutFields";
 import ImageUpload from "./ImageUpload";
@@ -12,6 +12,7 @@ interface DayModalProps {
   workout: AssignedWorkout | null;
   role: 'coach' | 'student';
   studentId?: number;
+  templates?: WorkoutTemplate[];
   onClose: () => void;
   onRefresh: () => void;
 }
@@ -32,10 +33,11 @@ function formatDateLabel(dateStr: string, lang: string): { weekday: string; full
 
 type ModalView = 'detail' | 'create' | 'edit' | 'complete' | 'confirmDelete';
 
-export default function DayModal({ date, workout, role, studentId, onClose, onRefresh }: DayModalProps) {
+export default function DayModal({ date, workout, role, studentId, templates, onClose, onRefresh }: DayModalProps) {
   const { t, i18n } = useTranslation();
   const { showSuccess, showError, showWarning } = useFeedback();
   const [view, setView] = useState<ModalView>('detail');
+  const [selectedTemplate, setSelectedTemplate] = useState<WorkoutTemplate | null>(null);
 
   // Complete workout state
   const [timeH, setTimeH] = useState("");
@@ -130,8 +132,9 @@ export default function DayModal({ date, workout, role, studentId, onClose, onRe
             studentId={studentId || workout?.student_id || 0}
             dueDate={date}
             existingWorkout={view === 'edit' ? workout || undefined : undefined}
-            onSave={() => { showSuccess(view === 'edit' ? t('assigned_workout_updated') : t('assigned_workout_created')); onRefresh(); }}
-            onCancel={() => setView('detail')}
+            initialData={view === 'create' ? selectedTemplate || undefined : undefined}
+            onSave={() => { setSelectedTemplate(null); showSuccess(view === 'edit' ? t('assigned_workout_updated') : t('assigned_workout_created')); onRefresh(); }}
+            onCancel={() => { setSelectedTemplate(null); setView('detail'); }}
           />
         )}
 
@@ -303,9 +306,25 @@ export default function DayModal({ date, workout, role, studentId, onClose, onRe
                 <div className="day-modal-empty-icon">🏃</div>
                 <p>{t('calendar_no_workout')}</p>
                 {role === 'coach' && (
-                  <button className="btn btn-primary" onClick={() => setView('create')}>
-                    + {t('calendar_assign')}
-                  </button>
+                  <div className="day-modal-assign-actions">
+                    <button className="btn btn-primary" onClick={() => setView('create')}>
+                      + {t('calendar_assign')}
+                    </button>
+                    {templates && templates.length > 0 && (
+                      <div className="template-select-wrapper">
+                        <select className="template-select" value=""
+                          onChange={(e) => {
+                            const tmpl = templates.find(tpl => tpl.id === Number(e.target.value));
+                            if (tmpl) { setSelectedTemplate(tmpl); setView('create'); }
+                          }}>
+                          <option value="">{t('template_select')}</option>
+                          {templates.map(tmpl => (
+                            <option key={tmpl.id} value={tmpl.id}>{tmpl.title}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
