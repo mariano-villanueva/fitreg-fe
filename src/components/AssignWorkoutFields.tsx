@@ -1,37 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createAssignedWorkout, updateAssignedWorkout } from "../api/coach";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import SegmentBuilder from "./SegmentBuilder";
-import type { WorkoutSegment, ExpectedField, AssignedWorkout } from "../types";
+import type { WorkoutSegment, ExpectedField, AssignedWorkout, WorkoutTemplate } from "../types";
 
 const EXPECTED_FIELD_OPTIONS: ExpectedField[] = ['time', 'distance', 'heart_rate', 'feeling'];
 
 interface AssignWorkoutFieldsProps {
-  studentId: number;
-  dueDate: string;
+  studentId?: number;
+  dueDate?: string;
   existingWorkout?: AssignedWorkout;
-  onSave: () => void;
+  initialData?: WorkoutTemplate;
+  mode?: 'assignment' | 'template';
+  onSave: (data?: Record<string, unknown>) => void;
   onCancel: () => void;
 }
 
-export default function AssignWorkoutFields({ studentId, dueDate, existingWorkout, onSave, onCancel }: AssignWorkoutFieldsProps) {
+export default function AssignWorkoutFields({ studentId, dueDate, existingWorkout, initialData, mode, onSave, onCancel }: AssignWorkoutFieldsProps) {
   const { t } = useTranslation();
   const { showError } = useFeedback();
   const isEdit = !!existingWorkout;
 
-  const [title, setTitle] = useState(existingWorkout?.title || "");
-  const [description, setDescription] = useState(existingWorkout?.description || "");
-  const [type, setType] = useState(existingWorkout?.type || "easy");
-  const [segments, setSegments] = useState<WorkoutSegment[]>(existingWorkout?.segments || []);
-  const [date, setDate] = useState(existingWorkout?.due_date?.slice(0, 10) || dueDate);
-  const [notes, setNotes] = useState(existingWorkout?.notes || "");
-  const [expectedFields, setExpectedFields] = useState<ExpectedField[]>(existingWorkout?.expected_fields || []);
+  const source = existingWorkout || initialData;
+  const [title, setTitle] = useState(source?.title || "");
+  const [description, setDescription] = useState(source?.description || "");
+  const [type, setType] = useState(source?.type || "easy");
+  const [segments, setSegments] = useState<WorkoutSegment[]>(source?.segments || []);
+  const [date, setDate] = useState(existingWorkout?.due_date?.slice(0, 10) || dueDate || "");
+  const [notes, setNotes] = useState(source?.notes || "");
+  const [expectedFields, setExpectedFields] = useState<ExpectedField[]>(source?.expected_fields || []);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (initialData && !existingWorkout) {
+      setTitle(initialData.title || "");
+      setDescription(initialData.description || "");
+      setType(initialData.type || "easy");
+      setSegments(initialData.segments || []);
+      setNotes(initialData.notes || "");
+      setExpectedFields(initialData.expected_fields || []);
+    }
+  }, [initialData]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+
+    if (mode === 'template') {
+      const templatePayload = {
+        title, description, type, notes,
+        expected_fields: expectedFields,
+        segments,
+      };
+      onSave(templatePayload as unknown as Record<string, unknown>);
+      setSaving(false);
+      return;
+    }
 
     const payload = {
       student_id: studentId,
@@ -102,6 +127,7 @@ export default function AssignWorkoutFields({ studentId, dueDate, existingWorkou
 
       <SegmentBuilder segments={segments} onChange={setSegments} />
 
+      {mode !== 'template' && (
       <div className="form-group">
         <label htmlFor="assign-due-date">{t('assigned_due_date')}</label>
         <input
@@ -113,6 +139,7 @@ export default function AssignWorkoutFields({ studentId, dueDate, existingWorkou
           required
         />
       </div>
+      )}
 
       <div className="form-group">
         <label htmlFor="assign-notes">{t('field_notes')}</label>
@@ -147,7 +174,9 @@ export default function AssignWorkoutFields({ studentId, dueDate, existingWorkou
 
       <div className="form-actions">
         <button type="submit" className="btn btn-primary" disabled={saving}>
-          {saving ? t('form_saving') : t('form_save')}
+          {saving ? t('loading') : mode === 'template'
+            ? (initialData ? t('template_update') : t('template_save'))
+            : t('form_save')}
         </button>
         <button type="button" className="btn" onClick={onCancel}>
           {t('form_cancel')}
