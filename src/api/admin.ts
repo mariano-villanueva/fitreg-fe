@@ -1,8 +1,15 @@
 import client from './client';
-import type { AdminUser, AdminStats, PendingAchievement } from '../types';
+import type { AdminUser, AdminStats, PendingAchievement, AdminUsersResponse } from '../types';
 
 export const getAdminStats = () => client.get<AdminStats>('/admin/stats');
-export const listAdminUsers = () => client.get<AdminUser[]>('/admin/users');
+export const listAdminUsers = (params?: {
+  search?: string;
+  role?: 'athlete' | 'coach' | 'admin' | '';
+  sort?: 'name' | 'email' | 'created_at';
+  order?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}) => client.get<AdminUsersResponse>('/admin/users', { params });
 export const updateAdminUser = (id: number, data: { is_coach?: boolean; is_admin?: boolean }) =>
   client.put(`/admin/users/${id}`, data);
 export const getPendingAchievements = () =>

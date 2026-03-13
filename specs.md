@@ -37,7 +37,9 @@ FitRegFE/
     │   ├── AdminRoute.tsx         # Admin guard (requires is_admin)
     │   ├── RoleSwitcher.tsx       # Athlete/Coach toggle
     │   ├── SegmentBuilder.tsx     # Workout structure editor (table + dropdown + edit modal)
-    │   └── SegmentDisplay.tsx     # Read-only segment view
+    │   ├── SegmentDisplay.tsx     # Read-only segment view
+    │   ├── Avatar.tsx             # Avatar with base64/URL support and initials fallback
+    │   └── ErrorState.tsx         # Error display for not_found / generic errors with back link
     ├── pages/
     │   ├── Login.tsx              # Google Sign-In
     │   ├── Onboarding.tsx         # First-time user profile setup (birth_date, height)
@@ -110,11 +112,12 @@ Dev: TypeScript ~5.9.3, Vite ^7.3.1, ESLint ^9.39.1
 ```typescript
 interface User {
   id: number; google_id: string; email: string; name: string;
-  avatar_url: string; sex: string; birth_date: string; age: number;
+  avatar_url: string; custom_avatar: string; sex: string; birth_date: string; age: number;
   weight_kg: number; height_cm: number; language: string;
   is_coach: boolean; is_admin: boolean;
   coach_description: string; coach_public: boolean;
   onboarding_completed: boolean; has_coach: boolean;
+  coach_id?: number; coach_name?: string; coach_avatar?: string;  // set when has_coach=true
   created_at: string; updated_at: string;
 }
 ```
@@ -122,11 +125,13 @@ interface User {
 ### Workout (personal)
 ```typescript
 interface Workout {
-  id: number; user_id: number; assigned_workout_id: number | null;
+  id: number; user_id: number;
   date: string; distance_km: number; duration_seconds: number;
   avg_pace: string; calories: number; avg_heart_rate: number;
+  feeling: number | null;
   type: 'easy'|'tempo'|'intervals'|'long_run'|'race'|'other';
-  notes: string; created_at: string; updated_at: string;
+  notes: string; segments: WorkoutSegment[];
+  created_at: string; updated_at: string;
 }
 ```
 
@@ -205,6 +210,8 @@ Student, WorkoutSegment, CoachAchievement, CoachRating, CoachPublicProfile, Admi
 - `updateProfile(data)` → PUT /me → User (no is_coach field)
 - `requestCoach({ locality, level: string[] })` → POST /coach-request (level is array of selected levels)
 - `getCoachRequestStatus()` → GET /coach-request → `{ status }`
+- `uploadAvatar(image: string)` → POST /me/avatar (base64 data URI, max 500KB)
+- `deleteAvatar()` → DELETE /me/avatar
 
 ### Workouts API (workouts.ts)
 - `listWorkouts()` → GET /workouts → Workout[]
@@ -331,6 +338,15 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 - Shows RoleSwitcher if user.is_coach is true
 - User avatar + name link to profile
 
+### Avatar
+- Displays `custom_avatar` (base64) or URL image, with initials fallback when no image available
+- Props: `src`, `name`, `size`, `className`
+- Used in: Sidebar, CoachDashboard (students/invitations), CoachDirectory, CoachPublicProfile
+
+### ErrorState
+- Generic error component for `not_found` and `generic` error types with back link
+- Replaces inline `<div className="error">` patterns across detail/form pages
+
 ### NotificationBadge
 - Polls unread count on mount
 - Displays red badge with count when > 0
@@ -375,7 +391,17 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 - Detail modal with results section for completed assignments
 - Edit/delete hidden for completed assignments
 
+### AdminUsers
+- Actions column uses a `···` dropdown menu (`admin-actions-menu`) instead of inline buttons
+- Dropdown items colored: green (add role), red (remove role)
+- Closes on outside click
+
+### CoachDashboard
+- Invitation errors are mapped to specific i18n keys: `invitation_error_user_not_found`, `invitation_error_self`, `invitation_error_already_pending`, `invitation_error_already_connected`, `invitation_error_max_coaches`
+- Uses `Avatar` component for students and pending invitations
+
 ### CoachDirectory
+- Uses `Avatar` component for coach list items
 - Does NOT auto-load coaches on page load — shows hint message
 - Filters: search (name + description), locality, level, sort order
 - Sort options: best rated (default), alphabetical, newest, oldest
@@ -384,7 +410,15 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 - Paginated (12/page)
 
 ### WorkoutDetail
-- Edit/Delete buttons hidden when `workout.assigned_workout_id` exists
+- Edit/Delete buttons always visible for personal workouts
+- Delete uses confirmation modal (not browser `confirm()`)
+- Shows segments via `SegmentDisplay` if workout has segments
+- Uses `ErrorState` for 404/403 load errors
+
+### WorkoutForm
+- Requires at least one segment — shows `segment_required` error if none
+- Loads existing segments when editing a workout
+- Uses `ErrorState` for 404/403 load errors
 
 ### Notifications
 - Lists all notifications with time-ago display
@@ -413,6 +447,9 @@ CSS classes follow BEM-like conventions. Key class families:
 - `.assignments-table`, `.pagination` - Tables & pagination
 - `.coach-status-badge`, `.coach-status-pending`, `.coach-status-approved` - Coach request status
 - `.detail-card`, `.detail-grid`, `.detail-item` - Detail views
+- `.admin-table`, `.admin-table th/td` - Admin table with sortable headers
+- `.admin-actions-menu`, `.admin-actions-trigger`, `.admin-actions-dropdown`, `.admin-actions-item` - Admin dropdown actions
+- `.admin-actions-item--add`, `.admin-actions-item--danger` - Colored action items
 
 ## Google OAuth
 

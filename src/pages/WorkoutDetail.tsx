@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 import { getWorkout, deleteWorkout } from "../api/workouts";
 import type { Workout } from "../types";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
+import SegmentDisplay from "../components/SegmentDisplay";
+import ErrorState from "../components/ErrorState";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -31,6 +34,8 @@ export default function WorkoutDetail() {
 
   const [workout, setWorkout] = useState<Workout | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorType, setErrorType] = useState<"not_found" | "generic" | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const feedbackShown = useRef(false);
   useEffect(() => {
@@ -49,17 +54,21 @@ export default function WorkoutDetail() {
   async function loadData() {
     try {
       setLoading(true);
+      setErrorType(null);
       const w = await getWorkout(workoutId);
       setWorkout(w);
-    } catch {
-      showError("Failed to load run.");
+    } catch (err) {
+      if (axios.isAxiosError(err) && (err.response?.status === 404 || err.response?.status === 403)) {
+        setErrorType("not_found");
+      } else {
+        setErrorType("generic");
+      }
     } finally {
       setLoading(false);
     }
   }
 
   async function handleDeleteWorkout() {
-    if (!confirm(t('workouts_delete_confirm'))) return;
     try {
       await deleteWorkout(workoutId);
       navigate("/");
@@ -69,7 +78,8 @@ export default function WorkoutDetail() {
   }
 
   if (loading) return <div className="loading">{t('loading')}</div>;
-  if (!workout) return <div className="error">{t('error')}</div>;
+  if (errorType) return <ErrorState type={errorType} backTo="/workouts" />;
+  if (!workout) return <ErrorState type="generic" backTo="/workouts" />;
 
   return (
     <div className="page">
@@ -85,7 +95,7 @@ export default function WorkoutDetail() {
             <Link to={`/workouts/${workout.id}/edit`} className="btn">
               {t('detail_edit')}
             </Link>
-            <button className="btn btn-danger" onClick={handleDeleteWorkout}>
+            <button className="btn btn-danger" onClick={() => setShowDeleteModal(true)}>
               {t('detail_delete')}
             </button>
           </div>
@@ -130,6 +140,13 @@ export default function WorkoutDetail() {
           )}
         </div>
 
+        {workout.segments && workout.segments.length > 0 && (
+          <div className="detail-notes">
+            <span className="detail-label">{t('segment_structure')}</span>
+            <SegmentDisplay segments={workout.segments} />
+          </div>
+        )}
+
         {workout.notes && (
           <div className="detail-notes">
             <span className="detail-label">{t('field_notes')}</span>
@@ -137,6 +154,22 @@ export default function WorkoutDetail() {
           </div>
         )}
       </div>
+
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>{t('workouts_delete_confirm')}</h2>
+            <div className="modal-actions">
+              <button className="btn" onClick={() => setShowDeleteModal(false)}>
+                {t('cancel')}
+              </button>
+              <button className="btn btn-danger" onClick={handleDeleteWorkout}>
+                {t('delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

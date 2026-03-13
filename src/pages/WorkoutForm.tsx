@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 import { getWorkout, createWorkout, updateWorkout } from "../api/workouts";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import SegmentBuilder from "../components/SegmentBuilder";
-import type { WorkoutSegment } from "../types";
+import ErrorState from "../components/ErrorState";
+import type { Workout, WorkoutSegment } from "../types";
 
 type RunType = 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'fartlek' | 'other';
 
@@ -41,6 +43,7 @@ export default function WorkoutForm() {
   const [feeling, setFeeling] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(false);
+  const [errorType, setErrorType] = useState<"not_found" | "generic" | null>(null);
 
   const durationSeconds = useMemo(
     () => hours * 3600 + minutes * 60 + seconds,
@@ -76,8 +79,13 @@ export default function WorkoutForm() {
       setAvgHeartRate(workout.avg_heart_rate || 0);
       setFeeling(workout.feeling);
       setNotes(workout.notes);
-    } catch {
-      showError("Failed to load workout.");
+      setSegments(workout.segments || []);
+    } catch (err) {
+      if (axios.isAxiosError(err) && (err.response?.status === 404 || err.response?.status === 403)) {
+        setErrorType("not_found");
+      } else {
+        setErrorType("generic");
+      }
     } finally {
       setLoading(false);
     }
@@ -85,6 +93,11 @@ export default function WorkoutForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (segments.length === 0) {
+      showError(t('segment_required'));
+      return;
+    }
 
     const payload = {
       date,
@@ -95,7 +108,8 @@ export default function WorkoutForm() {
       avg_heart_rate: avgHeartRate,
       feeling: feeling,
       notes,
-    };
+      segments,
+    } as Omit<Workout, "id" | "user_id" | "assigned_workout_id" | "avg_pace" | "created_at" | "updated_at"> & { segments: WorkoutSegment[] };
 
     try {
       if (isEdit && id) {
@@ -111,6 +125,7 @@ export default function WorkoutForm() {
   }
 
   if (loading) return <div className="loading">{t('loading')}</div>;
+  if (errorType) return <ErrorState type={errorType} backTo="/workouts" />;
 
   return (
     <div className="page">

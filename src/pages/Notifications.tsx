@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
-import { listNotifications, markAllAsRead, executeAction } from "../api/notifications";
+import { listNotifications, markAsRead, markAllAsRead, executeAction } from "../api/notifications";
+import Avatar from "../components/Avatar";
 import type { AppNotification } from "../types";
 
 function timeAgo(dateStr: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
@@ -27,12 +29,40 @@ function notificationIcon(type: string): string {
     case 'invitation_rejected': return '❌';
     case 'achievement_verified': return '🏆';
     case 'achievement_rejected': return '⚠️';
+    case 'assignment_message': return '💬';
     default: return '🔔';
+  }
+}
+
+function getNotificationLink(n: AppNotification): string | null {
+  const meta = n.metadata || {};
+  switch (n.type) {
+    case 'workout_assigned':
+      return '/my-assignments';
+    case 'workout_completed':
+    case 'workout_skipped':
+      return meta.workout_id ? `/coach/assigned-workouts/${meta.workout_id}/edit` : '/coach';
+    case 'invitation_accepted':
+      return '/';
+    case 'achievement_verified':
+    case 'achievement_rejected':
+      return '/coach/profile';
+    case 'achievement_pending':
+      return meta.achievement_id ? `/admin/achievements/${meta.achievement_id}` : '/admin/achievements';
+    case 'coach_request_approved':
+      return '/coach/profile';
+    case 'relationship_ended':
+      return '/coaches';
+    case 'assignment_message':
+      return meta.assigned_workout_id ? `/assignments/${meta.assigned_workout_id}` : '/my-assignments';
+    default:
+      return null;
   }
 }
 
 export default function Notifications() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { showSuccess, showError } = useFeedback();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [readIds, setReadIds] = useState<Set<number>>(new Set());
@@ -49,7 +79,6 @@ export default function Notifications() {
       const res = await listNotifications();
       setNotifications(res.data);
       setReadIds(new Set(res.data.filter((n: AppNotification) => n.is_read).map((n: AppNotification) => n.id)));
-      markAllAsRead();
     } catch {
       // Fail silently
     } finally {
@@ -57,15 +86,46 @@ export default function Notifications() {
     }
   }
 
-  async function handleAction(notifId: number, actionKey: string) {
+  async function handleMarkAsRead(e: React.MouseEvent, notifId: number) {
+    e.stopPropagation();
+    try {
+      await markAsRead(notifId);
+      setReadIds((prev) => new Set([...prev, notifId]));
+    } catch {
+      showError(t('error'));
+    }
+  }
+
+  async function handleMarkAllAsRead() {
+    try {
+      await markAllAsRead();
+      setReadIds(new Set(notifications.map((n) => n.id)));
+    } catch {
+      showError(t('error'));
+    }
+  }
+
+  async function handleAction(e: React.MouseEvent, notifId: number, actionKey: string) {
+    e.stopPropagation();
     try {
       await executeAction(notifId, actionKey);
       showSuccess(t('notification_action_done'));
       const res = await listNotifications();
       setNotifications(res.data);
+      setReadIds(new Set(res.data.filter((n: AppNotification) => n.is_read).map((n: AppNotification) => n.id)));
     } catch {
       showError(t('error'));
     }
+  }
+
+  function handleNotificationClick(n: AppNotification) {
+    const link = getNotificationLink(n);
+    if (!link) return;
+    // Mark as read on navigation
+    if (!readIds.has(n.id)) {
+      markAsRead(n.id).catch(() => {});
+    }
+    navigate(link);
   }
 
   const newNotifications = notifications.filter((n) => !readIds.has(n.id));
@@ -78,9 +138,16 @@ export default function Notifications() {
     <div className="page notifications-page">
       <div className="notifications-header">
         <h1>{t('notification_title')}</h1>
-        {newNotifications.length > 0 && (
-          <span className="notifications-new-badge">{newNotifications.length} {t('notification_new_label')}</span>
-        )}
+        <div className="notifications-header-actions">
+          {newNotifications.length > 0 && (
+            <>
+              <span className="notifications-new-badge">{newNotifications.length} {t('notification_new_label')}</span>
+              <button className="btn btn-sm" onClick={handleMarkAllAsRead}>
+                {t('notification_mark_all_read')}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {notifications.length === 0 ? (
@@ -99,11 +166,17 @@ export default function Notifications() {
             <div className="notification-list">
               {visibleNotifications.map((n) => {
                 const isNew = !readIds.has(n.id);
+                const link = getNotificationLink(n);
+                const isClickable = link != null;
                 return (
-                  <div key={n.id} className={`notification-card ${isNew ? 'notification-card--new' : ''}`}>
+                  <div
+                    key={n.id}
+                    className={`notification-card ${isNew ? 'notification-card--new' : ''} ${isClickable ? 'notification-card--clickable' : ''}`}
+                    onClick={isClickable ? () => handleNotificationClick(n) : undefined}
+                  >
                     <div className="notification-card-icon">
                       {n.metadata?.sender_avatar ? (
-                        <img src={String(n.metadata.sender_avatar)} alt="" className="notification-avatar" />
+                        <Avatar src={String(n.metadata.sender_avatar)} name={String(n.metadata.sender_name || '')} size={42} className="notification-avatar" />
                       ) : (
                         <span className="notification-emoji">{notificationIcon(n.type)}</span>
                       )}
@@ -115,17 +188,29 @@ export default function Notifications() {
                         <span className="notification-card-time">{timeAgo(n.created_at, t)}</span>
                       </div>
                       <p className="notification-card-text">{t(n.body, { defaultValue: n.body, ...(n.metadata || {}) })}</p>
-                      {n.actions && n.actions.length > 0 && (
-                        <div className="notification-card-actions">
-                          {n.actions.map((action) => (
+                      {(isNew || (n.actions && n.actions.length > 0)) && (
+                        <div className="notification-card-footer">
+                          {n.actions && n.actions.length > 0 && (
+                            <div className="notification-card-actions">
+                              {n.actions.map((action) => (
+                                <button
+                                  key={action.key}
+                                  className={`btn btn-sm ${action.style === 'primary' ? 'btn-primary' : action.style === 'danger' ? 'btn-danger' : ''}`}
+                                  onClick={(e) => handleAction(e, n.id, action.key)}
+                                >
+                                  {t(action.label)}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                          {isNew && (
                             <button
-                              key={action.key}
-                              className={`btn btn-sm ${action.style === 'primary' ? 'btn-primary' : action.style === 'danger' ? 'btn-danger' : ''}`}
-                              onClick={() => handleAction(n.id, action.key)}
+                              className="btn btn-sm notification-mark-read-btn"
+                              onClick={(e) => handleMarkAsRead(e, n.id)}
                             >
-                              {t(action.label)}
+                              {t('notification_mark_read')}
                             </button>
-                          ))}
+                          )}
                         </div>
                       )}
                     </div>

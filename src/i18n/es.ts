@@ -5,6 +5,11 @@ export default {
     app_tagline: 'Tu tracker de running',
     profile: 'Perfil',
     logout: 'Cerrar sesión',
+    avatar_change: 'Cambiar foto',
+    avatar_remove: 'Quitar foto',
+    avatar_updated: 'Foto de perfil actualizada',
+    avatar_removed: 'Foto de perfil eliminada',
+    avatar_invalid_type: 'El archivo debe ser una imagen',
 
     // Login
     login_title: 'FitReg',
@@ -91,6 +96,9 @@ export default {
     profile_height: 'Altura (cm)',
     profile_age: 'Edad',
     profile_weight: 'Peso (kg)',
+    profile_my_coach: 'Mi Entrenador',
+    profile_no_coach: 'Todavía no tenés un entrenador asignado.',
+    profile_find_coach: 'Buscar entrenador',
     profile_save: 'Guardar cambios',
     profile_saving: 'Guardando...',
     profile_saved: 'Perfil actualizado correctamente',
@@ -176,6 +184,7 @@ export default {
     segment_rest: 'Descanso',
     segment_structure: 'Estructura del entrenamiento',
     segment_empty: 'Agregá bloques para armar el entrenamiento',
+    segment_required: 'Debés agregar al menos un bloque de trabajo',
     segment_col_reps: 'Reps',
     segment_col_exercise: 'Ejercicio',
     segment_duplicate: 'Duplicar',
@@ -289,6 +298,18 @@ export default {
     admin_reject_reason: 'Motivo del rechazo',
     admin_reject_reason_placeholder: 'Ej: No se pudo comprobar su logro, indique fuentes para validarlo',
     admin_reject_confirm: 'Confirmar rechazo',
+    admin_search_placeholder: 'Buscar por nombre o email',
+    admin_filter_all: 'Todos',
+    admin_filter_athlete: 'Atleta',
+    admin_filter_coach: 'Entrenador',
+    admin_filter_admin: 'Admin',
+    admin_col_name: 'Nombre',
+    admin_col_joined: 'Registro',
+    admin_col_roles: 'Roles',
+    admin_col_actions: 'Acciones',
+    admin_showing: 'Mostrando {{from}}–{{to}} de {{total}} usuarios',
+    admin_toggle_coach: 'Entrenador',
+    admin_toggle_admin: 'Admin',
 
     // Invitations
     invitation_invite_student: 'Invitar alumno',
@@ -318,6 +339,7 @@ export default {
     notification_no_new: 'No hay notificaciones nuevas.',
     notification_show_read: 'Ver notificaciones anteriores ({{count}})',
     notification_hide_read: 'Ocultar notificaciones anteriores',
+    notification_mark_read: 'Marcar como leída',
     notification_mark_all_read: 'Marcar todas como leídas',
     notification_new_label: 'nuevas',
     notification_action_done: 'Acción realizada correctamente',
@@ -357,11 +379,14 @@ export default {
     notif_coach_request_approved_body: 'Tu solicitud para ser entrenador fue aprobada',
     notif_coach_request_rejected_title: 'Solicitud rechazada',
     notif_coach_request_rejected_body: 'Tu solicitud para ser entrenador fue rechazada',
+    notif_assignment_message_title: 'Nuevo mensaje en asignación',
+    notif_assignment_message_body: '{{sender_name}} escribió en: {{workout_title}}',
 
     // Notification preferences
     notification_preferences: 'Preferencias de notificaciones',
     notification_pref_workout_assigned: 'Nuevo entrenamiento asignado',
     notification_pref_workout_status: 'Entrenamiento completado/omitido',
+    notification_pref_assignment_message: 'Mensajes en asignaciones',
 
     // Relationship
     relationship_end: 'Desvincular',
@@ -388,6 +413,11 @@ export default {
     assigned_deleted: 'Asignación eliminada correctamente',
     invitation_sent_success: 'Invitación enviada correctamente',
     invitation_cancelled_success: 'Invitación cancelada',
+    invitation_error_user_not_found: 'No existe un usuario registrado con este email',
+    invitation_error_self: 'No puedes enviarte una invitación a ti mismo',
+    invitation_error_already_pending: 'Ya existe una invitación pendiente con este usuario',
+    invitation_error_already_connected: 'Ya tienes una relación activa con este usuario',
+    invitation_error_max_coaches: 'Este alumno ya tiene el máximo de coaches permitidos',
     invitation_request_sent: 'Solicitud enviada correctamente',
     role_updated: 'Rol actualizado correctamente',
     achievement_saved: 'Logro guardado correctamente',
@@ -422,6 +452,12 @@ export default {
 
     loading: 'Cargando...',
     error: 'Error',
+    error_not_found_title: 'No encontrado',
+    error_not_found_message: 'Este contenido no existe o no tenés permiso para verlo.',
+    error_forbidden_title: 'Acceso denegado',
+    error_forbidden_message: 'No tenés permiso para ver este contenido.',
+    error_generic_title: 'Algo salió mal',
+    error_generic_message: 'Ocurrió un error inesperado. Intentá de nuevo más tarde.',
     delete: 'Eliminar',
     edit: 'Editar',
     save: 'Guardar',
@@ -443,5 +479,15 @@ export default {
     template_from: 'Desde plantilla',
     template_select: 'Seleccionar plantilla...',
     template_segments_count: '{{count}} segmento(s)',
+
+    // Assignment detail & messages
+    assignment_detail_title: 'Detalle de asignación',
+    assignment_back: '← Volver',
+    assignment_messages_title: 'Mensajes',
+    assignment_messages_empty: 'No hay mensajes aún.',
+    assignment_messages_placeholder: 'Escribe un mensaje...',
+    assignment_messages_send: 'Enviar',
+    assignment_messages_readonly: 'Los mensajes son de solo lectura para asignaciones finalizadas.',
+    assignment_messages_link: 'Mensajes',
   }
 };

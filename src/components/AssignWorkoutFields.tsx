@@ -47,6 +47,12 @@ export default function AssignWorkoutFields({ studentId, dueDate, existingWorkou
     e.preventDefault();
     setSaving(true);
 
+    if (segments.length === 0) {
+      showError(t('segment_required'));
+      setSaving(false);
+      return;
+    }
+
     if (mode === 'template') {
       const templatePayload = {
         title, description, type, notes,
