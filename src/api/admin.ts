@@ -1,5 +1,5 @@
 import client from './client';
-import type { AdminUser, AdminStats, PendingAchievement, AdminUsersResponse } from '../types';
+import type { AdminStats, PendingAchievement, AdminUsersResponse } from '../types';
 
 export const getAdminStats = () => client.get<AdminStats>('/admin/stats');
 export const listAdminUsers = (params?: {
