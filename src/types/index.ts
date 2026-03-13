@@ -89,6 +89,19 @@ export interface WorkoutSegment {
   rest_intensity: 'easy' | 'moderate' | 'fast' | 'sprint';
 }
 
+export interface WorkoutTemplate {
+  id: number;
+  coach_id: number;
+  title: string;
+  description: string | null;
+  type: string;
+  notes: string | null;
+  expected_fields: ExpectedField[] | null;
+  segments?: WorkoutSegment[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CoachAchievement {
   id: number;
   coach_id: number;
