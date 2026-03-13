@@ -174,6 +174,13 @@ export interface AdminUser {
   created_at: string;
 }
 
+export interface AdminUsersResponse {
+  users: AdminUser[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface AdminStats {
   total_users: number;
   total_coaches: number;
