@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import { deleteAssignedWorkout, updateAssignedWorkoutStatus } from "../api/coach";
@@ -312,6 +313,13 @@ export default function DayModal({ date, workout, role, studentId, templates, on
                     <button className="btn" onClick={handleSkip}>⊘ {t('assigned_mark_skipped')}</button>
                   </div>
                 )}
+                {/* Messages link */}
+                <Link to={`/assignments/${workout.id}`} className="btn btn-link assignment-messages-link" onClick={onClose}>
+                  💬 {t('assignment_messages_link')}
+                  {(workout.unread_message_count ?? 0) > 0 && (
+                    <span className="badge badge-accent">{workout.unread_message_count}</span>
+                  )}
+                </Link>
               </div>
             ) : (
               <div className="day-modal-empty">

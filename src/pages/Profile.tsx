@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useFeedback } from "../context/FeedbackContext";
-import { updateProfile, requestCoach, getCoachRequestStatus } from "../api/auth";
+import { updateProfile, requestCoach, getCoachRequestStatus, uploadAvatar, deleteAvatar } from "../api/auth";
+import { getMe } from "../api/auth";
 import { getNotificationPreferences, updateNotificationPreferences } from "../api/notifications";
 import { useTranslation } from "react-i18next";
+import Avatar from "../components/Avatar";
 import type { NotificationPreferences } from "../types";
 
 export default function Profile() {
@@ -24,6 +27,8 @@ export default function Profile() {
   const [requestingCoach, setRequestingCoach] = useState(false);
   const [coachLocality, setCoachLocality] = useState("");
   const [coachLevels, setCoachLevels] = useState<string[]>([]);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getNotificationPreferences().then((res) => setNotifPrefs(res.data)).catch(() => {});
@@ -42,6 +47,7 @@ export default function Profile() {
       await updateNotificationPreferences({
         workout_assigned: updated.workout_assigned,
         workout_completed_or_skipped: updated.workout_completed_or_skipped,
+        assignment_message: updated.assignment_message,
       });
       showSuccess(t('preferences_saved'));
     } catch {
@@ -63,6 +69,61 @@ export default function Profile() {
       showError("Failed to update profile.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  function resizeImage(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 200;
+        canvas.height = 200;
+        const ctx = canvas.getContext('2d')!;
+        const min = Math.min(img.width, img.height);
+        const sx = (img.width - min) / 2;
+        const sy = (img.height - min) / 2;
+        ctx.drawImage(img, sx, sy, min, min, 0, 0, 200, 200);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showError(t('avatar_invalid_type'));
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const dataUri = await resizeImage(file);
+      await uploadAvatar(dataUri);
+      const res = await getMe();
+      setUser(res.data);
+      showSuccess(t('avatar_updated'));
+    } catch {
+      showError(t('error'));
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
+  async function handleAvatarRemove() {
+    setUploadingAvatar(true);
+    try {
+      await deleteAvatar();
+      const res = await getMe();
+      setUser(res.data);
+      showSuccess(t('avatar_removed'));
+    } catch {
+      showError(t('error'));
+    } finally {
+      setUploadingAvatar(false);
     }
   }
 
@@ -94,7 +155,36 @@ export default function Profile() {
       <h1>{t('profile_title')}</h1>
 
       <div className="profile-info">
-        <img src={user.avatar_url} alt={user.name} className="profile-avatar" />
+        <div className="profile-avatar-wrapper">
+          <Avatar src={user.custom_avatar} name={user.name} size={64} className="profile-avatar" />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            style={{ display: 'none' }}
+          />
+          <div className="profile-avatar-actions">
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+            >
+              {uploadingAvatar ? t('loading') : t('avatar_change')}
+            </button>
+            {user.custom_avatar && (
+              <button
+                type="button"
+                className="btn btn-sm btn-danger"
+                onClick={handleAvatarRemove}
+                disabled={uploadingAvatar}
+              >
+                {t('avatar_remove')}
+              </button>
+            )}
+          </div>
+        </div>
         <div className="profile-details">
           <h2>{user.name}</h2>
           <p className="profile-email">{user.email}</p>
@@ -175,34 +265,62 @@ export default function Profile() {
           </select>
         </div>
 
-        {coachRequestStatus === 'approved' && (
-          <div className="coach-status-badge coach-status-approved">
-            {t('coach_request_approved_badge')}
+        {/* My Coach / Find a Coach section (only for non-coaches) */}
+        {!user.is_coach && (
+          <div className="form-group">
+            <label><strong>{t('profile_my_coach')}</strong></label>
+            {user.has_coach ? (
+              <Link to={`/coaches/${user.coach_id}`} className="my-coach-card">
+                <Avatar src={user.coach_avatar} name={user.coach_name} size={40} />
+                <span className="my-coach-name">{user.coach_name}</span>
+                <span className="my-coach-arrow">→</span>
+              </Link>
+            ) : (
+              <div className="my-coach-empty">
+                <p>{t('profile_no_coach')}</p>
+                <Link to="/coaches" className="btn btn-primary">
+                  {t('profile_find_coach')}
+                </Link>
+              </div>
+            )}
           </div>
-        )}
-        {coachRequestStatus === 'pending' && (
-          <div className="coach-status-badge coach-status-pending">
-            {t('coach_request_pending_badge')}
-          </div>
-        )}
-        {coachRequestStatus === 'none' && (
-          <button type="button" className="btn btn-coach-request" onClick={() => setShowCoachModal(true)}>
-            {t('coach_request_btn')}
-          </button>
         )}
 
-        {notifPrefs && (
+        {/* Become a coach (only for non-coaches) */}
+        {!user.is_coach && (
+          <>
+            {coachRequestStatus === 'approved' && (
+              <div className="coach-status-badge coach-status-approved">
+                {t('coach_request_approved_badge')}
+              </div>
+            )}
+            {coachRequestStatus === 'pending' && (
+              <div className="coach-status-badge coach-status-pending">
+                {t('coach_request_pending_badge')}
+              </div>
+            )}
+            {coachRequestStatus === 'none' && (
+              <button type="button" className="btn btn-coach-request" onClick={() => setShowCoachModal(true)}>
+                {t('coach_request_btn')}
+              </button>
+            )}
+          </>
+        )}
+
+        {notifPrefs && (user.has_coach || user.is_coach) && (
           <div className="form-group">
             <label><strong>{t('notification_preferences')}</strong></label>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={notifPrefs.workout_assigned}
-                onChange={(e) => handlePrefChange('workout_assigned', e.target.checked)}
-              />
-              <span>{t('notification_pref_workout_assigned')}</span>
-            </label>
-            {user?.is_coach && (
+            {user.has_coach && (
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={notifPrefs.workout_assigned}
+                  onChange={(e) => handlePrefChange('workout_assigned', e.target.checked)}
+                />
+                <span>{t('notification_pref_workout_assigned')}</span>
+              </label>
+            )}
+            {user.is_coach && (
               <label className="checkbox-label">
                 <input
                   type="checkbox"
@@ -210,6 +328,16 @@ export default function Profile() {
                   onChange={(e) => handlePrefChange('workout_completed_or_skipped', e.target.checked)}
                 />
                 <span>{t('notification_pref_workout_status')}</span>
+              </label>
+            )}
+            {(user.has_coach || user.is_coach) && (
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={notifPrefs.assignment_message}
+                  onChange={(e) => handlePrefChange('assignment_message', e.target.checked)}
+                />
+                <span>{t('notification_pref_assignment_message')}</span>
               </label>
             )}
           </div>

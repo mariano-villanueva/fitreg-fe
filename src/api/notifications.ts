@@ -19,5 +19,5 @@ export const executeAction = (id: number, action: string) =>
 export const getNotificationPreferences = () =>
   client.get<NotificationPreferences>('/notification-preferences');
 
-export const updateNotificationPreferences = (data: { workout_assigned: boolean; workout_completed_or_skipped: boolean }) =>
+export const updateNotificationPreferences = (data: { workout_assigned: boolean; workout_completed_or_skipped: boolean; assignment_message?: boolean }) =>
   client.put('/notification-preferences', data);

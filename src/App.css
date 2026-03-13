@@ -3269,6 +3269,22 @@
   flex: 1;
 }
 
+.assignment-messages-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.assignment-messages-link .badge-accent {
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+}
+
 .day-modal-empty {
   text-align: center;
   padding: 40px 20px;
