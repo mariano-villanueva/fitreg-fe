@@ -18,6 +18,7 @@ import MyAssignedWorkouts from "./pages/MyAssignedWorkouts";
 import CoachDirectory from "./pages/CoachDirectory";
 import CoachPublicProfile from "./pages/CoachPublicProfile";
 import CoachProfileEdit from "./pages/CoachProfileEdit";
+import CoachTemplates from "./pages/CoachTemplates";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminAchievements from "./pages/AdminAchievements";
@@ -55,6 +56,7 @@ function App() {
                 <Route path="/coaches" element={<ProtectedRoute><CoachDirectory /></ProtectedRoute>} />
                 <Route path="/coaches/:id" element={<ProtectedRoute><CoachPublicProfile /></ProtectedRoute>} />
                 <Route path="/coach/profile" element={<ProtectedRoute><CoachProfileEdit /></ProtectedRoute>} />
+                <Route path="/coach/templates" element={<ProtectedRoute><CoachTemplates /></ProtectedRoute>} />
                 <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                 <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />

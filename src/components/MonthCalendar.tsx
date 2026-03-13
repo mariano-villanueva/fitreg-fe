@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { listAssignedWorkouts, getMyAssignedWorkouts } from "../api/coach";
-import type { AssignedWorkout } from "../types";
+import { listTemplates } from "../api/templates";
+import type { AssignedWorkout, WorkoutTemplate } from "../types";
 import DayModal from "./DayModal";
 
 interface MonthCalendarProps {
@@ -60,6 +61,7 @@ export default function MonthCalendar({ role, studentId, studentName }: MonthCal
   const [workoutMap, setWorkoutMap] = useState<Record<string, AssignedWorkout[]>>({});
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
 
   const monthNames = i18n.language.startsWith('en') ? MONTH_NAMES_EN : MONTH_NAMES_ES;
 
@@ -98,6 +100,12 @@ export default function MonthCalendar({ role, studentId, studentName }: MonthCal
   useEffect(() => {
     fetchWorkouts();
   }, [fetchWorkouts]);
+
+  useEffect(() => {
+    if (role === 'coach') {
+      listTemplates().then(res => setTemplates(res.data)).catch(() => setTemplates([]));
+    }
+  }, [role]);
 
   function prevMonth() {
     if (month === 0) { setMonth(11); setYear(year - 1); }
@@ -148,7 +156,12 @@ export default function MonthCalendar({ role, studentId, studentName }: MonthCal
             <div
               key={idx}
               className={`calendar-cell ${!cell.isCurrentMonth ? 'calendar-cell-muted' : ''} ${isToday ? 'calendar-cell-today' : ''}`}
-              onClick={() => cell.isCurrentMonth && setSelectedDate(key)}
+              onClick={() => {
+                if (!cell.isCurrentMonth) return;
+                const isPast = key < new Date().toISOString().slice(0, 10);
+                if (role === 'coach' && isPast && !workout) return;
+                setSelectedDate(key);
+              }}
             >
               <span className="calendar-day-number">
                 {cell.day}
@@ -177,6 +190,7 @@ export default function MonthCalendar({ role, studentId, studentName }: MonthCal
           workout={selectedWorkout}
           role={role}
           studentId={studentId}
+          templates={templates}
           onClose={() => setSelectedDate(null)}
           onRefresh={() => { setSelectedDate(null); fetchWorkouts(); }}
         />

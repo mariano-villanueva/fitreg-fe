@@ -407,5 +407,21 @@ export default {
     save: 'Save',
     cancel: 'Cancel',
     close: 'Close',
+
+    // Templates
+    template_title: 'My Templates',
+    template_new: 'New Template',
+    template_edit: 'Edit Template',
+    template_delete: 'Delete Template',
+    template_delete_confirm: 'Delete this template? This action cannot be undone.',
+    template_save: 'Save Template',
+    template_update: 'Update Template',
+    template_created: 'Template created',
+    template_updated: 'Template updated',
+    template_deleted: 'Template deleted',
+    template_empty: "You don't have templates yet",
+    template_from: 'From Template',
+    template_select: 'Select template...',
+    template_segments_count: '{{count}} segment(s)',
   }
 };
