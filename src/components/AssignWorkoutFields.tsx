@@ -58,6 +58,12 @@ export default function AssignWorkoutFields({ studentId, dueDate, existingWorkou
       return;
     }
 
+    if (!studentId) {
+      showError("Student ID is required.");
+      setSaving(false);
+      return;
+    }
+
     const payload = {
       student_id: studentId,
       title,
