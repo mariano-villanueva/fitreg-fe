@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import { deleteAssignedWorkout, updateAssignedWorkoutStatus } from "../api/coach";
@@ -38,6 +38,18 @@ export default function DayModal({ date, workout, role, studentId, templates, on
   const { showSuccess, showError, showWarning } = useFeedback();
   const [view, setView] = useState<ModalView>('detail');
   const [selectedTemplate, setSelectedTemplate] = useState<WorkoutTemplate | null>(null);
+  const [templateOpen, setTemplateOpen] = useState(false);
+  const templateRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (templateRef.current && !templateRef.current.contains(e.target as Node)) {
+        setTemplateOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Complete workout state
   const [timeH, setTimeH] = useState("");
@@ -310,20 +322,42 @@ export default function DayModal({ date, workout, role, studentId, templates, on
                     <button className="btn btn-primary" onClick={() => setView('create')}>
                       + {t('calendar_assign')}
                     </button>
-                    {templates && templates.length > 0 && (
-                      <div className="template-select-wrapper">
-                        <select className="template-select" value=""
-                          onChange={(e) => {
-                            const tmpl = templates.find(tpl => tpl.id === Number(e.target.value));
-                            if (tmpl) { setSelectedTemplate(tmpl); setView('create'); }
-                          }}>
-                          <option value="">{t('template_select')}</option>
-                          {templates.map(tmpl => (
-                            <option key={tmpl.id} value={tmpl.id}>{tmpl.title}</option>
+                    <div className="template-dropdown" ref={templateRef}>
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-template-trigger"
+                        onClick={() => setTemplateOpen(!templateOpen)}
+                      >
+                        + {t('template_from')}
+                        <span className="template-chevron">{templateOpen ? '▴' : '▾'}</span>
+                      </button>
+                      {templateOpen && (
+                        <div className="template-dropdown-menu">
+                          {templates && templates.length > 0 && templates.map(tmpl => (
+                            <button
+                              key={tmpl.id}
+                              type="button"
+                              className="template-dropdown-item"
+                              onClick={() => {
+                                setSelectedTemplate(tmpl);
+                                setView('create');
+                                setTemplateOpen(false);
+                              }}
+                            >
+                              {tmpl.title}
+                              {tmpl.type && <span className="template-dropdown-type">{t(`type_${tmpl.type}`)}</span>}
+                            </button>
                           ))}
-                        </select>
-                      </div>
-                    )}
+                          <button
+                            type="button"
+                            className="template-dropdown-item template-dropdown-create"
+                            onClick={() => { window.location.href = '/coach/templates'; }}
+                          >
+                            + {t('template_new')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

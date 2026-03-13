@@ -156,7 +156,12 @@ export default function MonthCalendar({ role, studentId, studentName }: MonthCal
             <div
               key={idx}
               className={`calendar-cell ${!cell.isCurrentMonth ? 'calendar-cell-muted' : ''} ${isToday ? 'calendar-cell-today' : ''}`}
-              onClick={() => cell.isCurrentMonth && setSelectedDate(key)}
+              onClick={() => {
+                if (!cell.isCurrentMonth) return;
+                const isPast = key < new Date().toISOString().slice(0, 10);
+                if (role === 'coach' && isPast && !workout) return;
+                setSelectedDate(key);
+              }}
             >
               <span className="calendar-day-number">
                 {cell.day}
