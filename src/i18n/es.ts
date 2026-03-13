@@ -427,5 +427,21 @@ export default {
     save: 'Guardar',
     cancel: 'Cancelar',
     close: 'Cerrar',
+
+    // Templates
+    template_title: 'Mis Plantillas',
+    template_new: 'Nueva plantilla',
+    template_edit: 'Editar plantilla',
+    template_delete: 'Eliminar plantilla',
+    template_delete_confirm: '¿Eliminar esta plantilla? Esta acción no se puede deshacer.',
+    template_save: 'Guardar plantilla',
+    template_update: 'Actualizar plantilla',
+    template_created: 'Plantilla creada',
+    template_updated: 'Plantilla actualizada',
+    template_deleted: 'Plantilla eliminada',
+    template_empty: 'No tenés plantillas todavía',
+    template_from: 'Desde plantilla',
+    template_select: 'Seleccionar plantilla...',
+    template_segments_count: '{{count}} segmento(s)',
   }
 };
