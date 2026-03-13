@@ -634,6 +634,83 @@
   border: 2px solid var(--accent);
 }
 
+.profile-avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-avatar-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  gap: 0.5rem;
+}
+
+.error-state-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-state h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.error-state p {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  max-width: 400px;
+}
+
+.my-coach-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+
+.my-coach-card:hover {
+  border-color: var(--accent);
+}
+
+.my-coach-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.my-coach-arrow {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.my-coach-empty {
+  text-align: center;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.my-coach-empty p {
+  margin: 0 0 0.75rem;
+  color: var(--text-secondary);
+}
+
 .profile-details h2 {
   font-size: 1.2rem;
   font-weight: 600;
@@ -1864,12 +1941,19 @@
 .notifications-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 1.5rem;
 }
 
 .notifications-header h1 {
   margin-bottom: 0;
+}
+
+.notifications-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .notifications-new-badge {
@@ -1986,10 +2070,39 @@
   line-height: 1.4;
 }
 
+.notification-card--clickable {
+  cursor: pointer;
+}
+
+.notification-card--clickable:hover {
+  border-color: var(--accent);
+}
+
+.notification-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.notification-card-footer:empty {
+  display: none;
+}
+
 .notification-card-actions {
   display: flex;
   gap: 8px;
-  margin-top: 10px;
+}
+
+.notification-mark-read-btn {
+  margin-left: auto;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.notification-mark-read-btn:hover {
+  opacity: 1;
 }
 
 .notifications-toggle-read {
@@ -3277,5 +3390,104 @@
   border-top: 1px solid var(--border);
   color: var(--accent);
   font-weight: 600;
+}
+
+/* ============================================================
+   ASSIGNMENT DETAIL PAGE
+   ============================================================ */
+.assignment-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.assignment-detail-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+/* ============================================================
+   ASSIGNMENT MESSAGES
+   ============================================================ */
+.assignment-messages {
+  margin-top: 1.5rem;
+}
+
+.assignment-messages h3 {
+  margin-bottom: 1rem;
+}
+
+.assignment-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.assignment-message {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.assignment-message--own {
+  flex-direction: row-reverse;
+}
+
+.assignment-message-bubble {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  max-width: 75%;
+}
+
+.assignment-message--own .assignment-message-bubble {
+  background: rgba(0, 212, 170, 0.1);
+  border-color: rgba(0, 212, 170, 0.3);
+}
+
+.assignment-message-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.assignment-message-body {
+  margin: 0;
+  word-break: break-word;
+}
+
+.assignment-message-time {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  display: block;
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.assignment-message-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.assignment-message-input input {
+  flex: 1;
+}
+
+.assignment-message-input--disabled {
+  margin-top: 1rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
 }
 

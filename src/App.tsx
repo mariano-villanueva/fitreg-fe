@@ -26,6 +26,7 @@ import AdminAchievementDetail from "./pages/AdminAchievementDetail";
 import AdminRoute from "./components/AdminRoute";
 import Notifications from "./pages/Notifications";
 import Onboarding from "./pages/Onboarding";
+import AssignmentDetail from "./pages/AssignmentDetail";
 import "./App.css";
 
 const GOOGLE_CLIENT_ID = "1022083787469-g78j2i0b1shlrdd26ttb8jsham44fbcq.apps.googleusercontent.com";
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/coach/assign/:studentId" element={<ProtectedRoute><AssignWorkoutForm /></ProtectedRoute>} />
                 <Route path="/coach/assigned-workouts/:id/edit" element={<ProtectedRoute><AssignWorkoutForm /></ProtectedRoute>} />
                 <Route path="/my-assignments" element={<ProtectedRoute><MyAssignedWorkouts /></ProtectedRoute>} />
+                <Route path="/assignments/:id" element={<ProtectedRoute><AssignmentDetail /></ProtectedRoute>} />
                 <Route path="/coaches" element={<ProtectedRoute><CoachDirectory /></ProtectedRoute>} />
                 <Route path="/coaches/:id" element={<ProtectedRoute><CoachPublicProfile /></ProtectedRoute>} />
                 <Route path="/coach/profile" element={<ProtectedRoute><CoachProfileEdit /></ProtectedRoute>} />
