@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getAssignedWorkout } from "../api/coach";
 import { useTranslation } from "react-i18next";
-import { useFeedback } from "../context/FeedbackContext";
 import AssignWorkoutFields from "../components/AssignWorkoutFields";
 import ErrorState from "../components/ErrorState";
 import type { AssignedWorkout } from "../types";
@@ -13,7 +12,6 @@ export default function AssignWorkoutForm() {
   const isEdit = !!id;
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { showError } = useFeedback();
   const [loading, setLoading] = useState(false);
   const [errorType, setErrorType] = useState<"not_found" | "generic" | null>(null);
   const [existingWorkout, setExistingWorkout] = useState<AssignedWorkout | undefined>();
