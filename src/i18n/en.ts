@@ -4,6 +4,11 @@ export default {
     app_tagline: 'Your running tracker',
     profile: 'Profile',
     logout: 'Log out',
+    avatar_change: 'Change photo',
+    avatar_remove: 'Remove photo',
+    avatar_updated: 'Profile photo updated',
+    avatar_removed: 'Profile photo removed',
+    avatar_invalid_type: 'File must be an image',
 
     login_title: 'FitReg',
     login_subtitle: 'Track your running progress',
@@ -83,6 +88,9 @@ export default {
     profile_height: 'Height (cm)',
     profile_age: 'Age',
     profile_weight: 'Weight (kg)',
+    profile_my_coach: 'My Coach',
+    profile_no_coach: "You don't have a coach yet.",
+    profile_find_coach: 'Find a coach',
     profile_save: 'Save changes',
     profile_saving: 'Saving...',
     profile_saved: 'Profile updated successfully',
@@ -163,6 +171,7 @@ export default {
     segment_rest: 'Rest',
     segment_structure: 'Workout structure',
     segment_empty: 'Add blocks to build the workout',
+    segment_required: 'You must add at least one workout block',
     segment_col_reps: 'Reps',
     segment_col_exercise: 'Exercise',
     segment_duplicate: 'Duplicate',
@@ -302,6 +311,7 @@ export default {
     notification_no_new: 'No new notifications.',
     notification_show_read: 'Show older notifications ({{count}})',
     notification_hide_read: 'Hide older notifications',
+    notification_mark_read: 'Mark as read',
     notification_mark_all_read: 'Mark all as read',
     notification_new_label: 'new',
     notification_action_done: 'Action completed successfully',
@@ -341,11 +351,14 @@ export default {
     notif_coach_request_approved_body: 'Your request to become a coach has been approved',
     notif_coach_request_rejected_title: 'Request rejected',
     notif_coach_request_rejected_body: 'Your request to become a coach has been rejected',
+    notif_assignment_message_title: 'New assignment message',
+    notif_assignment_message_body: '{{sender_name}} wrote in: {{workout_title}}',
 
     // Notification preferences
     notification_preferences: 'Notification preferences',
     notification_pref_workout_assigned: 'New assigned workout',
     notification_pref_workout_status: 'Workout completed/skipped',
+    notification_pref_assignment_message: 'Assignment messages',
 
     // Relationship
     relationship_end: 'End relationship',
@@ -402,6 +415,12 @@ export default {
 
     loading: 'Loading...',
     error: 'Error',
+    error_not_found_title: 'Not found',
+    error_not_found_message: "This content doesn't exist or you don't have permission to view it.",
+    error_forbidden_title: 'Access denied',
+    error_forbidden_message: "You don't have permission to view this content.",
+    error_generic_title: 'Something went wrong',
+    error_generic_message: 'An unexpected error occurred. Please try again later.',
     delete: 'Delete',
     edit: 'Edit',
     save: 'Save',
@@ -423,5 +442,15 @@ export default {
     template_from: 'From Template',
     template_select: 'Select template...',
     template_segments_count: '{{count}} segment(s)',
+
+    // Assignment detail & messages
+    assignment_detail_title: 'Assignment detail',
+    assignment_back: '← Back',
+    assignment_messages_title: 'Messages',
+    assignment_messages_empty: 'No messages yet.',
+    assignment_messages_placeholder: 'Write a message...',
+    assignment_messages_send: 'Send',
+    assignment_messages_readonly: 'Messages are read-only for completed assignments.',
+    assignment_messages_link: 'Messages',
   }
 };
