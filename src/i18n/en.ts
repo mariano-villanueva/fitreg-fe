@@ -469,5 +469,24 @@ export default {
     assignment_messages_send: 'Send',
     assignment_messages_readonly: 'Messages are read-only for completed assignments.',
     assignment_messages_link: 'Messages',
+
+    // Coach Daily View
+    daily_title: 'Daily student view',
+    daily_hide_empty: 'Hide unassigned',
+    daily_no_assignment: 'No workout assigned',
+    daily_prev: 'Previous',
+    daily_next: 'Next',
+    daily_today: 'Today',
+    daily_col_student: 'Student',
+    daily_col_workout: 'Workout',
+    daily_col_type: 'Type',
+    daily_col_status: 'Status',
+    daily_no_students: 'You have no active students',
+    daily_all_hidden: 'All students are hidden by the active filter',
+    daily_modal_results: 'Results',
+    daily_modal_segments: 'Segments',
+    daily_modal_description: 'Description',
+    daily_modal_notes: 'Notes',
+    daily_retry: 'Retry',
   }
 };

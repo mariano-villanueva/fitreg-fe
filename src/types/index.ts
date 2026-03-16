@@ -269,3 +269,10 @@ export interface FileResponse {
   url: string;
   created_at: string;
 }
+
+export interface DailySummaryItem {
+  student_id: number;
+  student_name: string;
+  student_avatar: string | null;
+  assigned_workout: AssignedWorkout | null;
+}
