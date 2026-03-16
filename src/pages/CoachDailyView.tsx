@@ -6,7 +6,8 @@ import Avatar from '../components/Avatar';
 import SegmentDisplay from '../components/SegmentDisplay';
 
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function formatSeconds(seconds: number): string {
@@ -20,7 +21,7 @@ function formatSeconds(seconds: number): string {
 function addDays(dateStr: string, delta: number): string {
   const d = new Date(dateStr + 'T00:00:00');
   d.setDate(d.getDate() + delta);
-  return d.toISOString().slice(0, 10);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function StatusBadge({ workout }: { workout: AssignedWorkout }) {
