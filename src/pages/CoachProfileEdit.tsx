@@ -187,7 +187,7 @@ export default function CoachProfileEdit() {
                 <th>{t('achievement_position')}</th>
                 <th>{t('achievement_extra_info')}</th>
                 <th>{t('achievement_public')}</th>
-                <th></th>
+                <th>{t('assigned_status')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -203,11 +203,13 @@ export default function CoachProfileEdit() {
                     <td>{a.position > 0 ? `#${a.position}` : '—'}</td>
                     <td className="achievement-extra-info-cell">{a.extra_info || '—'}</td>
                     <td style={{ textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
-                        checked={a.is_public}
-                        onChange={() => handleTogglePublic(a)}
-                      />
+                      <label className="checkbox-label" style={{ justifyContent: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={a.is_public}
+                          onChange={() => handleTogglePublic(a)}
+                        />
+                      </label>
                     </td>
                     <td>
                       {status === 'verified' && (

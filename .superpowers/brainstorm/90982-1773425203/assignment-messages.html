@@ -1,0 +1,216 @@
+<h2>Mensajes en Asignaciones — Opciones de Layout</h2>
+<p class="subtitle">Pagina dedicada <code>/assignments/:id</code> con detalle + chat. Click para elegir.</p>
+
+<div class="cards">
+
+  <!-- OPTION A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;">
+      <div style="background:#1a1a2e;color:#e0e0e0;font-family:-apple-system,system-ui,sans-serif;font-size:12px;padding:16px;min-height:520px;">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span style="color:#4a9eff;font-size:13px;">← Volver</span>
+          <span style="background:#4a9eff22;color:#4a9eff;padding:2px 10px;border-radius:12px;font-size:11px;">⏳ Pendiente</span>
+        </div>
+        <!-- Detail card -->
+        <div style="background:#16213e;border:1px solid #333;border-radius:10px;padding:14px;margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;">3k Suave</div>
+          <div style="display:flex;gap:12px;color:#888;font-size:11px;margin-bottom:8px;">
+            <span>📏 3 km</span><span>⏱ 00:20:00</span><span style="background:#4ade8033;color:#4ade80;padding:1px 6px;border-radius:4px;">Fácil</span>
+          </div>
+          <div style="font-size:10px;color:#666;text-transform:uppercase;margin-bottom:4px;">Estructura</div>
+          <div style="background:#1a1a2e;border-radius:6px;padding:8px;font-size:11px;margin-bottom:8px;">3 km — Suave</div>
+          <div style="font-size:10px;color:#666;text-transform:uppercase;margin-bottom:4px;">Notas del coach</div>
+          <div style="font-size:11px;color:#aaa;">Ritmo cómodo, sin forzar. Enfocate en la respiración.</div>
+        </div>
+        <!-- Messages section -->
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Mensajes (3)</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+          <!-- Student msg -->
+          <div style="display:flex;gap:8px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#4a9eff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">M</div>
+            <div>
+              <div style="font-size:10px;color:#888;margin-bottom:2px;">Mariano · 14:30</div>
+              <div style="background:#4a9eff22;border-radius:8px;padding:8px 10px;font-size:11px;max-width:220px;">A qué ritmo hago los 3k?</div>
+            </div>
+          </div>
+          <!-- Coach msg -->
+          <div style="display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#e67e22;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">C</div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;color:#888;margin-bottom:2px;">Coach · 14:45</div>
+              <div style="background:#e67e2222;border-radius:8px;padding:8px 10px;font-size:11px;max-width:220px;text-align:left;">Entre 6:00 y 6:30 /km, sin apurarte</div>
+            </div>
+          </div>
+          <!-- Student msg -->
+          <div style="display:flex;gap:8px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#4a9eff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">M</div>
+            <div>
+              <div style="font-size:10px;color:#888;margin-bottom:2px;">Mariano · 14:50</div>
+              <div style="background:#4a9eff22;border-radius:8px;padding:8px 10px;font-size:11px;max-width:220px;">Dale, gracias!</div>
+            </div>
+          </div>
+        </div>
+        <!-- Input -->
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="flex:1;background:#16213e;border:1px solid #333;border-radius:8px;padding:8px 10px;font-size:11px;color:#666;">Escribir mensaje...</div>
+          <div style="width:32px;height:32px;background:#4a9eff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;">➤</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Detalle + Chat lineal</h3>
+      <p>Detalle completo arriba, mensajes tipo chat abajo. Todo en un scroll continuo. Simple y familiar.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pro</h4><ul><li>Familiar (tipo WhatsApp)</li><li>Simple de implementar</li><li>Igual en mobile y desktop</li></ul></div>
+        <div class="cons"><h4>Contra</h4><ul><li>Scroll largo si el detalle es extenso</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;">
+      <div style="background:#1a1a2e;color:#e0e0e0;font-family:-apple-system,system-ui,sans-serif;font-size:12px;padding:16px;min-height:520px;">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span style="color:#4a9eff;font-size:13px;">← Volver</span>
+          <span style="background:#4a9eff22;color:#4a9eff;padding:2px 10px;border-radius:12px;font-size:11px;">⏳ Pendiente</span>
+        </div>
+        <!-- Collapsible detail -->
+        <div style="background:#16213e;border:1px solid #333;border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <span style="font-size:15px;font-weight:700;">3k Suave</span>
+              <div style="display:flex;gap:10px;color:#888;font-size:11px;margin-top:4px;">
+                <span>📏 3 km</span><span>⏱ 00:20:00</span><span style="background:#4ade8033;color:#4ade80;padding:1px 6px;border-radius:4px;">Fácil</span>
+              </div>
+            </div>
+            <span style="color:#666;font-size:16px;">▾</span>
+          </div>
+          <!-- Collapsed content shown -->
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid #333;">
+            <div style="font-size:10px;color:#666;text-transform:uppercase;margin-bottom:4px;">Estructura</div>
+            <div style="background:#1a1a2e;border-radius:6px;padding:8px;font-size:11px;margin-bottom:8px;">3 km — Suave</div>
+            <div style="font-size:10px;color:#666;text-transform:uppercase;margin-bottom:4px;">Notas del coach</div>
+            <div style="font-size:11px;color:#aaa;">Ritmo cómodo, sin forzar.</div>
+          </div>
+        </div>
+        <!-- Messages section - more prominent -->
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Mensajes (3)</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+          <div style="display:flex;gap:8px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#4a9eff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">M</div>
+            <div>
+              <div style="font-size:10px;color:#888;margin-bottom:2px;">Mariano · 14:30</div>
+              <div style="background:#4a9eff22;border-radius:8px;padding:8px 10px;font-size:11px;max-width:220px;">A qué ritmo hago los 3k?</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#e67e22;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">C</div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;color:#888;margin-bottom:2px;">Coach · 14:45</div>
+              <div style="background:#e67e2222;border-radius:8px;padding:8px 10px;font-size:11px;max-width:220px;text-align:left;">Entre 6:00 y 6:30 /km, sin apurarte</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#4a9eff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">M</div>
+            <div>
+              <div style="font-size:10px;color:#888;margin-bottom:2px;">Mariano · 14:50</div>
+              <div style="background:#4a9eff22;border-radius:8px;padding:8px 10px;font-size:11px;max-width:220px;">Dale, gracias!</div>
+            </div>
+          </div>
+        </div>
+        <!-- Input -->
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="flex:1;background:#16213e;border:1px solid #333;border-radius:8px;padding:8px 10px;font-size:11px;color:#666;">Escribir mensaje...</div>
+          <div style="width:32px;height:32px;background:#4a9eff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;">➤</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Detalle colapsable + Chat prominente</h3>
+      <p>El detalle es un card con toggle ▾/▴. Los mensajes son el foco principal de la pagina.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pro</h4><ul><li>Chat siempre accesible</li><li>Detalle no estorba</li><li>Buen balance</li></ul></div>
+        <div class="cons"><h4>Contra</h4><ul><li>Un click extra para ver detalle expandido</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;">
+      <div style="background:#1a1a2e;color:#e0e0e0;font-family:-apple-system,system-ui,sans-serif;font-size:12px;padding:16px;min-height:520px;">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span style="color:#4a9eff;font-size:13px;">← Volver</span>
+          <span style="background:#4a9eff22;color:#4a9eff;padding:2px 10px;border-radius:12px;font-size:11px;">⏳ Pendiente</span>
+        </div>
+        <!-- Two column layout -->
+        <div style="display:flex;gap:12px;height:440px;">
+          <!-- Left: Detail -->
+          <div style="flex:1;background:#16213e;border:1px solid #333;border-radius:10px;padding:14px;overflow-y:auto;">
+            <div style="font-size:15px;font-weight:700;margin-bottom:6px;">3k Suave</div>
+            <div style="display:flex;gap:10px;color:#888;font-size:11px;margin-bottom:10px;">
+              <span>📏 3 km</span><span>⏱ 00:20:00</span>
+            </div>
+            <span style="background:#4ade8033;color:#4ade80;padding:1px 6px;border-radius:4px;font-size:10px;">Fácil</span>
+            <div style="margin-top:12px;">
+              <div style="font-size:10px;color:#666;text-transform:uppercase;margin-bottom:4px;">Estructura</div>
+              <div style="background:#1a1a2e;border-radius:6px;padding:8px;font-size:11px;margin-bottom:10px;">3 km — Suave</div>
+              <div style="font-size:10px;color:#666;text-transform:uppercase;margin-bottom:4px;">Notas del coach</div>
+              <div style="font-size:11px;color:#aaa;">Ritmo cómodo, sin forzar. Enfocate en la respiración.</div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:8px;">
+              <div style="flex:1;background:#4a9eff;color:white;text-align:center;padding:6px;border-radius:6px;font-size:11px;font-weight:600;">✅ Completar</div>
+              <div style="flex:1;background:#333;color:#aaa;text-align:center;padding:6px;border-radius:6px;font-size:11px;">⊘ Omitir</div>
+            </div>
+          </div>
+          <!-- Right: Messages -->
+          <div style="flex:1;display:flex;flex-direction:column;background:#16213e;border:1px solid #333;border-radius:10px;overflow:hidden;">
+            <div style="padding:10px 14px;border-bottom:1px solid #333;font-weight:600;font-size:12px;">Mensajes (3)</div>
+            <div style="flex:1;padding:10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;">
+              <div style="display:flex;gap:6px;align-items:flex-start;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#4a9eff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;">M</div>
+                <div>
+                  <div style="font-size:9px;color:#888;margin-bottom:1px;">Mariano · 14:30</div>
+                  <div style="background:#4a9eff22;border-radius:6px;padding:6px 8px;font-size:10px;">A qué ritmo hago los 3k?</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:flex-start;flex-direction:row-reverse;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#e67e22;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;">C</div>
+                <div style="text-align:right;">
+                  <div style="font-size:9px;color:#888;margin-bottom:1px;">Coach · 14:45</div>
+                  <div style="background:#e67e2222;border-radius:6px;padding:6px 8px;font-size:10px;text-align:left;">Entre 6:00 y 6:30 /km</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:flex-start;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#4a9eff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;">M</div>
+                <div>
+                  <div style="font-size:9px;color:#888;margin-bottom:1px;">Mariano · 14:50</div>
+                  <div style="background:#4a9eff22;border-radius:6px;padding:6px 8px;font-size:10px;">Dale, gracias!</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:8px;border-top:1px solid #333;display:flex;gap:6px;">
+              <div style="flex:1;background:#1a1a2e;border:1px solid #333;border-radius:6px;padding:6px 8px;font-size:10px;color:#666;">Escribir mensaje...</div>
+              <div style="width:28px;height:28px;background:#4a9eff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">➤</div>
+            </div>
+          </div>
+        </div>
+        <!-- Mobile note -->
+        <div style="margin-top:8px;text-align:center;font-size:10px;color:#555;">En mobile → tabs [Detalle] [Mensajes (3)]</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Dos columnas (desktop) / Tabs (mobile)</h3>
+      <p>Detalle a la izquierda, chat a la derecha. En mobile se convierte en tabs.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pro</h4><ul><li>Todo visible a la vez en desktop</li><li>Maximo uso del espacio</li></ul></div>
+        <div class="cons"><h4>Contra</h4><ul><li>Mas complejo de implementar</li><li>Rompe con el estilo actual de la app</li><li>En mobile pierde contexto con tabs</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>

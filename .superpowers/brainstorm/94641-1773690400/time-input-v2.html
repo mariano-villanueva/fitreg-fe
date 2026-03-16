@@ -1,0 +1,369 @@
+<h2>B vs C — Variantes de diseño</h2>
+<p class="subtitle">Dos estilos distintos de cada opción. Hacé clic para seleccionar tu favorita.</p>
+
+<style>
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  @media (max-width: 700px) { .demo-grid { grid-template-columns: 1fr; } }
+
+  .demo-card {
+    background: #1a1d2e;
+    border: 2px solid #2a2d3e;
+    border-radius: 14px;
+    padding: 24px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  }
+  .demo-card:hover { border-color: #00d4aa44; transform: translateY(-1px); }
+  .demo-card.selected-card { border-color: #00d4aa; background: #0d2e2a; }
+
+  .card-tag { font-size: 11px; color: #00d4aa; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 4px; }
+  .card-title { font-size: 15px; font-weight: 600; color: #eee; margin-bottom: 4px; }
+  .card-desc { font-size: 12px; color: #555; margin-bottom: 20px; }
+  .select-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #2a2d3e; display:flex; align-items:center; justify-content:center; font-size:12px; transition: all 0.2s; }
+  .demo-card.selected-card .select-check { background: #00d4aa; border-color: #00d4aa; color: #0f1117; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+
+  /* ───── B1: Reloj minimalista ───── */
+  .b1-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .b1-input {
+    background: #0f1117;
+    border: 2px solid #333;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    padding: 14px 18px;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    caret-color: #00d4aa;
+  }
+  .b1-input:focus { border-color: #00d4aa; box-shadow: 0 0 0 3px #00d4aa22; }
+  .b1-hint { display: flex; justify-content: space-between; font-size: 11px; color: #444; padding: 0 4px; }
+  .b1-parsed { font-size: 14px; color: #00d4aa; text-align: center; font-weight: 600; min-height: 20px; }
+
+  /* ───── B2: Reloj con segmentos iluminados ───── */
+  .b2-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .b2-display {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: #0a0c14;
+    border: 2px solid #1e2235;
+    border-radius: 12px;
+    padding: 10px 16px;
+    position: relative;
+    cursor: text;
+  }
+  .b2-segment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .b2-seg-input {
+    width: 54px;
+    background: transparent;
+    border: none;
+    color: #00d4aa;
+    font-size: 36px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    outline: none;
+    caret-color: #00d4aa;
+    -moz-appearance: textfield;
+  }
+  .b2-seg-input::-webkit-inner-spin-button,
+  .b2-seg-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .b2-seg-input:focus { background: #00d4aa11; border-radius: 6px; }
+  .b2-seg-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 1px; }
+  .b2-colon { font-size: 32px; font-weight: 700; color: #00d4aa66; padding: 0 2px; margin-bottom: 14px; }
+  .b2-parsed { font-size: 13px; color: #666; }
+  .b2-parsed .val { color: #eee; font-weight: 600; }
+
+  /* ───── C1: Spinners circulares ───── */
+  .c1-wrap { display: flex; gap: 16px; justify-content: center; }
+  .c1-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .c1-btn {
+    width: 36px; height: 36px;
+    background: #0f1117;
+    border: 2px solid #2a2d3e;
+    border-radius: 50%;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    user-select: none;
+  }
+  .c1-btn:hover { background: #00d4aa; border-color: #00d4aa; color: #0f1117; }
+  .c1-btn:active { transform: scale(0.9); }
+  .c1-val {
+    width: 58px; height: 58px;
+    background: #0f1117;
+    border: 2px solid #2a2d3e;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 700;
+    font-family: monospace;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.1s;
+  }
+  .c1-val.highlight { color: #00d4aa; border-color: #00d4aa44; }
+  .c1-unit { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: .5px; }
+  .c1-sep { font-size: 26px; color: #333; font-weight: 700; margin-top: -20px; }
+
+  /* ───── C2: Spinners tipo pill ───── */
+  .c2-wrap { display: flex; gap: 8px; align-items: stretch; }
+  .c2-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0f1117;
+    border: 2px solid #2a2d3e;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .c2-col:hover { border-color: #00d4aa55; }
+  .c2-btn {
+    background: transparent;
+    border: none;
+    color: #555;
+    font-size: 16px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .c2-btn:hover { background: #00d4aa22; color: #00d4aa; }
+  .c2-btn:active { background: #00d4aa44; }
+  .c2-val {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: monospace;
+    color: #fff;
+    text-align: center;
+    padding: 4px 0;
+    border-top: 1px solid #1e2235;
+    border-bottom: 1px solid #1e2235;
+  }
+  .c2-unit {
+    font-size: 10px;
+    color: #555;
+    text-align: center;
+    padding: 4px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .c2-preview { font-size: 13px; color: #888; text-align: center; margin-top: 8px; }
+  .c2-preview strong { color: #00d4aa; }
+</style>
+
+<div class="demo-grid">
+
+  <!-- B1 -->
+  <div class="demo-card" id="card-b1" onclick="selectCard('b1')">
+    <div class="card-header">
+      <div>
+        <div class="card-tag">B1 — Reloj</div>
+        <div class="card-title">Input monoespaciado minimalista</div>
+        <div class="card-desc">Un campo único, el formato aparece mientras escribís</div>
+      </div>
+      <div class="select-check" id="check-b1">✓</div>
+    </div>
+    <div class="b1-wrap" onclick="event.stopPropagation()">
+      <input
+        class="b1-input"
+        id="b1-in"
+        maxlength="8"
+        placeholder="00:00:00"
+        value="00:45:30"
+        oninput="formatB1(this)"
+      />
+      <div class="b1-hint">
+        <span>HH</span><span>MM</span><span>SS</span>
+      </div>
+      <div class="b1-parsed" id="b1-parsed">45 min 30 seg</div>
+    </div>
+  </div>
+
+  <!-- B2 -->
+  <div class="demo-card" id="card-b2" onclick="selectCard('b2')">
+    <div class="card-header">
+      <div>
+        <div class="card-tag">B2 — Reloj</div>
+        <div class="card-title">Segmentos iluminados independientes</div>
+        <div class="card-desc">Cada campo por separado pero con estética de display digital</div>
+      </div>
+      <div class="select-check" id="check-b2">✓</div>
+    </div>
+    <div class="b2-wrap" onclick="event.stopPropagation()">
+      <div class="b2-display">
+        <div class="b2-segment">
+          <input class="b2-seg-input" id="b2-h" type="number" min="0" max="99" value="0" oninput="clampB2('b2-h',99); updateB2()">
+          <div class="b2-seg-label">horas</div>
+        </div>
+        <div class="b2-colon">:</div>
+        <div class="b2-segment">
+          <input class="b2-seg-input" id="b2-m" type="number" min="0" max="59" value="45" oninput="clampB2('b2-m',59); updateB2()">
+          <div class="b2-seg-label">min</div>
+        </div>
+        <div class="b2-colon">:</div>
+        <div class="b2-segment">
+          <input class="b2-seg-input" id="b2-s" type="number" min="0" max="59" value="30" oninput="clampB2('b2-s',59); updateB2()">
+          <div class="b2-seg-label">seg</div>
+        </div>
+      </div>
+      <div class="b2-parsed" id="b2-parsed">→ <span class="val">45 min 30 seg</span></div>
+    </div>
+  </div>
+
+  <!-- C1 -->
+  <div class="demo-card" id="card-c1" onclick="selectCard('c1')">
+    <div class="card-header">
+      <div>
+        <div class="card-tag">C1 — Spinners</div>
+        <div class="card-title">Botones circulares con caja cuadrada</div>
+        <div class="card-desc">Botones redondos arriba/abajo, valor central grande</div>
+      </div>
+      <div class="select-check" id="check-c1">✓</div>
+    </div>
+    <div class="c1-wrap" onclick="event.stopPropagation()">
+      <div class="c1-col">
+        <button class="c1-btn" onclick="spinC1('h',1)">▲</button>
+        <div class="c1-val" id="c1-h">00</div>
+        <button class="c1-btn" onclick="spinC1('h',-1)">▼</button>
+        <div class="c1-unit">h</div>
+      </div>
+      <div class="c1-sep">:</div>
+      <div class="c1-col">
+        <button class="c1-btn" onclick="spinC1('m',1)">▲</button>
+        <div class="c1-val" id="c1-m">45</div>
+        <button class="c1-btn" onclick="spinC1('m',-1)">▼</button>
+        <div class="c1-unit">min</div>
+      </div>
+      <div class="c1-sep">:</div>
+      <div class="c1-col">
+        <button class="c1-btn" onclick="spinC1('s',1)">▲</button>
+        <div class="c1-val" id="c1-s">30</div>
+        <button class="c1-btn" onclick="spinC1('s',-1)">▼</button>
+        <div class="c1-unit">seg</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C2 -->
+  <div class="demo-card" id="card-c2" onclick="selectCard('c2')">
+    <div class="card-header">
+      <div>
+        <div class="card-tag">C2 — Spinners</div>
+        <div class="card-title">Columnas tipo pill integradas</div>
+        <div class="card-desc">Todo en una sola caja, flechas arriba/abajo dentro del bloque</div>
+      </div>
+      <div class="select-check" id="check-c2">✓</div>
+    </div>
+    <div onclick="event.stopPropagation()">
+      <div class="c2-wrap">
+        <div class="c2-col">
+          <button class="c2-btn" onclick="spinC2('h',1)">▲</button>
+          <div class="c2-val" id="c2-h">00</div>
+          <button class="c2-btn" onclick="spinC2('h',-1)">▼</button>
+          <div class="c2-unit">horas</div>
+        </div>
+        <div class="c2-col">
+          <button class="c2-btn" onclick="spinC2('m',1)">▲</button>
+          <div class="c2-val" id="c2-m">45</div>
+          <button class="c2-btn" onclick="spinC2('m',-1)">▼</button>
+          <div class="c2-unit">min</div>
+        </div>
+        <div class="c2-col">
+          <button class="c2-btn" onclick="spinC2('s',1)">▲</button>
+          <div class="c2-val" id="c2-s">30</div>
+          <button class="c2-btn" onclick="spinC2('s',-1)">▼</button>
+          <div class="c2-unit">seg</div>
+        </div>
+      </div>
+      <div class="c2-preview" id="c2-preview">→ <strong>45 min 30 seg</strong></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── B1 ──
+function formatB1(el) {
+  let raw = el.value.replace(/\D/g, '').slice(0, 6);
+  let out = '';
+  for (let i = 0; i < raw.length; i++) {
+    if (i === 2 || i === 4) out += ':';
+    out += raw[i];
+  }
+  el.value = out;
+  const parts = out.split(':');
+  const h = parseInt(parts[0]) || 0;
+  const m = parseInt(parts[1]) || 0;
+  const s = parseInt(parts[2]) || 0;
+  document.getElementById('b1-parsed').textContent = fmtLabel(h, m, s);
+}
+
+// ── B2 ──
+function clampB2(id, max) {
+  const el = document.getElementById(id);
+  if (parseInt(el.value) > max) el.value = max;
+  if (parseInt(el.value) < 0) el.value = 0;
+}
+function updateB2() {
+  const h = parseInt(document.getElementById('b2-h').value) || 0;
+  const m = parseInt(document.getElementById('b2-m').value) || 0;
+  const s = parseInt(document.getElementById('b2-s').value) || 0;
+  document.getElementById('b2-parsed').innerHTML = '→ <span class="val">' + fmtLabel(h, m, s) + '</span>';
+}
+
+// ── C1 ──
+const c1 = { h: 0, m: 45, s: 30 };
+const c1max = { h: 99, m: 59, s: 59 };
+function spinC1(k, d) {
+  c1[k] = Math.max(0, Math.min(c1max[k], c1[k] + d));
+  const el = document.getElementById('c1-' + k);
+  el.textContent = String(c1[k]).padStart(2, '0');
+  el.classList.add('highlight');
+  setTimeout(() => el.classList.remove('highlight'), 300);
+}
+
+// ── C2 ──
+const c2 = { h: 0, m: 45, s: 30 };
+const c2max = { h: 99, m: 59, s: 59 };
+function spinC2(k, d) {
+  c2[k] = Math.max(0, Math.min(c2max[k], c2[k] + d));
+  document.getElementById('c2-' + k).textContent = String(c2[k]).padStart(2, '0');
+  document.getElementById('c2-preview').innerHTML =
+    '→ <strong>' + fmtLabel(c2.h, c2.m, c2.s) + '</strong>';
+}
+
+// ── shared ──
+function fmtLabel(h, m, s) {
+  let o = '';
+  if (h > 0) o += h + 'h ';
+  if (m > 0) o += m + ' min ';
+  if (s > 0) o += s + ' seg';
+  return o.trim() || '0 seg';
+}
+
+function selectCard(id) {
+  ['b1','b2','c1','c2'].forEach(c => {
+    document.getElementById('card-' + c).classList.toggle('selected-card', c === id);
+  });
+}
+</script>

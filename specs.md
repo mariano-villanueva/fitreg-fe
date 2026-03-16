@@ -56,6 +56,7 @@ FitRegFE/
     │   ├── CoachDirectory.tsx     # Coach list with filters, pagination, search-on-demand
     │   ├── CoachPublicProfile.tsx # Coach profile with achievements, ratings, rating form
     │   ├── CoachProfileEdit.tsx   # Edit coach description, visibility, CRUD achievements
+    │   ├── CoachDailyView.tsx     # Coach daily view: all students' workout status for a given day
     │   ├── Notifications.tsx      # Notification list with action buttons
     │   ├── AdminDashboard.tsx     # Platform metrics dashboard
     │   ├── AdminUsers.tsx         # User management table with role toggles
@@ -105,6 +106,7 @@ Dev: TypeScript ~5.9.3, Vite ^7.3.1, ESLint ^9.39.1
 | /admin | AdminDashboard | Admin | Platform metrics |
 | /admin/users | AdminUsers | Admin | User management table |
 | /admin/achievements | AdminAchievements | Admin | Pending achievement verification |
+| /coach/daily | CoachDailyView | Protected | Daily student workout status view |
 
 ## TypeScript Types
 
@@ -193,6 +195,16 @@ interface CoachListItem {
 }
 ```
 
+### DailySummaryItem
+```typescript
+interface DailySummaryItem {
+  student_id: number;
+  student_name: string;
+  student_avatar: string | null;
+  assigned_workout: AssignedWorkout | null;
+}
+```
+
 ### Other types
 Student, WorkoutSegment, CoachAchievement, CoachRating, CoachPublicProfile, AdminUser, AdminStats, PendingAchievement, AuthResponse — see `src/types/index.ts` for full definitions.
 
@@ -232,6 +244,7 @@ Student, WorkoutSegment, CoachAchievement, CoachRating, CoachPublicProfile, Admi
 - `deleteAssignedWorkout(id)` → DELETE /coach/assigned-workouts/:id
 - `getMyAssignedWorkouts()` → GET /my-assigned-workouts → AssignedWorkout[]
 - `updateAssignedWorkoutStatus(id, data)` → PUT /my-assigned-workouts/:id/status
+- `getDailySummary(date: string)` → GET /coach/daily-summary?date=YYYY-MM-DD → DailySummaryItem[]
 
 ### Coaches API (coaches.ts)
 - `listCoaches({ search?, locality?, level?, sort?, page?, limit? })` → GET /coaches → `{ data, total }`
@@ -295,7 +308,8 @@ Student, WorkoutSegment, CoachAchievement, CoachRating, CoachPublicProfile, Admi
 - `app_*` - App branding
 - `login_*` - Login page
 - `workouts_*` - Workout list
-- `type_*` - Workout types (easy, tempo, intervals, long_run, race, fartlek, other)
+- `type_*` - Workout types (easy, tempo, intervals, long_run, long, race, fartlek, hills, recovery, other)
+- `daily_*` - Coach daily view (daily_title, daily_hide_empty, daily_no_assignment, daily_prev, daily_next, daily_today, daily_col_*, daily_no_students, daily_all_hidden, daily_modal_*, daily_retry)
 - `field_*` - Form fields
 - `form_*` - Form actions
 - `detail_*` - Detail page
@@ -351,6 +365,11 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 - Polls unread count on mount
 - Displays red badge with count when > 0
 
+### DayModal
+- Props: `date`, `workout`, `role`, `studentId?`, `templates?`, `onClose`, `onRefresh`, `readOnly?`
+- `readOnly={true}`: hides all action buttons (edit/delete for coach, complete/skip for student). Used by CoachDailyView.
+- Default `readOnly` is `false` (existing behavior unchanged).
+
 ### SegmentBuilder
 - Table-based layout with dropdown menus per row
 - Actions: edit (opens modal), duplicate, move up/down, delete
@@ -399,6 +418,18 @@ Old notifications with hardcoded text fall back gracefully via `defaultValue`.
 ### CoachDashboard
 - Invitation errors are mapped to specific i18n keys: `invitation_error_user_not_found`, `invitation_error_self`, `invitation_error_already_pending`, `invitation_error_already_connected`, `invitation_error_max_coaches`
 - Uses `Avatar` component for students and pending invitations
+- Stat cards: Students, Pending assignments, "Ejercicios del día" (links to `/coach/daily`)
+
+### CoachDailyView
+- Route: `/coach/daily` — coach-only, protected
+- Date navigator: `←` / `→` buttons + `<input type="date">` + "Hoy" badge/button. No date restriction (past and future allowed).
+- Table columns: Alumno (avatar + name, clicking name navigates to `/coach/students/:id`) | Entrenamiento | Tipo | Estado | Sensación
+- Clicking any cell except the student name opens `DayModal` in `readOnly` mode
+- Rows without workout: single `colSpan={4}` cell in gray italic
+- Filter: "Ocultar sin asignación" checkbox (toggle switch style) — local state, no re-fetch
+- Empty states: loading spinner, error + retry button, no students, all hidden by filter
+- Modal: reuses `DayModal` component with `readOnly={true}` (hides edit/delete/complete/skip actions)
+- Date helpers use local timezone (`getFullYear/Month/Date`), not UTC `toISOString()`
 
 ### CoachDirectory
 - Uses `Avatar` component for coach list items
@@ -450,6 +481,7 @@ CSS classes follow BEM-like conventions. Key class families:
 - `.admin-table`, `.admin-table th/td` - Admin table with sortable headers
 - `.admin-actions-menu`, `.admin-actions-trigger`, `.admin-actions-dropdown`, `.admin-actions-item` - Admin dropdown actions
 - `.admin-actions-item--add`, `.admin-actions-item--danger` - Colored action items
+- `.checkbox-label input[type="checkbox"]` - Rendered as a toggle switch (pill shape, slides on check, uses `--accent` color). Applied globally to all `<label className="checkbox-label">` wrappers.
 
 ## Google OAuth
 

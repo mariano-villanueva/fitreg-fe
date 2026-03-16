@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import SegmentBuilder from "../components/SegmentBuilder";
 import ErrorState from "../components/ErrorState";
+import TimeInput, { type TimeValue, toSeconds, fromSeconds } from "../components/TimeInput";
+import DistanceInput from "../components/DistanceInput";
 import type { Workout, WorkoutSegment } from "../types";
 
 type RunType = 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'fartlek' | 'other';
@@ -35,9 +37,7 @@ export default function WorkoutForm() {
 
   // Results
   const [distanceKm, setDistanceKm] = useState(0);
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
+  const [duration, setDuration] = useState<TimeValue>({ h: 0, m: 0, s: 0 });
   const [calories, setCalories] = useState(0);
   const [avgHeartRate, setAvgHeartRate] = useState(0);
   const [feeling, setFeeling] = useState<number | null>(null);
@@ -45,17 +45,14 @@ export default function WorkoutForm() {
   const [loading, setLoading] = useState(false);
   const [errorType, setErrorType] = useState<"not_found" | "generic" | null>(null);
 
-  const durationSeconds = useMemo(
-    () => hours * 3600 + minutes * 60 + seconds,
-    [hours, minutes, seconds]
-  );
+  const durationSeconds = useMemo(() => toSeconds(duration), [duration]);
 
   const avgPace = useMemo(() => {
     if (distanceKm <= 0 || durationSeconds <= 0) return "--:--";
     const paceSeconds = durationSeconds / distanceKm;
     const paceMin = Math.floor(paceSeconds / 60);
     const paceSec = Math.round(paceSeconds % 60);
-    return `${paceMin}:${String(paceSec).padStart(2, "0")} /km`;
+    return `${paceMin}:${String(paceSec).padStart(2, "0")}`;
   }, [distanceKm, durationSeconds]);
 
   useEffect(() => {
@@ -71,10 +68,7 @@ export default function WorkoutForm() {
       setDate(workout.date.slice(0, 10));
       setType(workout.type as RunType);
       setDistanceKm(workout.distance_km);
-      const total = workout.duration_seconds;
-      setHours(Math.floor(total / 3600));
-      setMinutes(Math.floor((total % 3600) / 60));
-      setSeconds(total % 60);
+      setDuration(fromSeconds(workout.duration_seconds));
       setCalories(workout.calories);
       setAvgHeartRate(workout.avg_heart_rate || 0);
       setFeeling(workout.feeling);
@@ -104,12 +98,13 @@ export default function WorkoutForm() {
       type,
       distance_km: distanceKm,
       duration_seconds: durationSeconds,
+      avg_pace: avgPace !== "--:--" ? avgPace : "",
       calories,
       avg_heart_rate: avgHeartRate,
       feeling: feeling,
       notes,
       segments,
-    } as Omit<Workout, "id" | "user_id" | "assigned_workout_id" | "avg_pace" | "created_at" | "updated_at"> & { segments: WorkoutSegment[] };
+    } as Omit<Workout, "id" | "user_id" | "assigned_workout_id" | "created_at" | "updated_at"> & { segments: WorkoutSegment[] };
 
     try {
       if (isEdit && id) {
@@ -180,55 +175,19 @@ export default function WorkoutForm() {
         <h3>{t('workout_results_title')}</h3>
 
         <div className="form-group">
-          <label htmlFor="workout-distance">{t('field_distance')}</label>
-          <input
-            id="workout-distance"
-            type="number"
-            min={0}
-            step={0.01}
-            value={distanceKm}
-            onChange={(e) => setDistanceKm(Number(e.target.value))}
-          />
+          <DistanceInput valueKm={distanceKm} onChange={setDistanceKm} label={t('field_distance')} showUnitToggle />
         </div>
 
         <div className="form-group">
           <label>{t('field_duration')}</label>
-          <div className="duration-inputs">
-            <div className="duration-field">
-              <input
-                type="number"
-                min={0}
-                value={hours}
-                onChange={(e) => setHours(Number(e.target.value))}
-              />
-              <span>h</span>
-            </div>
-            <div className="duration-field">
-              <input
-                type="number"
-                min={0}
-                max={59}
-                value={minutes}
-                onChange={(e) => setMinutes(Number(e.target.value))}
-              />
-              <span>m</span>
-            </div>
-            <div className="duration-field">
-              <input
-                type="number"
-                min={0}
-                max={59}
-                value={seconds}
-                onChange={(e) => setSeconds(Number(e.target.value))}
-              />
-              <span>s</span>
-            </div>
-          </div>
+          <TimeInput value={duration} onChange={setDuration} />
         </div>
 
         <div className="form-group">
           <label>{t('field_pace')}</label>
-          <div className="pace-display">{avgPace}</div>
+          <div className="pace-display">
+            {avgPace !== '--:--' ? <>{avgPace} <span className="pace-unit">{t('field_pace_unit')}</span></> : '--:--'}
+          </div>
         </div>
 
         <div className="form-row">
@@ -256,14 +215,32 @@ export default function WorkoutForm() {
         </div>
 
         <div className="form-group">
-          <label>{t('workout_feeling')}: <strong>{feeling != null ? `${feeling}/10` : '—'}</strong></label>
-          <input
-            type="range"
-            min={1}
-            max={10}
-            value={feeling ?? 5}
-            onChange={(e) => setFeeling(Number(e.target.value))}
-          />
+          <label>{t('workout_feeling')} *</label>
+          <div className="effort-slider-wrap">
+            <input
+              type="range"
+              min={1}
+              max={10}
+              value={feeling ?? 5}
+              onChange={(e) => setFeeling(Number(e.target.value))}
+              className="effort-slider"
+              style={{ background: `linear-gradient(to right, var(--accent, #00d4aa) ${((feeling ?? 5) - 1) / 9 * 100}%, var(--border-color, #333) ${((feeling ?? 5) - 1) / 9 * 100}%)` }}
+            />
+            <div className="effort-scale-labels">
+              <span>1</span>
+              <span>5</span>
+              <span>10</span>
+            </div>
+            <div className="effort-value">
+              <span className="effort-number">{feeling ?? 5}</span>
+              <span className="effort-label">— {
+                (feeling ?? 5) <= 3 ? t('effort_level_easy') :
+                (feeling ?? 5) <= 6 ? t('effort_level_moderate') :
+                (feeling ?? 5) <= 8 ? t('effort_level_hard') :
+                t('effort_level_max')
+              }</span>
+            </div>
+          </div>
         </div>
 
         <div className="form-actions">

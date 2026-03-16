@@ -1,0 +1,300 @@
+<h2>¿Cómo te sentiste? — Opciones de diseño</h2>
+<p class="subtitle">Hacé clic en cada opción para ver cómo se siente interactuar con ella</p>
+
+<style>
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  @media (max-width: 700px) {
+    .demo-grid { grid-template-columns: 1fr; }
+  }
+  .demo-card {
+    background: #1a1d2e;
+    border: 2px solid #2a2d3e;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .demo-card:hover { border-color: #00d4aa44; }
+  .demo-card.selected-card { border-color: #00d4aa; background: #0d2e2a; }
+  .demo-card h3 { margin: 0 0 4px 0; font-size: 14px; color: #00d4aa; text-transform: uppercase; letter-spacing: 1px; }
+  .demo-card p { margin: 0 0 16px 0; font-size: 12px; color: #888; }
+  .demo-label { font-size: 13px; color: #ccc; margin-bottom: 10px; }
+
+  /* Option A: Stars */
+  .stars-row { display: flex; gap: 6px; }
+  .star-btn {
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    transition: transform 0.15s;
+    filter: grayscale(1) opacity(0.4);
+    line-height: 1;
+  }
+  .star-btn.lit { filter: none; }
+  .star-btn:hover { transform: scale(1.2); }
+
+  /* Option B: Emojis */
+  .emoji-row { display: flex; gap: 8px; }
+  .emoji-btn {
+    font-size: 32px;
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    line-height: 1;
+    opacity: 0.5;
+  }
+  .emoji-btn.selected-emoji { border-color: #00d4aa; background: #00d4aa22; opacity: 1; transform: scale(1.15); }
+  .emoji-btn:hover { opacity: 1; transform: scale(1.1); }
+  .emoji-label { font-size: 11px; color: #666; text-align: center; margin-top: 4px; }
+
+  /* Option C: Slider */
+  .slider-wrap { padding: 4px 0; }
+  .feeling-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+  .slider-markers { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-top: 6px; }
+  .slider-value { font-size: 28px; font-weight: 700; color: #00d4aa; text-align: center; margin-top: 8px; }
+
+  /* Option D: 2×5 grid */
+  .grid-2x5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .grid-btn {
+    background: #2a2d3e;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px 4px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: #aaa;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .grid-btn:hover { background: #3a3d4e; color: #fff; }
+  .grid-btn.selected-grid { background: #00d4aa; border-color: #00d4aa; color: #0f1117; }
+
+  /* Option E: NPS compact */
+  .nps-row { display: flex; gap: 4px; flex-wrap: nowrap; }
+  .nps-btn {
+    flex: 1;
+    background: #2a2d3e;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    padding: 8px 2px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #aaa;
+    transition: all 0.15s;
+    text-align: center;
+    min-width: 0;
+  }
+  .nps-btn:hover { background: #3a3d4e; color: #fff; }
+  .nps-btn.selected-nps { border-color: #00d4aa; color: #00d4aa; background: #00d4aa15; }
+  .nps-labels { display: flex; justify-content: space-between; font-size: 10px; color: #555; margin-top: 4px; }
+
+  /* Selection check */
+  .select-check {
+    float: right;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid #2a2d3e;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+  .demo-card.selected-card .select-check { background: #00d4aa; border-color: #00d4aa; color: #0f1117; }
+
+  .option-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+</style>
+
+<div class="demo-grid">
+
+  <!-- Option A: Stars -->
+  <div class="demo-card" id="card-a" onclick="selectCard('a')">
+    <div class="option-header">
+      <div>
+        <h3>A — Estrellas</h3>
+        <p>5 niveles con estrellas clásicas</p>
+      </div>
+      <div class="select-check" id="check-a">✓</div>
+    </div>
+    <div class="demo-label">¿Cómo te sentiste?</div>
+    <div class="stars-row" id="stars" onclick="event.stopPropagation()">
+      <button class="star-btn" onclick="setStars(1)">⭐</button>
+      <button class="star-btn" onclick="setStars(2)">⭐</button>
+      <button class="star-btn" onclick="setStars(3)">⭐</button>
+      <button class="star-btn" onclick="setStars(4)">⭐</button>
+      <button class="star-btn" onclick="setStars(5)">⭐</button>
+    </div>
+  </div>
+
+  <!-- Option B: Emojis -->
+  <div class="demo-card" id="card-b" onclick="selectCard('b')">
+    <div class="option-header">
+      <div>
+        <h3>B — Emojis</h3>
+        <p>5 caras expresivas, muy intuitivo</p>
+      </div>
+      <div class="select-check" id="check-b">✓</div>
+    </div>
+    <div class="demo-label">¿Cómo te sentiste?</div>
+    <div class="emoji-row" id="emojis" onclick="event.stopPropagation()">
+      <div style="text-align:center">
+        <button class="emoji-btn" onclick="setEmoji(0)">😫</button>
+        <div class="emoji-label">Muy mal</div>
+      </div>
+      <div style="text-align:center">
+        <button class="emoji-btn" onclick="setEmoji(1)">😕</button>
+        <div class="emoji-label">Mal</div>
+      </div>
+      <div style="text-align:center">
+        <button class="emoji-btn" onclick="setEmoji(2)">😐</button>
+        <div class="emoji-label">Regular</div>
+      </div>
+      <div style="text-align:center">
+        <button class="emoji-btn" onclick="setEmoji(3)">😊</button>
+        <div class="emoji-label">Bien</div>
+      </div>
+      <div style="text-align:center">
+        <button class="emoji-btn" onclick="setEmoji(4)">🤩</button>
+        <div class="emoji-label">¡Genial!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: Slider -->
+  <div class="demo-card" id="card-c" onclick="selectCard('c')">
+    <div class="option-header">
+      <div>
+        <h3>C — Slider</h3>
+        <p>Deslizable, 1-10, moderno</p>
+      </div>
+      <div class="select-check" id="check-c">✓</div>
+    </div>
+    <div class="demo-label">¿Cómo te sentiste?</div>
+    <div class="slider-wrap" onclick="event.stopPropagation()">
+      <input
+        type="range" min="1" max="10" value="5"
+        class="feeling-slider"
+        id="slider-input"
+        oninput="updateSlider(this.value)"
+        style="background: linear-gradient(to right, #00d4aa 40%, #2a2d3e 40%);"
+      />
+      <div class="slider-markers">
+        <span>1 — Muy mal</span>
+        <span>10 — Excelente</span>
+      </div>
+      <div class="slider-value" id="slider-val">5</div>
+    </div>
+  </div>
+
+  <!-- Option D: 2×5 Grid -->
+  <div class="demo-card" id="card-d" onclick="selectCard('d')">
+    <div class="option-header">
+      <div>
+        <h3>D — Grilla 2×5</h3>
+        <p>10 valores en dos filas compactas</p>
+      </div>
+      <div class="select-check" id="check-d">✓</div>
+    </div>
+    <div class="demo-label">¿Cómo te sentiste?</div>
+    <div class="grid-2x5" onclick="event.stopPropagation()">
+      <button class="grid-btn" onclick="setGrid(1)">1</button>
+      <button class="grid-btn" onclick="setGrid(2)">2</button>
+      <button class="grid-btn" onclick="setGrid(3)">3</button>
+      <button class="grid-btn" onclick="setGrid(4)">4</button>
+      <button class="grid-btn" onclick="setGrid(5)">5</button>
+      <button class="grid-btn" onclick="setGrid(6)">6</button>
+      <button class="grid-btn" onclick="setGrid(7)">7</button>
+      <button class="grid-btn" onclick="setGrid(8)">8</button>
+      <button class="grid-btn" onclick="setGrid(9)">9</button>
+      <button class="grid-btn" onclick="setGrid(10)">10</button>
+    </div>
+  </div>
+
+  <!-- Option E: NPS compact (full width) -->
+  <div class="demo-card" id="card-e" onclick="selectCard('e')" style="grid-column: 1 / -1">
+    <div class="option-header">
+      <div>
+        <h3>E — Fila compacta NPS (1-10)</h3>
+        <p>Los 10 valores en una sola fila angosta, sin scroll horizontal</p>
+      </div>
+      <div class="select-check" id="check-e">✓</div>
+    </div>
+    <div class="demo-label">¿Cómo te sentiste?</div>
+    <div class="nps-row" onclick="event.stopPropagation()">
+      <button class="nps-btn" onclick="setNps(1)">1</button>
+      <button class="nps-btn" onclick="setNps(2)">2</button>
+      <button class="nps-btn" onclick="setNps(3)">3</button>
+      <button class="nps-btn" onclick="setNps(4)">4</button>
+      <button class="nps-btn" onclick="setNps(5)">5</button>
+      <button class="nps-btn" onclick="setNps(6)">6</button>
+      <button class="nps-btn" onclick="setNps(7)">7</button>
+      <button class="nps-btn" onclick="setNps(8)">8</button>
+      <button class="nps-btn" onclick="setNps(9)">9</button>
+      <button class="nps-btn" onclick="setNps(10)">10</button>
+    </div>
+    <div class="nps-labels"><span>😫 Muy mal</span><span>😊 Bien</span><span>🤩 Excelente</span></div>
+  </div>
+
+</div>
+
+<script>
+// Stars
+function setStars(n) {
+  document.querySelectorAll('.star-btn').forEach((btn, i) => {
+    btn.classList.toggle('lit', i < n);
+  });
+}
+
+// Emojis
+function setEmoji(idx) {
+  document.querySelectorAll('.emoji-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected-emoji', i === idx);
+  });
+}
+
+// Slider
+function updateSlider(val) {
+  document.getElementById('slider-val').textContent = val;
+  const pct = ((val - 1) / 9) * 100;
+  document.getElementById('slider-input').style.background =
+    `linear-gradient(to right, #00d4aa ${pct}%, #2a2d3e ${pct}%)`;
+}
+
+// Grid
+function setGrid(n) {
+  document.querySelectorAll('.grid-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected-grid', i + 1 === n);
+  });
+}
+
+// NPS
+function setNps(n) {
+  document.querySelectorAll('.nps-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected-nps', i + 1 === n);
+  });
+}
+
+// Card selection
+function selectCard(id) {
+  ['a','b','c','d','e'].forEach(c => {
+    document.getElementById('card-' + c).classList.toggle('selected-card', c === id);
+  });
+}
+</script>
