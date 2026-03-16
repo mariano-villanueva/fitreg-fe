@@ -71,7 +71,7 @@ function DetailModal({ item, onClose }: DetailModalProps) {
               {item.student_name} · {wo.due_date}
             </div>
           </div>
-          <button className="btn btn-sm" onClick={onClose} aria-label="Cerrar">✕</button>
+          <button className="btn btn-sm" onClick={onClose} aria-label={t('close')}>✕</button>
         </div>
 
         <div style={{ marginTop: 12, marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -257,6 +257,12 @@ export default function CoachDailyView() {
                 <tr
                   key={item.student_id}
                   onClick={() => item.assigned_workout && setSelectedItem(item)}
+                  onKeyDown={(e) => {
+                    if (item.assigned_workout && (e.key === 'Enter' || e.key === ' ')) {
+                      setSelectedItem(item);
+                    }
+                  }}
+                  tabIndex={item.assigned_workout ? 0 : undefined}
                   style={{
                     cursor: item.assigned_workout ? 'pointer' : 'default',
                     opacity: item.assigned_workout ? 1 : 0.6,
