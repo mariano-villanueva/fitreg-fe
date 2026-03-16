@@ -1,5 +1,5 @@
 import client from './client';
-import type { Student, AssignedWorkout, Workout, WorkoutSegment } from '../types';
+import type { Student, AssignedWorkout, Workout, WorkoutSegment, DailySummaryItem } from '../types';
 
 export const listStudents = () => client.get<Student[]>('/coach/students');
 export const addStudent = (email: string) => client.post<Student>('/coach/students', { email });
@@ -57,3 +57,6 @@ export const updateAssignedWorkoutStatus = (id: number, data: {
   image_file_id?: number | null;
 }) =>
   client.put<AssignedWorkout>(`/my-assigned-workouts/${id}/status`, data);
+
+export const getDailySummary = (date: string) =>
+  client.get<DailySummaryItem[]>(`/coach/daily-summary?date=${date}`);

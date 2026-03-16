@@ -489,5 +489,24 @@ export default {
     assignment_messages_send: 'Enviar',
     assignment_messages_readonly: 'Los mensajes son de solo lectura para asignaciones finalizadas.',
     assignment_messages_link: 'Mensajes',
+
+    // Coach Daily View
+    daily_title: 'Vista diaria de alumnos',
+    daily_hide_empty: 'Ocultar sin asignación',
+    daily_no_assignment: 'Sin entrenamiento asignado',
+    daily_prev: 'Anterior',
+    daily_next: 'Siguiente',
+    daily_today: 'Hoy',
+    daily_col_student: 'Alumno',
+    daily_col_workout: 'Entrenamiento',
+    daily_col_type: 'Tipo',
+    daily_col_status: 'Estado',
+    daily_no_students: 'No tenés alumnos activos',
+    daily_all_hidden: 'Todos los alumnos están ocultos por el filtro activo',
+    daily_modal_results: 'Resultados',
+    daily_modal_segments: 'Segmentos',
+    daily_modal_description: 'Descripción',
+    daily_modal_notes: 'Notas',
+    daily_retry: 'Reintentar',
   }
 };
