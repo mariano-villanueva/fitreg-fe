@@ -107,6 +107,10 @@ export default function CoachDashboard() {
           <span className="coach-stat-value">{pendingCount}</span>
           <span className="coach-stat-label">{t('coach_stats_pending')}</span>
         </div>
+        <Link to="/coach/daily" className="coach-stat-card" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+          <span className="coach-stat-value">📅</span>
+          <span className="coach-stat-label">{t('coach_stats_today')}</span>
+        </Link>
       </div>
 
       <div className="coach-section">

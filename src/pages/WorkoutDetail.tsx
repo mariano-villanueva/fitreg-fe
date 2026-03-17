@@ -85,7 +85,7 @@ export default function WorkoutDetail() {
     <div className="page">
       <div className="page-header">
         <div>
-          <Link to="/" className="btn btn-link back-link">
+          <Link to="/workouts" className="btn btn-link back-link">
             {t('detail_back')}
           </Link>
           <h1>Run - {new Date(workout.date).toLocaleDateString()}</h1>
@@ -120,7 +120,9 @@ export default function WorkoutDetail() {
           </div>
           <div className="detail-item">
             <span className="detail-label">{t('field_pace')}</span>
-            <span className="detail-value">{workout.avg_pace}</span>
+            <span className="detail-value">
+              {workout.avg_pace ? <>{workout.avg_pace.replace(/\s*\/?km\s*$/i, '')} <span className="pace-unit">{t('field_pace_unit')}</span></> : '—'}
+            </span>
           </div>
           <div className="detail-item">
             <span className="detail-label">{t('field_calories')}</span>
@@ -135,7 +137,12 @@ export default function WorkoutDetail() {
           {workout.feeling != null && (
             <div className="detail-item">
               <span className="detail-label">{t('workout_feeling')}</span>
-              <span className="detail-value">{workout.feeling}/10</span>
+              <span className="detail-value">{workout.feeling}/10 — {
+                workout.feeling <= 3 ? t('effort_level_easy') :
+                workout.feeling <= 6 ? t('effort_level_moderate') :
+                workout.feeling <= 8 ? t('effort_level_hard') :
+                t('effort_level_max')
+              }</span>
             </div>
           )}
         </div>

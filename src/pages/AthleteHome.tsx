@@ -8,6 +8,8 @@ import { useAuth } from "../context/AuthContext";
 import { useFeedback } from "../context/FeedbackContext";
 import SegmentDisplay from "../components/SegmentDisplay";
 import ImageUpload from "../components/ImageUpload";
+import TimeInput, { type TimeValue, toSeconds } from "../components/TimeInput";
+import DistanceInput from "../components/DistanceInput";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -26,12 +28,9 @@ export default function AthleteHome() {
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [confirmModal, setConfirmModal] = useState<{ status: string; workout: AssignedWorkout } | null>(null);
-  const [resultFeeling, setResultFeeling] = useState(0);
-  const [timeH, setTimeH] = useState("");
-  const [timeM, setTimeM] = useState("");
-  const [timeS, setTimeS] = useState("");
-  const [resultDistance, setResultDistance] = useState("");
-  const [distanceUnit, setDistanceUnit] = useState<'km' | 'm'>('km');
+  const [resultFeeling, setResultFeeling] = useState(5);
+  const [time, setTime] = useState<TimeValue>({ h: 0, m: 0, s: 0 });
+  const [resultDistanceKm, setResultDistanceKm] = useState(0);
   const [resultHeartRate, setResultHeartRate] = useState("");
   const [resultImage, setResultImage] = useState<FileResponse | null>(null);
 
@@ -101,26 +100,28 @@ export default function AthleteHome() {
   }
 
   function openModal(workout: AssignedWorkout, status: string) {
-    setResultFeeling(0);
-    setTimeH(""); setTimeM(""); setTimeS("");
-    setResultDistance(""); setDistanceUnit('km');
+    setResultFeeling(5);
+    setTime({ h: 0, m: 0, s: 0 });
+    setResultDistanceKm(0);
     setResultHeartRate("");
     setResultImage(null);
     setConfirmModal({ status, workout });
   }
 
   function getTimeSeconds(): number | null {
-    const h = Number(timeH) || 0;
-    const m = Number(timeM) || 0;
-    const s = Number(timeS) || 0;
-    if (h === 0 && m === 0 && s === 0) return null;
-    return h * 3600 + m * 60 + s;
+    const total = toSeconds(time);
+    return total > 0 ? total : null;
   }
 
   function getDistanceKm(): number | null {
-    const val = Number(resultDistance);
-    if (!val) return null;
-    return distanceUnit === 'm' ? val / 1000 : val;
+    return resultDistanceKm > 0 ? resultDistanceKm : null;
+  }
+
+  function getEffortLabel(val: number): string {
+    if (val <= 3) return t('effort_level_easy');
+    if (val <= 6) return t('effort_level_moderate');
+    if (val <= 8) return t('effort_level_hard');
+    return t('effort_level_max');
   }
 
   async function handleStatusUpdate() {
@@ -155,7 +156,12 @@ export default function AthleteHome() {
 
   return (
     <div className="page athlete-home">
-      <h1>{t('home_welcome', { name: user?.name?.split(' ')[0] || '' })}</h1>
+      <div className="home-hero">
+        <h1>{t('home_welcome', { name: user?.name?.split(' ')[0] || '' })}</h1>
+        <Link to="/workouts/new" className="btn btn-primary home-log-btn">
+          + {t('home_log_workout')}
+        </Link>
+      </div>
 
       {/* Next planned workout */}
       <section className="home-section">
@@ -247,8 +253,8 @@ export default function AthleteHome() {
                   </div>
                   {workout.avg_pace && (
                     <div className="run-stat">
-                      <span className="run-stat-value">{workout.avg_pace}</span>
-                      <span className="run-stat-label">{t('field_pace').toLowerCase()}</span>
+                      <span className="run-stat-value">{workout.avg_pace.replace(/\s*\/?km\s*$/i, '')}</span>
+                      <span className="run-stat-label">{t('field_pace_unit')}</span>
                     </div>
                   )}
                 </div>
@@ -271,25 +277,12 @@ export default function AthleteHome() {
                   {fields.includes('time') && (
                     <div className="form-group">
                       <label>{t('expected_field_time')}</label>
-                      <div className="time-inputs">
-                        <input type="number" min="0" max="99" placeholder="HH" value={timeH} onChange={(e) => setTimeH(e.target.value)} />
-                        <span>:</span>
-                        <input type="number" min="0" max="59" placeholder="MM" value={timeM} onChange={(e) => setTimeM(e.target.value)} />
-                        <span>:</span>
-                        <input type="number" min="0" max="59" placeholder="SS" value={timeS} onChange={(e) => setTimeS(e.target.value)} />
-                      </div>
+                      <TimeInput value={time} onChange={setTime} />
                     </div>
                   )}
                   {fields.includes('distance') && (
                     <div className="form-group">
-                      <label>{t('expected_field_distance')}</label>
-                      <div className="distance-input">
-                        <input type="number" step="0.01" min="0" value={resultDistance} onChange={(e) => setResultDistance(e.target.value)} />
-                        <select value={distanceUnit} onChange={(e) => setDistanceUnit(e.target.value as 'km' | 'm')}>
-                          <option value="km">km</option>
-                          <option value="m">m</option>
-                        </select>
-                      </div>
+                      <DistanceInput valueKm={resultDistanceKm} onChange={setResultDistanceKm} label={t('expected_field_distance')} showUnitToggle />
                     </div>
                   )}
                   {fields.includes('heart_rate') && (
@@ -303,15 +296,25 @@ export default function AthleteHome() {
                   )}
                   <div className="form-group">
                     <label>{t('expected_field_feeling')} *</label>
-                    <div className="feeling-selector">
-                      {[1,2,3,4,5,6,7,8,9,10].map((v) => (
-                        <button
-                          key={v}
-                          type="button"
-                          className={`feeling-btn ${resultFeeling === v ? 'feeling-btn-active' : ''}`}
-                          onClick={() => setResultFeeling(v)}
-                        >{v}</button>
-                      ))}
+                    <div className="effort-slider-wrap">
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={resultFeeling}
+                        onChange={(e) => setResultFeeling(Number(e.target.value))}
+                        className="effort-slider"
+                        style={{ background: `linear-gradient(to right, var(--accent, #00d4aa) ${(resultFeeling - 1) / 9 * 100}%, var(--border-color, #333) ${(resultFeeling - 1) / 9 * 100}%)` }}
+                      />
+                      <div className="effort-scale-labels">
+                        <span>1</span>
+                        <span>5</span>
+                        <span>10</span>
+                      </div>
+                      <div className="effort-value">
+                        <span className="effort-number">{resultFeeling}</span>
+                        <span className="effort-label">— {getEffortLabel(resultFeeling)}</span>
+                      </div>
                     </div>
                   </div>
                   <div className="form-group">

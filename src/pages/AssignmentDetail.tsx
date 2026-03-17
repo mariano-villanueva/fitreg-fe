@@ -215,7 +215,12 @@ export default function AssignmentDetail() {
               {workout.result_feeling && (
                 <div className="detail-item">
                   <span className="detail-label">{t("expected_field_feeling")}</span>
-                  <span>{workout.result_feeling}/10</span>
+                  <span>{workout.result_feeling}/10 — {
+                    workout.result_feeling <= 3 ? t('effort_level_easy') :
+                    workout.result_feeling <= 6 ? t('effort_level_moderate') :
+                    workout.result_feeling <= 8 ? t('effort_level_hard') :
+                    t('effort_level_max')
+                  }</span>
                 </div>
               )}
             </div>

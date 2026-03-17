@@ -1,0 +1,238 @@
+<h2>Selector de distancia — Opciones</h2>
+<p class="subtitle">Dos contextos: registrar entreno propio (solo km) y completar asignación (km o m)</p>
+
+<style>
+  .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+  @media (max-width: 700px) { .demo-grid { grid-template-columns: 1fr; } }
+  .demo-card { background: #1a1d2e; border: 2px solid #2a2d3e; border-radius: 14px; padding: 24px; cursor: pointer; transition: border-color .2s, background .2s, transform .15s; }
+  .demo-card:hover { border-color: #00d4aa44; transform: translateY(-1px); }
+  .demo-card.selected-card { border-color: #00d4aa; background: #0d2e2a; }
+  .card-tag { font-size: 11px; color: #00d4aa; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 4px; }
+  .card-title { font-size: 15px; font-weight: 600; color: #eee; margin-bottom: 3px; }
+  .card-desc { font-size: 12px; color: #555; margin-bottom: 20px; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .select-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #2a2d3e; display:flex; align-items:center; justify-content:center; font-size:12px; transition: all .2s; flex-shrink:0; }
+  .demo-card.selected-card .select-check { background: #00d4aa; border-color: #00d4aa; color: #0f1117; }
+  .demo-label { font-size: 12px; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px; }
+  .result-preview { font-size: 12px; color: #555; margin-top: 10px; }
+  .result-preview strong { color: #00d4aa; }
+
+  /* ── A: Unit toggle pill ── */
+  .a-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .a-row { display: flex; gap: 0; border-radius: 10px; overflow: hidden; border: 2px solid #2a2d3e; }
+  .a-input {
+    flex: 1; background: #0f1117; border: none; outline: none;
+    color: #fff; font-size: 22px; font-weight: 700; padding: 12px 14px;
+    min-width: 0; font-family: monospace;
+  }
+  .a-input:focus { background: #0a0c14; }
+  .a-unit-toggle { display: flex; flex-direction: column; background: #0f1117; border-left: 2px solid #2a2d3e; }
+  .a-unit-btn { flex: 1; padding: 0 14px; background: transparent; border: none; color: #555; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; white-space: nowrap; letter-spacing: .5px; }
+  .a-unit-btn.active { background: #00d4aa; color: #0f1117; }
+  .a-unit-btn:hover:not(.active) { color: #00d4aa; background: #00d4aa11; }
+
+  /* ── B: Input + botones de incremento ── */
+  .b-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .b-main { display: flex; align-items: center; gap: 8px; }
+  .b-input-wrap { display: flex; align-items: center; background: #0f1117; border: 2px solid #2a2d3e; border-radius: 10px; flex: 1; transition: border-color .15s; }
+  .b-input-wrap:focus-within { border-color: #00d4aa; }
+  .b-input { background: transparent; border: none; outline: none; color: #fff; font-size: 26px; font-weight: 700; padding: 10px 12px; width: 100%; min-width: 0; font-family: monospace; }
+  .b-unit { font-size: 13px; color: #555; padding-right: 12px; font-weight: 600; white-space: nowrap; }
+  .b-quick { display: flex; gap: 6px; flex-wrap: wrap; }
+  .b-quick-btn {
+    background: #0f1117; border: 2px solid #2a2d3e; border-radius: 20px;
+    color: #888; font-size: 12px; font-weight: 600; padding: 4px 12px;
+    cursor: pointer; transition: all .15s; white-space: nowrap;
+  }
+  .b-quick-btn:hover { border-color: #00d4aa; color: #00d4aa; background: #00d4aa11; }
+  .b-quick-btn.minus { color: #ff6b6b88; border-color: #ff6b6b33; }
+  .b-quick-btn.minus:hover { color: #ff6b6b; border-color: #ff6b6b; background: #ff6b6b11; }
+
+  /* ── C: Presets + input libre ── */
+  .c-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .c-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .c-preset {
+    background: #0f1117; border: 2px solid #2a2d3e; border-radius: 8px;
+    color: #888; font-size: 13px; font-weight: 700; padding: 8px 4px;
+    cursor: pointer; text-align: center; transition: all .15s;
+  }
+  .c-preset:hover { border-color: #00d4aa; color: #00d4aa; background: #00d4aa11; }
+  .c-preset.active { background: #00d4aa; border-color: #00d4aa; color: #0f1117; }
+  .c-preset small { display: block; font-size: 10px; font-weight: 400; opacity: .7; }
+  .c-divider { text-align: center; font-size: 11px; color: #444; position: relative; }
+  .c-divider::before, .c-divider::after { content: ''; position: absolute; top: 50%; width: 38%; height: 1px; background: #2a2d3e; }
+  .c-divider::before { left: 0; } .c-divider::after { right: 0; }
+  .c-free { display: flex; align-items: center; background: #0f1117; border: 2px solid #2a2d3e; border-radius: 10px; transition: border-color .15s; }
+  .c-free:focus-within { border-color: #00d4aa; }
+  .c-free input { background: transparent; border: none; outline: none; color: #fff; font-size: 22px; font-weight: 700; padding: 10px 12px; flex: 1; min-width: 0; font-family: monospace; }
+  .c-free span { font-size: 13px; color: #555; padding-right: 12px; font-weight: 600; }
+
+  /* ── D: Input inline con unidad flotante ── */
+  .d-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .d-field {
+    position: relative; display: inline-flex; align-items: center;
+    background: #0f1117; border: 2px solid #2a2d3e; border-radius: 10px;
+    width: 100%; transition: border-color .15s;
+  }
+  .d-field:focus-within { border-color: #00d4aa; box-shadow: 0 0 0 3px #00d4aa18; }
+  .d-input {
+    background: transparent; border: none; outline: none;
+    color: #fff; font-size: 32px; font-weight: 700; padding: 14px 60px 14px 16px;
+    width: 100%; min-width: 0; font-family: monospace;
+  }
+  .d-badge {
+    position: absolute; right: 12px;
+    background: #2a2d3e; border-radius: 6px;
+    font-size: 13px; font-weight: 700; color: #888;
+    padding: 4px 8px; pointer-events: none;
+  }
+  .d-unit-tabs { display: flex; gap: 6px; }
+  .d-tab {
+    flex: 1; background: #0f1117; border: 2px solid #2a2d3e; border-radius: 8px;
+    color: #555; font-size: 13px; font-weight: 700; padding: 8px;
+    cursor: pointer; text-align: center; transition: all .15s;
+  }
+  .d-tab.active { background: #00d4aa22; border-color: #00d4aa; color: #00d4aa; }
+  .d-tab:hover:not(.active) { border-color: #444; color: #aaa; }
+</style>
+
+<div class="demo-grid">
+
+  <!-- A: Unit toggle pill -->
+  <div class="demo-card" id="card-a" onclick="selectCard('a')">
+    <div class="card-header">
+      <div><div class="card-tag">A</div><div class="card-title">Toggle pill integrado</div><div class="card-desc">km/m como botones dentro del propio input</div></div>
+      <div class="select-check" id="check-a">✓</div>
+    </div>
+    <div class="demo-label">Distancia</div>
+    <div class="a-wrap" onclick="event.stopPropagation()">
+      <div class="a-row">
+        <input class="a-input" id="a-val" type="number" min="0" step="0.01" value="10.5" oninput="updateA()">
+        <div class="a-unit-toggle">
+          <button class="a-unit-btn active" id="a-km" onclick="setAUnit('km')">km</button>
+          <button class="a-unit-btn" id="a-m" onclick="setAUnit('m')">m</button>
+        </div>
+      </div>
+      <div class="result-preview" id="a-preview">→ <strong>10.50 km</strong></div>
+    </div>
+  </div>
+
+  <!-- B: Input + incrementos rápidos -->
+  <div class="demo-card" id="card-b" onclick="selectCard('b')">
+    <div class="card-header">
+      <div><div class="card-tag">B</div><div class="card-title">Botones de incremento rápido</div><div class="card-desc">Chips para sumar/restar distancias comunes</div></div>
+      <div class="select-check" id="check-b">✓</div>
+    </div>
+    <div class="demo-label">Distancia</div>
+    <div class="b-wrap" onclick="event.stopPropagation()">
+      <div class="b-main">
+        <div class="b-input-wrap">
+          <input class="b-input" id="b-val" type="number" min="0" step="0.01" value="10.5">
+          <span class="b-unit">km</span>
+        </div>
+      </div>
+      <div class="b-quick">
+        <button class="b-quick-btn minus" onclick="addB(-5)">−5</button>
+        <button class="b-quick-btn minus" onclick="addB(-1)">−1</button>
+        <button class="b-quick-btn minus" onclick="addB(-0.5)">−0.5</button>
+        <button class="b-quick-btn" onclick="addB(0.5)">+0.5</button>
+        <button class="b-quick-btn" onclick="addB(1)">+1</button>
+        <button class="b-quick-btn" onclick="addB(5)">+5</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- C: Presets + libre -->
+  <div class="demo-card" id="card-c" onclick="selectCard('c')">
+    <div class="card-header">
+      <div><div class="card-tag">C</div><div class="card-title">Presets de distancias típicas</div><div class="card-desc">5k / 10k / 21k / 42k de un toque, o escribís libre</div></div>
+      <div class="select-check" id="check-c">✓</div>
+    </div>
+    <div class="demo-label">Distancia</div>
+    <div class="c-wrap" onclick="event.stopPropagation()">
+      <div class="c-presets">
+        <div class="c-preset" id="cp-5" onclick="setPreset(5)">5<small>km</small></div>
+        <div class="c-preset" id="cp-10" onclick="setPreset(10)">10<small>km</small></div>
+        <div class="c-preset active" id="cp-21" onclick="setPreset(21.097)">21.1<small>media</small></div>
+        <div class="c-preset" id="cp-42" onclick="setPreset(42.195)">42.2<small>maratón</small></div>
+      </div>
+      <div class="c-divider">o ingresá</div>
+      <div class="c-free">
+        <input id="c-val" type="number" min="0" step="0.01" value="21.097" oninput="clearPresets()">
+        <span>km</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- D: Input grande con badge de unidad -->
+  <div class="demo-card" id="card-d" onclick="selectCard('d')">
+    <div class="card-header">
+      <div><div class="card-tag">D</div><div class="card-title">Input grande + tabs de unidad</div><div class="card-desc">Campo prominente, unidad como tabs separadas debajo</div></div>
+      <div class="select-check" id="check-d">✓</div>
+    </div>
+    <div class="demo-label">Distancia</div>
+    <div class="d-wrap" onclick="event.stopPropagation()">
+      <div class="d-field">
+        <input class="d-input" id="d-val" type="number" min="0" step="0.01" value="10.5" oninput="updateD()">
+        <span class="d-badge" id="d-badge">km</span>
+      </div>
+      <div class="d-unit-tabs">
+        <div class="d-tab active" id="d-km" onclick="setDUnit('km')">km — kilómetros</div>
+        <div class="d-tab" id="d-m" onclick="setDUnit('m')">m — metros</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// A
+let aUnit = 'km';
+function setAUnit(u) {
+  aUnit = u;
+  document.getElementById('a-km').classList.toggle('active', u === 'km');
+  document.getElementById('a-m').classList.toggle('active', u === 'm');
+  updateA();
+}
+function updateA() {
+  const v = parseFloat(document.getElementById('a-val').value) || 0;
+  const km = aUnit === 'm' ? v / 1000 : v;
+  document.getElementById('a-preview').innerHTML = '→ <strong>' + km.toFixed(2) + ' km</strong>';
+}
+
+// B
+function addB(delta) {
+  const el = document.getElementById('b-val');
+  const v = Math.max(0, (parseFloat(el.value) || 0) + delta);
+  el.value = parseFloat(v.toFixed(2));
+}
+
+// C
+const presetMap = { 5: 'cp-5', 10: 'cp-10', 21.097: 'cp-21', 42.195: 'cp-42' };
+function setPreset(val) {
+  document.getElementById('c-val').value = val;
+  clearPresets();
+  const key = Object.keys(presetMap).find(k => Math.abs(parseFloat(k) - val) < 0.01);
+  if (key) document.getElementById(presetMap[key]).classList.add('active');
+}
+function clearPresets() {
+  Object.values(presetMap).forEach(id => document.getElementById(id).classList.remove('active'));
+}
+
+// D
+let dUnit = 'km';
+function setDUnit(u) {
+  dUnit = u;
+  document.getElementById('d-km').classList.toggle('active', u === 'km');
+  document.getElementById('d-m').classList.toggle('active', u === 'm');
+  document.getElementById('d-badge').textContent = u;
+}
+function updateD() {}
+
+// card selection
+function selectCard(id) {
+  ['a','b','c','d'].forEach(c => {
+    document.getElementById('card-' + c).classList.toggle('selected-card', c === id);
+  });
+}
+</script>

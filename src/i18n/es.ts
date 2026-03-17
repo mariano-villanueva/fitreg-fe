@@ -25,6 +25,11 @@ export default {
     workouts_new: 'Registrar Entrenamiento',
     workouts_empty: 'No hay entrenamientos registrados. ¡Registrá tu primera sesión!',
     workouts_delete_confirm: '¿Estás seguro de que querés eliminar este entrenamiento?',
+    workouts_recent: 'Últimos entrenos',
+    workouts_all: 'Historial completo',
+    workouts_showing: 'Mostrando {{from}}–{{to}} de {{total}} entrenos',
+    workouts_prev: 'Anterior',
+    workouts_next: 'Siguiente',
 
     // Workout types
     type_easy: 'Fácil',
@@ -34,6 +39,9 @@ export default {
     type_race: 'Carrera',
     type_fartlek: 'Fartlek',
     type_other: 'Otro',
+    type_long: 'Largo',
+    type_recovery: 'Recuperación',
+    type_hills: 'Cuestas',
 
     // Calendar
     calendar_title: 'Calendario de Entrenamientos',
@@ -59,12 +67,16 @@ export default {
     // Workout fields
     field_date: 'Fecha',
     field_type: 'Tipo',
-    field_distance: 'Distancia (km)',
+    field_distance: 'Distancia',
     field_duration: 'Duración',
     field_hours: 'Horas',
     field_minutes: 'Minutos',
     field_seconds: 'Segundos',
+    field_hours_short: 'h',
+    field_minutes_short: 'min',
+    field_seconds_short: 'seg',
     field_pace: 'Ritmo',
+    field_pace_unit: 'min/km',
     field_calories: 'Calorías',
     field_heart_rate: 'Pulsaciones promedio',
     field_heart_rate_short: 'PPM',
@@ -146,6 +158,7 @@ export default {
     coach_stats_achievements: 'Logros verificados',
     coach_stats_avg_rating: 'Valoración promedio',
     coach_stats_pending: 'Asignaciones pendientes',
+    coach_stats_today: 'Entrenamientos de hoy',
 
     // Assigned workouts
     assigned_title: 'Título',
@@ -167,7 +180,7 @@ export default {
     assigned_history: 'Historial',
     assigned_no_history: 'No hay entrenamientos finalizados.',
     assigned_from_coach: 'Asignado por',
-    assigned_feeling_required: 'Debés indicar cómo te sentiste (1-10) para completar el entrenamiento.',
+    assigned_feeling_required: 'Debés indicar el esfuerzo (1-10) para completar el entrenamiento.',
     assigned_detail: 'Ver detalle',
     assigned_results: 'Resultados',
 
@@ -198,6 +211,12 @@ export default {
     unit_m: 'm',
     unit_min: 'min',
     unit_sec: 'seg',
+    unit_km_label: 'kilómetros',
+    unit_m_label: 'metros',
+    unit_mi_label: 'millas',
+    dist_half: 'media',
+    dist_marathon: 'maratón',
+    distance_or: 'o ingresá',
 
     // Intensities
     intensity_easy: 'Suave',
@@ -215,6 +234,7 @@ export default {
     home_recent_activity: 'Actividad reciente',
     home_see_all: 'Ver todos',
     home_see_all_assignments: 'Ver todas las asignaciones',
+    home_log_workout: 'Registrar entrenamiento',
 
     // Coach directory
     coach_directory: 'Entrenadores',
@@ -398,7 +418,11 @@ export default {
     expected_field_time: 'Tiempo',
     expected_field_distance: 'Distancia',
     expected_field_heart_rate: 'Pulsaciones',
-    expected_field_feeling: 'Sensación',
+    expected_field_feeling: 'Esfuerzo',
+    effort_level_easy: 'Suave',
+    effort_level_moderate: 'Moderado',
+    effort_level_hard: 'Intenso',
+    effort_level_max: 'Máximo',
 
     // Dates
     date_today: 'Hoy',
@@ -446,7 +470,7 @@ export default {
 
     // Common
     workout_results_title: 'Resultados',
-    workout_feeling: 'Cómo te sentiste',
+    workout_feeling: 'Esfuerzo',
     workout_created: 'Entrenamiento registrado correctamente',
     workout_saved: 'Entrenamiento actualizado correctamente',
 

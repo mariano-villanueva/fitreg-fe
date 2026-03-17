@@ -22,6 +22,11 @@ export default {
     workouts_new: 'Log Workout',
     workouts_empty: 'No workouts recorded yet. Log your first session!',
     workouts_delete_confirm: 'Are you sure you want to delete this workout?',
+    workouts_recent: 'Recent workouts',
+    workouts_all: 'Full history',
+    workouts_showing: 'Showing {{from}}–{{to}} of {{total}} workouts',
+    workouts_prev: 'Previous',
+    workouts_next: 'Next',
 
     type_easy: 'Easy',
     type_tempo: 'Tempo',
@@ -30,6 +35,9 @@ export default {
     type_race: 'Race',
     type_fartlek: 'Fartlek',
     type_other: 'Other',
+    type_long: 'Long run',
+    type_recovery: 'Recovery',
+    type_hills: 'Hills',
 
     // Calendar
     calendar_title: 'Training Calendar',
@@ -54,12 +62,16 @@ export default {
 
     field_date: 'Date',
     field_type: 'Type',
-    field_distance: 'Distance (km)',
+    field_distance: 'Distance',
     field_duration: 'Duration',
     field_hours: 'Hours',
     field_minutes: 'Minutes',
     field_seconds: 'Seconds',
+    field_hours_short: 'h',
+    field_minutes_short: 'min',
+    field_seconds_short: 'sec',
     field_pace: 'Pace',
+    field_pace_unit: 'min/km',
     field_calories: 'Calories',
     field_heart_rate: 'Average Heart Rate',
     field_heart_rate_short: 'BPM',
@@ -135,6 +147,7 @@ export default {
     coach_stats_achievements: 'Verified achievements',
     coach_stats_avg_rating: 'Average rating',
     coach_stats_pending: 'Pending assignments',
+    coach_stats_today: "Today's workouts",
 
     assigned_title: 'Title',
     assigned_description: 'Description',
@@ -155,7 +168,7 @@ export default {
     assigned_history: 'History',
     assigned_no_history: 'No completed workouts yet.',
     assigned_from_coach: 'Assigned by',
-    assigned_feeling_required: 'You must rate how you felt (1-10) to complete the workout.',
+    assigned_feeling_required: 'You must rate your effort (1-10) to complete the workout.',
     assigned_detail: 'Details',
     assigned_results: 'Results',
 
@@ -184,6 +197,12 @@ export default {
     unit_m: 'm',
     unit_min: 'min',
     unit_sec: 'sec',
+    unit_km_label: 'kilometers',
+    unit_m_label: 'meters',
+    unit_mi_label: 'miles',
+    dist_half: 'half',
+    dist_marathon: 'marathon',
+    distance_or: 'or enter',
 
     intensity_easy: 'Easy',
     intensity_moderate: 'Moderate',
@@ -199,6 +218,7 @@ export default {
     home_recent_activity: 'Recent activity',
     home_see_all: 'See all',
     home_see_all_assignments: 'See all assignments',
+    home_log_workout: 'Log workout',
 
     // Coach directory
     coach_directory: 'Coaches',
@@ -381,7 +401,11 @@ export default {
     expected_field_time: 'Time',
     expected_field_distance: 'Distance',
     expected_field_heart_rate: 'Heart rate',
-    expected_field_feeling: 'Feeling',
+    expected_field_feeling: 'Effort',
+    effort_level_easy: 'Easy',
+    effort_level_moderate: 'Moderate',
+    effort_level_hard: 'Intense',
+    effort_level_max: 'Maximum',
 
     date_today: 'Today',
     date_tomorrow: 'Tomorrow',
@@ -426,7 +450,7 @@ export default {
     file_upload_error_generic: 'Failed to upload image',
 
     workout_results_title: 'Results',
-    workout_feeling: 'How did you feel',
+    workout_feeling: 'Effort',
     workout_created: 'Workout logged successfully',
     workout_saved: 'Workout updated successfully',
 

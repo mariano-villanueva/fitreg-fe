@@ -1,0 +1,196 @@
+<h2>Vista Calendario - Coach (planificando para un alumno)</h2>
+<p class="subtitle">Así se vería el mes con entrenamientos asignados. Tocá un día para ver el modal.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Calendario de Entrenamientos — Juan Pérez</div>
+  <div class="mockup-body" style="padding: 0; background: #1a1a2e;">
+
+    <!-- Month nav -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding: 16px 20px; border-bottom: 1px solid #2a2a4a;">
+      <button style="background:none; border:1px solid #444; color:#ccc; border-radius:6px; padding:6px 14px; cursor:pointer; font-size:14px;">← Anterior</button>
+      <span style="color:#e0e0e0; font-size:18px; font-weight:600;">Marzo 2026</span>
+      <button style="background:none; border:1px solid #444; color:#ccc; border-radius:6px; padding:6px 14px; cursor:pointer; font-size:14px;">Siguiente →</button>
+    </div>
+
+    <!-- Weekday headers -->
+    <div style="display:grid; grid-template-columns: repeat(7, 1fr); text-align:center; padding: 10px 0; border-bottom: 1px solid #2a2a4a;">
+      <span style="color:#888; font-size:12px; font-weight:600;">DOM</span>
+      <span style="color:#888; font-size:12px; font-weight:600;">LUN</span>
+      <span style="color:#888; font-size:12px; font-weight:600;">MAR</span>
+      <span style="color:#888; font-size:12px; font-weight:600;">MIÉ</span>
+      <span style="color:#888; font-size:12px; font-weight:600;">JUE</span>
+      <span style="color:#888; font-size:12px; font-weight:600;">VIE</span>
+      <span style="color:#888; font-size:12px; font-weight:600;">SÁB</span>
+    </div>
+
+    <!-- Calendar grid -->
+    <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #2a2a4a;">
+
+      <!-- Row 1: March starts on Sunday -->
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer; position:relative;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">1</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">2</span>
+        <div style="margin-top:4px; padding:4px 6px; border-radius:4px; background:#1e3a5f; border-left:3px solid #4a9eff; font-size:11px;">
+          <div style="color:#4a9eff; font-weight:600;">Easy 5K</div>
+          <div style="color:#888; font-size:10px;">⏳ Pendiente</div>
+        </div>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">3</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">4</span>
+        <div style="margin-top:4px; padding:4px 6px; border-radius:4px; background:#1e3a5f; border-left:3px solid #4a9eff; font-size:11px;">
+          <div style="color:#4a9eff; font-weight:600;">Intervalos</div>
+          <div style="color:#888; font-size:10px;">⏳ Pendiente</div>
+        </div>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">5</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">6</span>
+        <div style="margin-top:4px; padding:4px 6px; border-radius:4px; background:#1e3a5f; border-left:3px solid #4a9eff; font-size:11px;">
+          <div style="color:#4a9eff; font-weight:600;">Tempo 8K</div>
+          <div style="color:#888; font-size:10px;">⏳ Pendiente</div>
+        </div>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">7</span>
+      </div>
+
+      <!-- Row 2 -->
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">8</span>
+        <div style="margin-top:4px; padding:4px 6px; border-radius:4px; background:#1a3a2a; border-left:3px solid #4ade80; font-size:11px;">
+          <div style="color:#4ade80; font-weight:600;">Easy 6K</div>
+          <div style="color:#888; font-size:10px;">✅ Completado</div>
+        </div>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">9</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">10</span>
+        <div style="margin-top:4px; padding:4px 6px; border-radius:4px; background:#1a3a2a; border-left:3px solid #4ade80; font-size:11px;">
+          <div style="color:#4ade80; font-weight:600;">Fartlek</div>
+          <div style="color:#888; font-size:10px;">✅ Completado</div>
+        </div>
+      </div>
+      <div style="background:#1e1e3a; min-height:90px; padding:6px; cursor:pointer; box-shadow: inset 0 0 0 2px #6366f1; border-radius:4px;">
+        <span style="color:#fff; font-size:13px; font-weight:700;">11</span>
+        <div style="position:absolute; bottom:2px; right:4px; font-size:9px; color:#6366f1;">HOY</div>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">12</span>
+        <div style="margin-top:4px; padding:4px 6px; border-radius:4px; background:#1e3a5f; border-left:3px solid #4a9eff; font-size:11px;">
+          <div style="color:#4a9eff; font-weight:600;">Long Run 15K</div>
+          <div style="color:#888; font-size:10px;">⏳ Pendiente</div>
+        </div>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">13</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">14</span>
+      </div>
+
+      <!-- Row 3 -->
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">15</span>
+        <div style="margin-top:4px; padding:4px 6px; border-radius:4px; background:#3a2a1a; border-left:3px solid #888; font-size:11px;">
+          <div style="color:#888; font-weight:600;">Easy 5K</div>
+          <div style="color:#666; font-size:10px;">⊘ Omitido</div>
+        </div>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">16</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">17</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">18</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">19</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">20</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">21</span>
+      </div>
+
+      <!-- Row 4 -->
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">22</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">23</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">24</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">25</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">26</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">27</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">28</span>
+      </div>
+
+      <!-- Row 5 -->
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">29</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">30</span>
+      </div>
+      <div style="background:#1a1a2e; min-height:90px; padding:6px; cursor:pointer;">
+        <span style="color:#e0e0e0; font-size:13px; font-weight:500;">31</span>
+      </div>
+      <div style="background:#141428; min-height:90px; padding:6px;">
+        <span style="color:#555; font-size:13px;">1</span>
+      </div>
+      <div style="background:#141428; min-height:90px; padding:6px;">
+        <span style="color:#555; font-size:13px;">2</span>
+      </div>
+      <div style="background:#141428; min-height:90px; padding:6px;">
+        <span style="color:#555; font-size:13px;">3</span>
+      </div>
+      <div style="background:#141428; min-height:90px; padding:6px;">
+        <span style="color:#555; font-size:13px;">4</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:20px;">
+  <h3>Código de colores</h3>
+  <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="width:16px; height:16px; border-radius:3px; background:#1e3a5f; border-left:3px solid #4a9eff;"></div>
+      <span style="color:#ccc; font-size:13px;">Pendiente</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="width:16px; height:16px; border-radius:3px; background:#1a3a2a; border-left:3px solid #4ade80;"></div>
+      <span style="color:#ccc; font-size:13px;">Completado</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="width:16px; height:16px; border-radius:3px; background:#3a2a1a; border-left:3px solid #888;"></div>
+      <span style="color:#ccc; font-size:13px;">Omitido</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="width:16px; height:16px; border-radius:3px; background:#1e1e3a; box-shadow: inset 0 0 0 2px #6366f1;"></div>
+      <span style="color:#ccc; font-size:13px;">Hoy</span>
+    </div>
+  </div>
+</div>

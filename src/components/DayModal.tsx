@@ -7,6 +7,8 @@ import type { AssignedWorkout, FileResponse, WorkoutTemplate } from "../types";
 import SegmentDisplay from "./SegmentDisplay";
 import AssignWorkoutFields from "./AssignWorkoutFields";
 import ImageUpload from "./ImageUpload";
+import TimeInput, { type TimeValue, toSeconds } from "./TimeInput";
+import DistanceInput from "./DistanceInput";
 
 interface DayModalProps {
   date: string;
@@ -16,6 +18,7 @@ interface DayModalProps {
   templates?: WorkoutTemplate[];
   onClose: () => void;
   onRefresh: () => void;
+  readOnly?: boolean;
 }
 
 function formatDuration(seconds: number): string {
@@ -34,9 +37,11 @@ function formatDateLabel(dateStr: string, lang: string): { weekday: string; full
 
 type ModalView = 'detail' | 'create' | 'edit' | 'complete' | 'confirmDelete';
 
-export default function DayModal({ date, workout, role, studentId, templates, onClose, onRefresh }: DayModalProps) {
+const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '');
+
+export default function DayModal({ date, workout, role, studentId, templates, onClose, onRefresh, readOnly = false }: DayModalProps) {
   const { t, i18n } = useTranslation();
-  const { showSuccess, showError, showWarning } = useFeedback();
+  const { showSuccess, showError } = useFeedback();
   const [view, setView] = useState<ModalView>('detail');
   const [selectedTemplate, setSelectedTemplate] = useState<WorkoutTemplate | null>(null);
   const [templateOpen, setTemplateOpen] = useState(false);
@@ -53,39 +58,33 @@ export default function DayModal({ date, workout, role, studentId, templates, on
   }, []);
 
   // Complete workout state
-  const [timeH, setTimeH] = useState("");
-  const [timeM, setTimeM] = useState("");
-  const [timeS, setTimeS] = useState("");
-  const [resultDistance, setResultDistance] = useState("");
-  const [distanceUnit, setDistanceUnit] = useState<'km' | 'm'>('km');
+  const [time, setTime] = useState<TimeValue>({ h: 0, m: 0, s: 0 });
+  const [resultDistanceKm, setResultDistanceKm] = useState(0);
   const [resultHeartRate, setResultHeartRate] = useState("");
-  const [resultFeeling, setResultFeeling] = useState(0);
+  const [resultFeeling, setResultFeeling] = useState(5);
   const [resultImage, setResultImage] = useState<FileResponse | null>(null);
 
   const { weekday, full } = formatDateLabel(date, i18n.language);
 
   function getTimeSeconds(): number | null {
-    const h = Number(timeH) || 0;
-    const m = Number(timeM) || 0;
-    const s = Number(timeS) || 0;
-    if (h === 0 && m === 0 && s === 0) return null;
-    return h * 3600 + m * 60 + s;
+    const total = toSeconds(time);
+    return total > 0 ? total : null;
   }
 
   function getDistanceKm(): number | null {
-    const val = Number(resultDistance);
-    if (!val) return null;
-    return distanceUnit === 'm' ? val / 1000 : val;
+    return resultDistanceKm > 0 ? resultDistanceKm : null;
+  }
+
+  function getEffortLabel(val: number): string {
+    if (val <= 3) return t('effort_level_easy');
+    if (val <= 6) return t('effort_level_moderate');
+    if (val <= 8) return t('effort_level_hard');
+    return t('effort_level_max');
   }
 
   async function handleComplete() {
     if (!workout) return;
     const fields = workout.expected_fields || ['feeling'];
-
-    if (resultFeeling < 1) {
-      showWarning(t('assigned_feeling_required'));
-      return;
-    }
 
     const data: Record<string, unknown> = { status: 'completed', result_feeling: resultFeeling };
     if (fields.includes('time')) data.result_time_seconds = getTimeSeconds();
@@ -161,25 +160,12 @@ export default function DayModal({ date, workout, role, studentId, templates, on
                 {fields.includes('time') && (
                   <div className="form-group">
                     <label>{t('expected_field_time')}</label>
-                    <div className="time-inputs">
-                      <input type="number" min="0" max="99" placeholder="HH" value={timeH} onChange={(e) => setTimeH(e.target.value)} />
-                      <span>:</span>
-                      <input type="number" min="0" max="59" placeholder="MM" value={timeM} onChange={(e) => setTimeM(e.target.value)} />
-                      <span>:</span>
-                      <input type="number" min="0" max="59" placeholder="SS" value={timeS} onChange={(e) => setTimeS(e.target.value)} />
-                    </div>
+                    <TimeInput value={time} onChange={setTime} />
                   </div>
                 )}
                 {fields.includes('distance') && (
                   <div className="form-group">
-                    <label>{t('expected_field_distance')}</label>
-                    <div className="distance-input">
-                      <input type="number" step="0.01" min="0" value={resultDistance} onChange={(e) => setResultDistance(e.target.value)} />
-                      <select value={distanceUnit} onChange={(e) => setDistanceUnit(e.target.value as 'km' | 'm')}>
-                        <option value="km">km</option>
-                        <option value="m">m</option>
-                      </select>
-                    </div>
+                    <DistanceInput valueKm={resultDistanceKm} onChange={setResultDistanceKm} label={t('expected_field_distance')} showUnitToggle />
                   </div>
                 )}
                 {fields.includes('heart_rate') && (
@@ -193,15 +179,25 @@ export default function DayModal({ date, workout, role, studentId, templates, on
                 )}
                 <div className="form-group">
                   <label>{t('expected_field_feeling')} *</label>
-                  <div className="feeling-selector">
-                    {[1,2,3,4,5,6,7,8,9,10].map((v) => (
-                      <button
-                        key={v}
-                        type="button"
-                        className={`feeling-btn ${resultFeeling === v ? 'feeling-btn-active' : ''}`}
-                        onClick={() => setResultFeeling(v)}
-                      >{v}</button>
-                    ))}
+                  <div className="effort-slider-wrap">
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={resultFeeling}
+                      onChange={(e) => setResultFeeling(Number(e.target.value))}
+                      className="effort-slider"
+                      style={{ background: `linear-gradient(to right, var(--accent, #00d4aa) ${(resultFeeling - 1) / 9 * 100}%, var(--border-color, #333) ${(resultFeeling - 1) / 9 * 100}%)` }}
+                    />
+                    <div className="effort-scale-labels">
+                      <span>1</span>
+                      <span>5</span>
+                      <span>10</span>
+                    </div>
+                    <div className="effort-value">
+                      <span className="effort-number">{resultFeeling}</span>
+                      <span className="effort-label">— {getEffortLabel(resultFeeling)}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="form-group">
@@ -293,21 +289,28 @@ export default function DayModal({ date, workout, role, studentId, templates, on
                         {workout.result_feeling != null && (
                           <div className="day-modal-result">
                             <div className="day-modal-result-label">{t('expected_field_feeling')}</div>
-                            <div className="day-modal-result-value">{workout.result_feeling}/10</div>
+                            <div className="day-modal-result-value">{workout.result_feeling}/10 — {getEffortLabel(workout.result_feeling)}</div>
                           </div>
                         )}
                       </div>
+                      {workout.image_url && (
+                        <img
+                          src={`${apiBase}${workout.image_url}?token=${localStorage.getItem('token')}`}
+                          alt={t('workout_image')}
+                          className="day-modal-result-image"
+                        />
+                      )}
                     </div>
                   )}
                 </div>
 
-                {role === 'coach' && workout.status === 'pending' && (
+                {!readOnly && role === 'coach' && workout.status === 'pending' && (
                   <div className="day-modal-actions">
                     <button className="btn btn-primary" onClick={() => setView('edit')}>✏️ {t('calendar_edit')}</button>
                     <button className="btn btn-danger" onClick={() => setView('confirmDelete')}>🗑 {t('calendar_delete')}</button>
                   </div>
                 )}
-                {role === 'student' && workout.status === 'pending' && (
+                {!readOnly && role === 'student' && workout.status === 'pending' && (
                   <div className="day-modal-actions">
                     <button className="btn btn-primary" onClick={() => setView('complete')}>✅ {t('assigned_mark_completed')}</button>
                     <button className="btn" onClick={handleSkip}>⊘ {t('assigned_mark_skipped')}</button>
