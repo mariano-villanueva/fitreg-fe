@@ -41,7 +41,7 @@ const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').re
 
 export default function DayModal({ date, workout, role, studentId, templates, onClose, onRefresh, readOnly = false }: DayModalProps) {
   const { t, i18n } = useTranslation();
-  const { showSuccess, showError, showWarning } = useFeedback();
+  const { showSuccess, showError } = useFeedback();
   const [view, setView] = useState<ModalView>('detail');
   const [selectedTemplate, setSelectedTemplate] = useState<WorkoutTemplate | null>(null);
   const [templateOpen, setTemplateOpen] = useState(false);
