@@ -19,6 +19,8 @@ import CoachDirectory from "./pages/CoachDirectory";
 import CoachPublicProfile from "./pages/CoachPublicProfile";
 import CoachProfileEdit from "./pages/CoachProfileEdit";
 import CoachTemplates from "./pages/CoachTemplates";
+import CoachWeeklyTemplates from './pages/CoachWeeklyTemplates';
+import WeeklyTemplateForm from './pages/WeeklyTemplateForm';
 import CoachDailyView from "./pages/CoachDailyView";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
@@ -60,6 +62,9 @@ function App() {
                 <Route path="/coaches/:id" element={<ProtectedRoute><CoachPublicProfile /></ProtectedRoute>} />
                 <Route path="/coach/profile" element={<ProtectedRoute><CoachProfileEdit /></ProtectedRoute>} />
                 <Route path="/coach/templates" element={<ProtectedRoute><CoachTemplates /></ProtectedRoute>} />
+                <Route path="/coach/weekly-templates" element={<ProtectedRoute><CoachWeeklyTemplates /></ProtectedRoute>} />
+                <Route path="/coach/weekly-templates/new" element={<ProtectedRoute><WeeklyTemplateForm /></ProtectedRoute>} />
+                <Route path="/coach/weekly-templates/:id/edit" element={<ProtectedRoute><WeeklyTemplateForm /></ProtectedRoute>} />
                 <Route path="/coach/daily" element={<ProtectedRoute><CoachDailyView /></ProtectedRoute>} />
                 <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                 <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
