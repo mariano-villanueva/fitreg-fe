@@ -4150,14 +4150,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 32px;
+  padding: 12px 28px;
   background: #0a0a0a;
   border-bottom: 1px solid #1a1a1a;
   flex-shrink: 0;
 }
 
 .landing-logo {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.5px;
   line-height: 1;
@@ -4185,12 +4185,29 @@
 /* Left panel — value proposition */
 .landing-left {
   flex: 1.3;
-  padding: 48px 48px 48px 48px;
+  position: relative;
+  background-image: url('https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=900&q=80&fit=crop');
+  background-size: cover;
+  background-position: center;
+  padding: 32px 36px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 24px;
+  gap: 16px;
   border-right: 1px solid #151515;
+}
+
+.landing-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.48));
+  z-index: 0;
+}
+
+.landing-left > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Badge */
@@ -4223,7 +4240,7 @@
 
 /* Headline block */
 .landing-headline {
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 900;
   line-height: 1.15;
   letter-spacing: -1px;
@@ -4252,62 +4269,62 @@
 .landing-features {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .landing-feature {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .landing-feature-icon {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   background: #1a2a1a;
   border: 1px solid rgba(74, 222, 128, 0.2);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 15px;
   flex-shrink: 0;
 }
 
 .landing-feature-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #fff;
   margin: 0 0 2px 0;
 }
 
 .landing-feature-sub {
-  font-size: 11px;
+  font-size: 10px;
   color: #666;
   margin: 0;
 }
 
 /* Right panel — login card */
 .landing-right {
-  width: 300px;
-  padding: 48px 32px;
+  width: 280px;
+  padding: 32px 26px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 20px;
+  gap: 14px;
   background: #0d0d0d;
   flex-shrink: 0;
 }
 
 .landing-login-title {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 800;
   color: #fff;
   margin: 0 0 6px 0;
 }
 
 .landing-login-desc {
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
   line-height: 1.55;
   margin: 0;
@@ -4403,5 +4420,9 @@
 
   .landing-headline {
     font-size: 26px;
+  }
+
+  .landing-features {
+    display: none;
   }
 }
