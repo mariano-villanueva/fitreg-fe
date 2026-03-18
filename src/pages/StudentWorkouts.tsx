@@ -4,6 +4,7 @@ import { listStudents } from "../api/coach";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import MonthCalendar from "../components/MonthCalendar";
+import WeeklyTemplateAssignModal from "../components/WeeklyTemplateAssignModal";
 
 export default function StudentWorkouts() {
   const { id } = useParams<{ id: string }>();
@@ -12,6 +13,8 @@ export default function StudentWorkouts() {
   const { t } = useTranslation();
   const { showSuccess } = useFeedback();
   const [studentName, setStudentName] = useState("");
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [calendarKey, setCalendarKey] = useState(0);
 
   const feedbackShown = useRef(false);
   useEffect(() => {
@@ -37,11 +40,31 @@ export default function StudentWorkouts() {
     }
   }
 
+  function handleAssignSuccess() {
+    setShowAssignModal(false);
+    showSuccess(t('weekly_template_assigned'));
+    setCalendarKey((k) => k + 1);
+  }
+
   return (
     <div className="page">
       <Link to="/coach" className="back-link">{t('detail_back')}</Link>
-      <h1>{t('coach_student_workouts')}</h1>
-      <MonthCalendar role="coach" studentId={studentId} studentName={studentName} />
+      <div className="page-header">
+        <h1>{studentName || t('coach_student_workouts')}</h1>
+        <button className="btn btn-primary" onClick={() => setShowAssignModal(true)}>
+          📅 {t('weekly_template_assign')}
+        </button>
+      </div>
+      <MonthCalendar key={calendarKey} role="coach" studentId={studentId} studentName={studentName} />
+
+      {showAssignModal && (
+        <WeeklyTemplateAssignModal
+          presetStudentId={studentId}
+          presetStudentName={studentName}
+          onClose={() => setShowAssignModal(false)}
+          onSuccess={handleAssignSuccess}
+        />
+      )}
     </div>
   );
 }

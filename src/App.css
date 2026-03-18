@@ -4104,3 +4104,30 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
+
+/* Weekly template assign — conflict panel */
+.weekly-assign-conflict {
+  border: 1px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.weekly-assign-conflict__header {
+  font-weight: 600;
+  color: #f59e0b;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+.weekly-assign-conflict__list {
+  margin: 0 0 8px 16px;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+.weekly-assign-conflict__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}

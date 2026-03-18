@@ -19,8 +19,8 @@ export const deleteWeeklyTemplate = (id: number) =>
 export const putWeeklyTemplateDays = (id: number, days: WeeklyTemplateDay[]) =>
   client.put<WeeklyTemplate>(`/coach/weekly-templates/${id}/days`, { days });
 
-export const assignWeeklyTemplate = (id: number, studentId: number, startDate: string) =>
+export const assignWeeklyTemplate = (id: number, studentId: number, startDate: string, force = false) =>
   client.post<{ assigned_workout_ids: number[] }>(
     `/coach/weekly-templates/${id}/assign`,
-    { student_id: studentId, start_date: startDate }
+    { student_id: studentId, start_date: startDate, force }
   );

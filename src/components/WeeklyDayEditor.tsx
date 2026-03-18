@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listTemplates } from '../api/templates';
-import type { WeeklyTemplateDay, WeeklyTemplateSegment, WorkoutTemplate } from '../types';
+import type { WeeklyTemplateDay, WeeklyTemplateSegment, WorkoutTemplate, WorkoutSegment } from '../types';
+import AssignWorkoutFields from './AssignWorkoutFields';
 
 interface Props {
   dayIndex: number; // 0=Mon … 6=Sun
@@ -14,184 +15,189 @@ interface Props {
 const DAY_NAMES_ES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const DAY_NAMES_EN = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-const emptySegment = (): WeeklyTemplateSegment => ({
-  order_index: 0,
-  segment_type: 'simple',
-  repetitions: 1,
-  value: 0,
-  unit: '',
-  intensity: '',
-  work_value: 0,
-  work_unit: '',
-  work_intensity: '',
-  rest_value: 0,
-  rest_unit: '',
-  rest_intensity: '',
-});
+function weeklyDayToTemplate(day: WeeklyTemplateDay): WorkoutTemplate {
+  return {
+    id: 0,
+    coach_id: 0,
+    title: day.title,
+    description: day.description,
+    type: day.type ?? 'easy',
+    notes: day.notes,
+    expected_fields: [],
+    created_at: '',
+    updated_at: '',
+    segments: day.segments.map((s) => ({
+      order_index: s.order_index,
+      segment_type: s.segment_type,
+      repetitions: s.repetitions,
+      value: s.value ?? 0,
+      unit: (s.unit ?? 'km') as WorkoutSegment['unit'],
+      intensity: (s.intensity ?? 'easy') as WorkoutSegment['intensity'],
+      work_value: s.work_value ?? 0,
+      work_unit: (s.work_unit ?? 'km') as WorkoutSegment['work_unit'],
+      work_intensity: (s.work_intensity ?? 'easy') as WorkoutSegment['work_intensity'],
+      rest_value: s.rest_value ?? 0,
+      rest_unit: (s.rest_unit ?? 'km') as WorkoutSegment['rest_unit'],
+      rest_intensity: (s.rest_intensity ?? 'easy') as WorkoutSegment['rest_intensity'],
+    })),
+  };
+}
+
+function segmentsToWeekly(segs: WorkoutSegment[]): WeeklyTemplateSegment[] {
+  return segs.map((s, i) => ({
+    order_index: i,
+    segment_type: s.segment_type,
+    repetitions: s.repetitions,
+    value: s.value,
+    unit: s.unit,
+    intensity: s.intensity,
+    work_value: s.work_value,
+    work_unit: s.work_unit,
+    work_intensity: s.work_intensity,
+    rest_value: s.rest_value,
+    rest_unit: s.rest_unit,
+    rest_intensity: s.rest_intensity,
+  }));
+}
+
+type View = 'detail' | 'empty' | 'form';
 
 export default function WeeklyDayEditor({ dayIndex, initial, onSave, onRemove, onCancel }: Props) {
   const { t, i18n } = useTranslation();
   const dayNames = i18n.language.startsWith('es') ? DAY_NAMES_ES : DAY_NAMES_EN;
 
+  const [view, setView] = useState<View>(initial ? 'detail' : 'empty');
+  const [selectedTemplate, setSelectedTemplate] = useState<WorkoutTemplate | null>(null);
   const [dailyTemplates, setDailyTemplates] = useState<WorkoutTemplate[]>([]);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
-  const [title, setTitle] = useState(initial?.title ?? '');
-  const [description, setDescription] = useState(initial?.description ?? '');
-  const [type, setType] = useState(initial?.type ?? '');
-  const [distanceKm, setDistanceKm] = useState(initial?.distance_km ?? 0);
-  const [durationSeconds, setDurationSeconds] = useState(initial?.duration_seconds ?? 0);
-  const [notes, setNotes] = useState(initial?.notes ?? '');
-  const [fromTemplateId, setFromTemplateId] = useState<number | null>(initial?.from_template_id ?? null);
-  const [segments, setSegments] = useState<WeeklyTemplateSegment[]>(initial?.segments ?? []);
+  const [templateOpen, setTemplateOpen] = useState(false);
+  const templateRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     listTemplates().then((res) => setDailyTemplates(res.data)).catch(() => {});
   }, []);
 
-  function handleTemplateLoad(templateId: number | '') {
-    setSelectedTemplateId(templateId);
-    if (templateId === '') return;
-    const tmpl = dailyTemplates.find((t) => t.id === templateId);
-    if (!tmpl) return;
-    setTitle(tmpl.title);
-    setDescription(tmpl.description ?? '');
-    setType(tmpl.type ?? '');
-    setNotes(tmpl.notes ?? '');
-    setFromTemplateId(tmpl.id);
-    setSegments(
-      (tmpl.segments ?? []).map((s, i) => ({
-        order_index: i,
-        segment_type: s.segment_type,
-        repetitions: s.repetitions,
-        value: s.value,
-        unit: s.unit,
-        intensity: s.intensity,
-        work_value: s.work_value,
-        work_unit: s.work_unit,
-        work_intensity: s.work_intensity,
-        rest_value: s.rest_value,
-        rest_unit: s.rest_unit,
-        rest_intensity: s.rest_intensity,
-      }))
-    );
-  }
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (templateRef.current && !templateRef.current.contains(e.target as Node)) {
+        setTemplateOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  function addSegment() {
-    setSegments((prev) => [...prev, { ...emptySegment(), order_index: prev.length }]);
-  }
-
-  function removeSegment(index: number) {
-    setSegments((prev) => prev.filter((_, i) => i !== index).map((s, i) => ({ ...s, order_index: i })));
-  }
-
-  function updateSegment(index: number, field: keyof WeeklyTemplateSegment, value: string | number) {
-    setSegments((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s))
-    );
-  }
-
-  function handleSave() {
-    if (!title.trim()) return;
+  function handleFormSave(data?: Record<string, unknown>) {
+    if (!data) return;
     onSave({
       day_of_week: dayIndex,
-      title: title.trim(),
-      description,
-      type,
-      distance_km: distanceKm,
-      duration_seconds: durationSeconds,
-      notes,
-      from_template_id: fromTemplateId,
-      segments,
+      title: data.title as string,
+      description: (data.description as string) || null,
+      type: (data.type as string) || null,
+      distance_km: null,
+      duration_seconds: null,
+      notes: (data.notes as string) || null,
+      from_template_id: selectedTemplate?.id ?? initial?.from_template_id ?? null,
+      segments: segmentsToWeekly(data.segments as WorkoutSegment[]),
     });
   }
 
+  const formInitialData: WorkoutTemplate | undefined =
+    selectedTemplate ?? (initial ? weeklyDayToTemplate(initial) : undefined);
+
   return (
     <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
-        <h3>{dayNames[dayIndex]}</h3>
-
-        {/* Preload from daily template */}
-        <div className="form-group">
-          <label>{t('weekly_template_load_from')}</label>
-          <select
-            value={selectedTemplateId}
-            onChange={(e) => handleTemplateLoad(e.target.value === '' ? '' : Number(e.target.value))}
-          >
-            <option value="">{t('weekly_template_load_select')}</option>
-            {dailyTemplates.map((tmpl) => (
-              <option key={tmpl.id} value={tmpl.id}>{tmpl.title}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Manual fields */}
-        <div className="form-group">
-          <label>{t('title')} *</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} />
-        </div>
-        <div className="form-group">
-          <label>{t('description')}</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
-        </div>
-        <div className="form-group">
-          <label>{t('type')}</label>
-          <input value={type} onChange={(e) => setType(e.target.value)} />
-        </div>
-        <div className="form-row">
-          <div className="form-group">
-            <label>{t('distance_km')}</label>
-            <input type="number" min="0" step="0.1" value={distanceKm}
-              onChange={(e) => setDistanceKm(parseFloat(e.target.value) || 0)} />
+      <div className="modal day-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="day-modal-header">
+          <div>
+            <div className="day-modal-weekday">{dayNames[dayIndex]}</div>
           </div>
-          <div className="form-group">
-            <label>{t('duration_seconds')}</label>
-            <input type="number" min="0" value={durationSeconds}
-              onChange={(e) => setDurationSeconds(parseInt(e.target.value) || 0)} />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>{t('notes')}</label>
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+          <button className="day-modal-close" onClick={onCancel}>✕</button>
         </div>
 
-        {/* Segments */}
-        <div className="form-group">
-          <label>{t('segments')}</label>
-          {segments.map((seg, i) => (
-            <div key={i} className="segment-row">
-              <select
-                value={seg.segment_type}
-                onChange={(e) => updateSegment(i, 'segment_type', e.target.value as 'simple' | 'interval')}
-              >
-                <option value="simple">{t('segment_simple')}</option>
-                <option value="interval">{t('segment_interval')}</option>
-              </select>
-              <input
-                type="number" placeholder={t('value')} min="0" step="0.01"
-                value={seg.value ?? ''} onChange={(e) => updateSegment(i, 'value', parseFloat(e.target.value) || 0)}
-              />
-              <input
-                placeholder={t('unit')} value={seg.unit ?? ''}
-                onChange={(e) => updateSegment(i, 'unit', e.target.value)}
-              />
-              <button type="button" className="btn btn-sm btn-danger" onClick={() => removeSegment(i)}>×</button>
+        <div className="day-modal-body">
+          {/* Empty state */}
+          {view === 'empty' && (
+            <div className="day-modal-empty">
+              <div className="day-modal-empty-icon">🏃</div>
+              <p>{t('weekly_template_day_empty')}</p>
+              <div className="day-modal-assign-actions">
+                <button className="btn btn-primary" onClick={() => setView('form')}>
+                  + {t('weekly_template_create_manual')}
+                </button>
+                <div className="template-dropdown" ref={templateRef}>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-template-trigger"
+                    onClick={() => setTemplateOpen(!templateOpen)}
+                  >
+                    + {t('template_from')}
+                    <span className="template-chevron">{templateOpen ? '▴' : '▾'}</span>
+                  </button>
+                  {templateOpen && (
+                    <div className="template-dropdown-menu">
+                      {dailyTemplates.length > 0 ? dailyTemplates.map((tmpl) => (
+                        <button
+                          key={tmpl.id}
+                          type="button"
+                          className="template-dropdown-item"
+                          onClick={() => {
+                            setSelectedTemplate(tmpl);
+                            setView('form');
+                            setTemplateOpen(false);
+                          }}
+                        >
+                          {tmpl.title}
+                          {tmpl.type && (
+                            <span className="template-dropdown-type">{t(`type_${tmpl.type}`)}</span>
+                          )}
+                        </button>
+                      )) : (
+                        <div className="template-dropdown-item" style={{ opacity: 0.6, cursor: 'default' }}>
+                          {t('template_empty')}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          ))}
-          <button type="button" className="btn btn-sm" onClick={addSegment}>
-            + {t('add_segment')}
-          </button>
-        </div>
-
-        <div className="form-actions">
-          <button className="btn" onClick={onCancel}>{t('cancel')}</button>
-          {initial && (
-            <button className="btn btn-danger" onClick={onRemove}>
-              {t('weekly_template_remove_day')}
-            </button>
           )}
-          <button className="btn btn-primary" onClick={handleSave} disabled={!title.trim()}>
-            {t('save')}
-          </button>
+
+          {/* Detail view (existing day) */}
+          {view === 'detail' && initial && (
+            <div className="day-modal-workout">
+              <div className="day-modal-card" style={{ borderLeftColor: 'var(--accent)' }}>
+                <div className="day-modal-card-top">
+                  <div>
+                    <div className="day-modal-card-title">{initial.title}</div>
+                    <div className="day-modal-card-meta">
+                      {initial.type && <span className="day-modal-type-badge">{initial.type}</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="day-modal-actions">
+                <button className="btn btn-primary" onClick={() => setView('form')}>
+                  ✏️ {t('edit')}
+                </button>
+                <button className="btn btn-danger" onClick={onRemove}>
+                  🗑 {t('weekly_template_remove_day')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Form view */}
+          {view === 'form' && (
+            <AssignWorkoutFields
+              mode="template"
+              initialData={formInitialData}
+              saveLabel={t('save')}
+              onSave={handleFormSave}
+              onCancel={() => setView(initial ? 'detail' : 'empty')}
+            />
+          )}
         </div>
       </div>
     </div>

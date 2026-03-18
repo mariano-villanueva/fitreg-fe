@@ -13,11 +13,12 @@ interface AssignWorkoutFieldsProps {
   existingWorkout?: AssignedWorkout;
   initialData?: WorkoutTemplate;
   mode?: 'assignment' | 'template';
+  saveLabel?: string;
   onSave: (data?: Record<string, unknown>) => void;
   onCancel: () => void;
 }
 
-export default function AssignWorkoutFields({ studentId, dueDate, existingWorkout, initialData, mode, onSave, onCancel }: AssignWorkoutFieldsProps) {
+export default function AssignWorkoutFields({ studentId, dueDate, existingWorkout, initialData, mode, saveLabel, onSave, onCancel }: AssignWorkoutFieldsProps) {
   const { t } = useTranslation();
   const { showError } = useFeedback();
   const isEdit = !!existingWorkout;
@@ -187,7 +188,7 @@ export default function AssignWorkoutFields({ studentId, dueDate, existingWorkou
       <div className="form-actions">
         <button type="submit" className="btn btn-primary" disabled={saving}>
           {saving ? t('loading') : mode === 'template'
-            ? (initialData ? t('template_update') : t('template_save'))
+            ? (saveLabel ?? (initialData ? t('template_update') : t('template_save')))
             : t('form_save')}
         </button>
         <button type="button" className="btn" onClick={onCancel}>
