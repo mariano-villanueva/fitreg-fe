@@ -7,6 +7,7 @@ import type { AssignedWorkout, FileResponse, WorkoutTemplate } from "../types";
 import SegmentDisplay from "./SegmentDisplay";
 import AssignWorkoutFields from "./AssignWorkoutFields";
 import ImageUpload from "./ImageUpload";
+import AuthImage from "./AuthImage";
 import TimeInput, { type TimeValue, toSeconds } from "./TimeInput";
 import DistanceInput from "./DistanceInput";
 
@@ -294,8 +295,8 @@ export default function DayModal({ date, workout, role, studentId, templates, on
                         )}
                       </div>
                       {workout.image_url && (
-                        <img
-                          src={`${apiBase}${workout.image_url}?token=${localStorage.getItem('token')}`}
+                        <AuthImage
+                          src={`${apiBase}${workout.image_url}`}
                           alt={t('workout_image')}
                           className="day-modal-result-image"
                         />

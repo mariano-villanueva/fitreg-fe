@@ -9,8 +9,7 @@ import ErrorState from "../components/ErrorState";
 import TimeInput, { type TimeValue, toSeconds, fromSeconds } from "../components/TimeInput";
 import DistanceInput from "../components/DistanceInput";
 import type { Workout, WorkoutSegment } from "../types";
-
-type RunType = 'easy' | 'tempo' | 'intervals' | 'long_run' | 'race' | 'fartlek' | 'other';
+import { WORKOUT_TYPES, type WorkoutType } from "../constants/workoutTypes";
 
 export default function WorkoutForm() {
   const { t } = useTranslation();
@@ -19,18 +18,8 @@ export default function WorkoutForm() {
   const navigate = useNavigate();
   const isEdit = Boolean(id);
 
-  const TYPE_OPTIONS: { value: RunType; label: string }[] = [
-    { value: "easy", label: t('type_easy') },
-    { value: "tempo", label: t('type_tempo') },
-    { value: "intervals", label: t('type_intervals') },
-    { value: "long_run", label: t('type_long_run') },
-    { value: "race", label: t('type_race') },
-    { value: "fartlek", label: t('type_fartlek') },
-    { value: "other", label: t('type_other') },
-  ];
-
   // Basic info
-  const [type, setType] = useState<RunType>("easy");
+  const [type, setType] = useState<WorkoutType>("running");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState("");
   const [segments, setSegments] = useState<WorkoutSegment[]>([]);
@@ -66,7 +55,7 @@ export default function WorkoutForm() {
       setLoading(true);
       const workout = await getWorkout(workoutId);
       setDate(workout.date.slice(0, 10));
-      setType(workout.type as RunType);
+      setType(workout.type as WorkoutType);
       setDistanceKm(workout.distance_km);
       setDuration(fromSeconds(workout.duration_seconds));
       setCalories(workout.calories);
@@ -147,12 +136,10 @@ export default function WorkoutForm() {
             <select
               id="workout-type"
               value={type}
-              onChange={(e) => setType(e.target.value as RunType)}
+                      onChange={(e) => setType(e.target.value as WorkoutType)}
             >
-              {TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
+              {WORKOUT_TYPES.map((wt) => (
+                <option key={wt} value={wt}>{t(`type_${wt}`)}</option>
               ))}
             </select>
           </div>
