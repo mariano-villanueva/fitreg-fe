@@ -107,6 +107,49 @@ export interface WorkoutTemplate {
   updated_at: string;
 }
 
+export interface WeeklyTemplateSegment {
+  order_index: number;
+  segment_type: 'simple' | 'interval';
+  repetitions: number;
+  value: number | null;
+  unit: string | null;
+  intensity: string | null;
+  work_value: number | null;
+  work_unit: string | null;
+  work_intensity: string | null;
+  rest_value: number | null;
+  rest_unit: string | null;
+  rest_intensity: string | null;
+}
+
+export interface WeeklyTemplateDay {
+  day_of_week: number; // 0=Mon … 6=Sun
+  title: string;
+  description: string | null;
+  type: string | null;
+  distance_km: number | null;
+  duration_seconds: number | null;
+  notes: string | null;
+  from_template_id: number | null;
+  segments: WeeklyTemplateSegment[];
+}
+
+export interface WeeklyTemplate {
+  id: number;
+  coach_id: number;
+  name: string;
+  description: string | null;
+  days: WeeklyTemplateDay[];
+  day_count?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AssignConflictResponse {
+  error: string;
+  conflicting_dates: string[];
+}
+
 export interface CoachAchievement {
   id: number;
   coach_id: number;
