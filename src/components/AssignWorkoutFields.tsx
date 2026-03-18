@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import SegmentBuilder from "./SegmentBuilder";
 import type { WorkoutSegment, ExpectedField, AssignedWorkout, WorkoutTemplate } from "../types";
+import { WORKOUT_TYPES } from "../constants/workoutTypes";
 
 const EXPECTED_FIELD_OPTIONS: ExpectedField[] = ['time', 'distance', 'heart_rate', 'feeling'];
 
@@ -128,13 +129,9 @@ export default function AssignWorkoutFields({ studentId, dueDate, existingWorkou
           value={type}
           onChange={(e) => setType(e.target.value)}
         >
-          <option value="easy">{t('type_easy')}</option>
-          <option value="tempo">{t('type_tempo')}</option>
-          <option value="intervals">{t('type_intervals')}</option>
-          <option value="long_run">{t('type_long_run')}</option>
-          <option value="race">{t('type_race')}</option>
-          <option value="fartlek">{t('type_fartlek')}</option>
-          <option value="other">{t('type_other')}</option>
+          {WORKOUT_TYPES.map((wt) => (
+            <option key={wt} value={wt}>{t(`type_${wt}`)}</option>
+          ))}
         </select>
       </div>
 
