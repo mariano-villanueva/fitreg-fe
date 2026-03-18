@@ -2,7 +2,7 @@ export default {
   translation: {
     // Nav
     app_name: 'FitReg',
-    app_tagline: 'Tu tracker de running',
+    app_tagline: 'coaching real · logros reales',
     profile: 'Perfil',
     logout: 'Cerrar sesión',
     avatar_change: 'Cambiar foto',
@@ -19,6 +19,24 @@ export default {
     login_feature_1: 'Registrá tus sesiones de running',
     login_feature_2: 'Seguí distancia, ritmo y más',
     login_feature_3: 'Visualizá tu progreso',
+
+    // Landing
+    landing_badge: '100% HUMANO · CERO IA',
+    landing_headline: 'Superá tus límites con un coach de verdad.',
+    landing_subheadline: 'FitReg conecta atletas con entrenadores reales — personas con logros verificados por nuestra comunidad, no algoritmos ni prompts.',
+    landing_feature_1_title: 'Coaches con logros verificados',
+    landing_feature_1_sub: 'Cada coach tiene historial real auditado por FitReg',
+    landing_feature_2_title: 'Planes de entrenamiento personalizados',
+    landing_feature_2_sub: 'Tu coach arma, asigna y ajusta tu semana',
+    landing_feature_3_title: 'Seguimiento y feedback real',
+    landing_feature_3_sub: 'Tu progreso visible para vos y tu coach',
+    landing_login_title: 'Empezá ahora',
+    landing_login_desc: 'Para coaches que quieren crecer y atletas que quieren resultados reales.',
+    landing_free_label: 'Gratis para atletas',
+    landing_trust_title: 'Por qué FitReg',
+    landing_trust_1: 'Coaches con identidad verificada',
+    landing_trust_2: 'Logros auditados, no autoreportados',
+    landing_trust_3: 'Sin bots ni respuestas automatizadas',
 
     // Workout list
     workouts_title: 'Entrenamientos',
