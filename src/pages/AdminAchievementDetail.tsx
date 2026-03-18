@@ -4,6 +4,7 @@ import { getPendingAchievements, verifyAchievement, rejectAchievement } from "..
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import type { PendingAchievement } from "../types";
+import AuthImage from "../components/AuthImage";
 
 export default function AdminAchievementDetail() {
   const { t } = useTranslation();
@@ -52,7 +53,6 @@ export default function AdminAchievementDetail() {
   if (!achievement) return <div className="page"><p>{t('admin_achievement_not_found')}</p></div>;
 
   const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '');
-  const token = localStorage.getItem('token');
 
   return (
     <div className="page">
@@ -98,8 +98,8 @@ export default function AdminAchievementDetail() {
         {achievement.image_url && (
           <div className="achievement-detail-image">
             <h3>{t('achievement_image')}</h3>
-            <img
-              src={`${apiBase}${achievement.image_url}?token=${token}`}
+            <AuthImage
+              src={`${apiBase}${achievement.image_url}`}
               alt={achievement.event_name}
               className="detail-image"
             />

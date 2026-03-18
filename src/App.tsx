@@ -30,7 +30,7 @@ import Onboarding from "./pages/Onboarding";
 import AssignmentDetail from "./pages/AssignmentDetail";
 import "./App.css";
 
-const GOOGLE_CLIENT_ID = "1022083787469-g78j2i0b1shlrdd26ttb8jsham44fbcq.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
 
 function App() {
   return (

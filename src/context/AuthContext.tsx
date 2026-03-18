@@ -30,7 +30,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         .catch(() => {
           localStorage.removeItem("token");
-          localStorage.removeItem("user");
           setToken(null);
           setUserState(null);
         })
@@ -40,9 +39,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [token]);
 
+  // Sync logout across browser tabs: when another tab removes the token from
+  // localStorage, this tab detects the change and clears its auth state.
+  useEffect(() => {
+    function handleStorageChange(e: StorageEvent) {
+      if (e.key === "token" && e.newValue === null) {
+        setToken(null);
+        setUserState(null);
+      }
+    }
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   function login(newToken: string, newUser: User) {
     localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(newUser));
     setToken(newToken);
     setUserState(newUser);
     if (newUser.language) {
@@ -52,13 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   function logout() {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
     setToken(null);
     setUserState(null);
   }
 
   function setUser(updatedUser: User) {
-    localStorage.setItem("user", JSON.stringify(updatedUser));
     setUserState(updatedUser);
   }
 

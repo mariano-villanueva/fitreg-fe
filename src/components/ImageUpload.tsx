@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { uploadFile, deleteFile } from '../api/files';
 import type { FileResponse } from '../types';
+import AuthImage from './AuthImage';
 
 interface ImageUploadProps {
   value: FileResponse | null;
@@ -61,8 +62,7 @@ export default function ImageUpload({ value, onChange, disabled }: ImageUploadPr
 
   // Strip /api suffix from VITE_API_URL since value.url already includes /api
   const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '');
-  const token = localStorage.getItem('token');
-  const imageUrl = value ? `${apiBase}${value.url}?token=${token}` : null;
+  const imageUrl = value ? `${apiBase}${value.url}` : null;
 
   return (
     <div className="image-upload">
@@ -80,7 +80,7 @@ export default function ImageUpload({ value, onChange, disabled }: ImageUploadPr
           {uploading ? (
             <div className="image-upload-spinner" />
           ) : value && imageUrl ? (
-            <img src={imageUrl} alt={value.original_name} />
+            <AuthImage src={imageUrl} alt={value.original_name} />
           ) : (
             <div className="image-upload-placeholder">📷</div>
           )}

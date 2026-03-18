@@ -9,6 +9,7 @@ import type { CoachPublicProfile as CoachProfileType } from "../types";
 import { useFeedback } from "../context/FeedbackContext";
 import Avatar from "../components/Avatar";
 import ErrorState from "../components/ErrorState";
+import AuthImage from "../components/AuthImage";
 
 export default function CoachPublicProfile() {
   const { id } = useParams<{ id: string }>();
@@ -84,7 +85,6 @@ export default function CoachPublicProfile() {
   const myRating = profile.ratings.find((r) => r.student_id === user?.id);
   const isEditing = !!myRating;
   const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '');
-  const token = localStorage.getItem('token');
 
   return (
     <div className="page coach-public-page">
@@ -185,8 +185,8 @@ export default function CoachPublicProfile() {
               {verifiedAchievements.map((a) => (
                 <div key={a.id} className="coach-achievement-modal-item">
                   {a.image_url && (
-                    <img
-                      src={`${apiBase}${a.image_url}?token=${token}`}
+                    <AuthImage
+                      src={`${apiBase}${a.image_url}`}
                       alt={a.event_name}
                       className="coach-achievement-modal-img"
                     />
