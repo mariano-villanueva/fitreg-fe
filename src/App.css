@@ -4139,10 +4139,11 @@
 .landing-page {
   background: #0a0a0a;
   color: #fff;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
 }
 
 /* Mini-navbar */
@@ -4306,27 +4307,27 @@
 
 /* Right panel — login card */
 .landing-right {
-  width: 280px;
-  padding: 32px 26px;
+  width: 320px;
+  padding: 0 36px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 14px;
+  gap: 18px;
   background: #0d0d0d;
   flex-shrink: 0;
 }
 
 .landing-login-title {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 800;
   color: #fff;
   margin: 0 0 6px 0;
 }
 
 .landing-login-desc {
-  font-size: 11px;
+  font-size: 13px;
   color: #666;
-  line-height: 1.55;
+  line-height: 1.6;
   margin: 0;
 }
 
@@ -4370,7 +4371,7 @@
 }
 
 .landing-trust-item {
-  font-size: 11px;
+  font-size: 12px;
   color: #888;
   display: flex;
   align-items: center;
