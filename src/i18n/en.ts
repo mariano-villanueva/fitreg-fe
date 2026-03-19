@@ -575,5 +575,17 @@ export default {
     daily_modal_description: 'Description',
     daily_modal_notes: 'Notes',
     daily_retry: 'Retry',
+
+    // Training load
+    load_title: 'Weekly load',
+    load_planned: 'Planned',
+    load_actual: 'Completed',
+    load_weeks_4: '4 wks',
+    load_weeks_8: '8 wks',
+    load_weeks_12: '12 wks',
+    load_no_data: 'No load data available',
+    load_personal_workouts_tooltip: 'Had personal workouts this week',
+    load_km: '{{km}} km',
+    load_compliance: '{{pct}}% compliance',
   }
 };

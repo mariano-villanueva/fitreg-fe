@@ -1,0 +1,227 @@
+.training-load-chart {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+}
+
+/* Header */
+.load-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.load-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Week toggle */
+.load-week-toggle {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.load-week-btn {
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.load-week-btn:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.load-week-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+
+/* Legend */
+.load-legend {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.load-legend-item {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.load-legend-item::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.load-legend-planned::before {
+  background: var(--border);
+  opacity: 0.8;
+}
+
+.load-legend-actual::before {
+  background: var(--accent);
+}
+
+/* Bar chart */
+.load-bars-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  height: 140px;
+  padding-bottom: 1.75rem; /* space for label + dot */
+  position: relative;
+}
+
+.load-bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  position: relative;
+  min-width: 0;
+}
+
+.load-bar-pair {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.load-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  transition: height 0.3s ease;
+  min-height: 2px;
+}
+
+.load-bar-planned {
+  background: var(--border);
+  opacity: 0.9;
+}
+
+.load-bar-actual {
+  background: var(--accent);
+}
+
+/* Personal workouts dot */
+.load-personal-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffa500;
+  margin-top: 3px;
+  flex-shrink: 0;
+  cursor: help;
+}
+
+/* Week label */
+.load-week-label {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin-top: 2px;
+  position: absolute;
+  bottom: 0;
+}
+
+/* Empty / loading */
+.load-empty {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 2rem 0;
+  margin: 0;
+}
+
+.load-skeleton {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  height: 140px;
+}
+
+.load-skeleton-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  background: var(--border);
+  opacity: 0.4;
+  animation: load-pulse 1.4s ease-in-out infinite;
+}
+
+.load-skeleton-bar:nth-child(odd) {
+  animation-delay: 0.2s;
+}
+
+@keyframes load-pulse {
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 0.5; }
+}
+
+/* Summary row */
+.load-summary {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.load-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 70px;
+}
+
+.load-summary-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.load-summary-planned {
+  color: var(--text-secondary);
+}
+
+.load-summary-actual {
+  color: var(--accent);
+}
+
+.load-summary-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
