@@ -105,48 +105,48 @@
   border-bottom: none;
 }
 
-.col-student {
+.weekly-compliance-table .col-student {
   text-align: left;
   min-width: 140px;
 }
 
-.col-day {
+.weekly-compliance-table .col-day {
   text-align: center;
   min-width: 44px;
 }
 
-.col-pct {
+.weekly-compliance-table .col-pct {
   text-align: right;
   font-weight: 600;
   min-width: 48px;
 }
 
-.col-km {
+.weekly-compliance-table .col-km {
   text-align: right;
   color: var(--text-secondary);
   font-size: 0.8rem;
   min-width: 64px;
 }
 
-.day-number {
+.weekly-compliance-table .day-number {
   display: block;
   font-size: 0.7rem;
   color: var(--text-secondary);
   opacity: 0.6;
 }
 
-.cell-none {
+.weekly-compliance-table .cell-none {
   color: var(--text-secondary);
   opacity: 0.4;
 }
 
-.student-link {
+.weekly-compliance-table .student-link {
   color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
 }
 
-.student-link:hover {
+.weekly-compliance-table .student-link:hover {
   color: var(--accent);
   text-decoration: underline;
 }

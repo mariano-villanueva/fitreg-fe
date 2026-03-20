@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getDailySummary } from '../api/coach';
 import type { Student, DailySummaryItem } from '../types';
 import {
@@ -30,6 +31,7 @@ interface Props {
 type DayMatrix = Map<number, DailySummaryItem | null>[];
 
 export default function WeeklyComplianceDashboard({ students }: Props) {
+  const { t } = useTranslation();
   const [weekSelection, setWeekSelection] = useState<WeekSelection>('current');
   const [dayMatrix, setDayMatrix] = useState<DayMatrix | null>(null);
   const [weekDates, setWeekDates] = useState<string[]>([]);
@@ -39,32 +41,38 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
     if (students.length === 0) return;
     const dates = getWeekDates(weekSelection);
     setWeekDates(dates);
-    loadWeek(dates);
-  }, [weekSelection, students]);
 
-  async function loadWeek(dates: string[]) {
-    setLoading(true);
-    try {
-      const results = await Promise.allSettled(
-        dates.map(date => getDailySummary(date))
-      );
+    let cancelled = false;
 
-      const matrix: DayMatrix = results.map(result => {
-        const map = new Map<number, DailySummaryItem | null>();
-        students.forEach(s => map.set(s.id, null));
-        if (result.status === 'fulfilled') {
-          for (const item of result.value.data) {
-            map.set(item.student_id, item);
+    async function loadWeek() {
+      setLoading(true);
+      setDayMatrix(null); // clear stale data before new fetch
+      try {
+        const results = await Promise.allSettled(
+          dates.map(date => getDailySummary(date))
+        );
+        if (cancelled) return;
+
+        const matrix: DayMatrix = results.map(result => {
+          const map = new Map<number, DailySummaryItem | null>();
+          students.forEach(s => map.set(s.id, null));
+          if (result.status === 'fulfilled') {
+            for (const item of result.value.data) {
+              map.set(item.student_id, item);
+            }
           }
-        }
-        return map;
-      });
+          return map;
+        });
 
-      setDayMatrix(matrix);
-    } finally {
-      setLoading(false);
+        setDayMatrix(matrix);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
-  }
+
+    loadWeek();
+    return () => { cancelled = true; };
+  }, [weekSelection, students.length]); // use students.length to avoid reference instability
 
   if (students.length === 0) return null;
 
@@ -73,7 +81,7 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
   const rows = students.map(student => {
     const dayItems = dayMatrix
       ? dayMatrix.map(dayMap => dayMap.get(student.id) ?? null)
-      : Array(7).fill(null);
+      : Array.from({ length: 7 }, (): DailySummaryItem | null => null);
 
     const pct = dayMatrix ? getCompliancePercent(dayItems) : null;
     const km = dayMatrix ? getKmSummary(dayItems) : null;
@@ -103,7 +111,7 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
     <div className="coach-section weekly-compliance">
       <div className="coach-section-header">
         <div className="weekly-compliance-title">
-          <h2>Cumplimiento semanal</h2>
+          <h2>{t('weekly_compliance_title')}</h2>
           {weekLabel && <span className="weekly-compliance-range">{weekLabel}</span>}
         </div>
         <div className="weekly-compliance-week-toggle">
@@ -111,13 +119,13 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
             className={`btn btn-sm${weekSelection === 'previous' ? ' btn-primary' : ''}`}
             onClick={() => setWeekSelection('previous')}
           >
-            ← Sem. ant.
+            {t('weekly_compliance_prev_week')}
           </button>
           <button
             className={`btn btn-sm${weekSelection === 'current' ? ' btn-primary' : ''}`}
             onClick={() => setWeekSelection('current')}
           >
-            Esta sem.
+            {t('weekly_compliance_current_week')}
           </button>
         </div>
       </div>
@@ -125,30 +133,30 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
       <div className="weekly-compliance-stats">
         <div className="weekly-compliance-stat weekly-compliance-stat--green">
           <span className="weekly-compliance-stat-value">{stats.on_track}</span>
-          <span className="weekly-compliance-stat-label">AL DÍA</span>
+          <span className="weekly-compliance-stat-label">{t('weekly_compliance_on_track')}</span>
         </div>
         <div className="weekly-compliance-stat weekly-compliance-stat--yellow">
           <span className="weekly-compliance-stat-value">{stats.has_pending}</span>
-          <span className="weekly-compliance-stat-label">CON PENDIENTES</span>
+          <span className="weekly-compliance-stat-label">{t('weekly_compliance_has_pending')}</span>
         </div>
         <div className="weekly-compliance-stat weekly-compliance-stat--red">
           <span className="weekly-compliance-stat-value">{stats.no_activity}</span>
-          <span className="weekly-compliance-stat-label">SIN ACTIVIDAD</span>
+          <span className="weekly-compliance-stat-label">{t('weekly_compliance_no_activity')}</span>
         </div>
         <div className="weekly-compliance-stat weekly-compliance-stat--neutral">
           <span className="weekly-compliance-stat-value">{students.length}</span>
-          <span className="weekly-compliance-stat-label">TOTAL</span>
+          <span className="weekly-compliance-stat-label">{t('weekly_compliance_total')}</span>
         </div>
       </div>
 
       {loading ? (
-        <div className="loading">Cargando...</div>
+        <div className="loading">{t('loading')}</div>
       ) : (
         <div className="weekly-compliance-table-wrapper">
           <table className="weekly-compliance-table">
             <thead>
               <tr>
-                <th className="col-student">Alumno</th>
+                <th className="col-student">{t('weekly_compliance_student_col')}</th>
                 {DAY_LABELS.map((label, i) => (
                   <th key={label} className="col-day">
                     {label}
@@ -174,7 +182,7 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
                   {dayItems.map((item, i) => {
                     const status = getCellStatus(item);
                     return (
-                      <td key={i} className={`col-day cell-${status}`}>
+                      <td key={weekDates[i] ?? i} className={`col-day cell-${status}`}>
                         {CELL_ICON[status]}
                       </td>
                     );
@@ -195,10 +203,10 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
             </tbody>
           </table>
           <div className="weekly-compliance-legend">
-            <span>✅ completado</span>
-            <span>❌ saltado</span>
-            <span>⏳ pendiente</span>
-            <span>— sin entreno</span>
+            <span>{`✅ ${t('status_completed')}`}</span>
+            <span>{`❌ ${t('status_skipped')}`}</span>
+            <span>{`⏳ ${t('status_pending')}`}</span>
+            <span>{`— ${t('weekly_compliance_no_workout')}`}</span>
           </div>
         </div>
       )}
