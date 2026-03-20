@@ -23,7 +23,10 @@ export function getWeekDates(selection: WeekSelection): string[] {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
     d.setDate(d.getDate() + i);
-    return d.toISOString().slice(0, 10);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   });
 }
 
@@ -83,6 +86,7 @@ export function getKmSummary(dayItems: (DailySummaryItem | null)[]): {
     if (aw.status === 'completed' && aw.result_distance_km != null) {
       completed += aw.result_distance_km;
     } else if (aw.status === 'completed' && aw.distance_km > 0) {
+      // Student completed but didn't log result distance — assume planned distance as proxy
       completed += aw.distance_km;
     }
   }
