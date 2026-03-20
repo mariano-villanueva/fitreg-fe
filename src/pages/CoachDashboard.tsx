@@ -7,7 +7,7 @@ import type { Student, AssignedWorkout, Invitation } from "../types";
 import { useTranslation } from "react-i18next";
 import { useFeedback } from "../context/FeedbackContext";
 import Avatar from "../components/Avatar";
-import WeeklyComplianceDashboard from '../components/WeeklyComplianceDashboard';
+import WeeklyComplianceDashboard from "../components/WeeklyComplianceDashboard";
 
 export default function CoachDashboard() {
   const { t } = useTranslation();
