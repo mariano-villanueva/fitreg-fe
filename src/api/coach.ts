@@ -1,5 +1,5 @@
 import client from './client';
-import type { Student, AssignedWorkout, Workout, WorkoutSegment, DailySummaryItem } from '../types';
+import type { Student, AssignedWorkout, Workout, WorkoutSegment, DailySummaryItem, WeeklyLoadEntry } from '../types';
 
 export const listStudents = () => client.get<Student[]>('/coach/students');
 export const addStudent = (email: string) => client.post<Student>('/coach/students', { email });
@@ -60,3 +60,9 @@ export const updateAssignedWorkoutStatus = (id: number, data: {
 
 export const getDailySummary = (date: string) =>
   client.get<DailySummaryItem[]>(`/coach/daily-summary?date=${date}`);
+
+export const getStudentLoad = (studentId: number, weeks = 8) =>
+  client.get<WeeklyLoadEntry[]>(`/coach/students/${studentId}/load?weeks=${weeks}`);
+
+export const getMyLoad = (weeks = 8) =>
+  client.get<WeeklyLoadEntry[]>(`/me/load?weeks=${weeks}`);

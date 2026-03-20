@@ -318,3 +318,15 @@ export interface DailySummaryItem {
   student_avatar: string | null;
   assigned_workout: AssignedWorkout | null;
 }
+
+export interface WeeklyLoadEntry {
+  week_start: string;
+  planned_km: number;
+  actual_km: number;
+  planned_seconds: number;
+  actual_seconds: number;
+  sessions_planned: number;
+  sessions_completed: number;
+  sessions_skipped: number;
+  has_personal_workouts: boolean;
+}

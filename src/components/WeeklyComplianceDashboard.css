@@ -1,0 +1,173 @@
+/* ---- Weekly Compliance Dashboard ---- */
+
+.weekly-compliance-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.weekly-compliance-title h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.weekly-compliance-range {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.weekly-compliance-week-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.weekly-compliance-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.weekly-compliance-stat {
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border: 1px solid transparent;
+}
+
+.weekly-compliance-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.weekly-compliance-stat-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+}
+
+.weekly-compliance-stat--green {
+  background: rgba(74, 222, 128, 0.08);
+  border-color: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+}
+
+.weekly-compliance-stat--yellow {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.weekly-compliance-stat--red {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.2);
+  color: #f87171;
+}
+
+.weekly-compliance-stat--neutral {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.weekly-compliance-table-wrapper {
+  overflow-x: auto;
+}
+
+.weekly-compliance-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.weekly-compliance-table thead tr {
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.weekly-compliance-table th {
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.weekly-compliance-table td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.weekly-compliance-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.weekly-compliance-table .col-student {
+  text-align: left;
+  min-width: 140px;
+}
+
+.weekly-compliance-table .col-day {
+  text-align: center;
+  min-width: 44px;
+}
+
+.weekly-compliance-table .col-pct {
+  text-align: right;
+  font-weight: 600;
+  min-width: 48px;
+}
+
+.weekly-compliance-table .col-km {
+  text-align: right;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  min-width: 64px;
+}
+
+.weekly-compliance-table .day-number {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.weekly-compliance-table .cell-none {
+  color: var(--text-secondary);
+  opacity: 0.4;
+}
+
+.weekly-compliance-table .student-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.weekly-compliance-table .student-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.weekly-compliance-legend {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .weekly-compliance-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .weekly-compliance-table th,
+  .weekly-compliance-table td {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.8rem;
+  }
+}
