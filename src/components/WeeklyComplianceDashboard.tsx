@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getDailySummary } from '../api/coach';
@@ -36,11 +36,19 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
   const [dayMatrix, setDayMatrix] = useState<DayMatrix | null>(null);
   const [weekDates, setWeekDates] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const cache = useRef<Map<string, DayMatrix>>(new Map());
 
   useEffect(() => {
     if (students.length === 0) return;
     const dates = getWeekDates(weekSelection);
     setWeekDates(dates);
+
+    const cacheKey = `${weekSelection}:${students.map(s => s.id).join(',')}`;
+    const cached = cache.current.get(cacheKey);
+    if (cached) {
+      setDayMatrix(cached);
+      return;
+    }
 
     let cancelled = false;
 
@@ -49,7 +57,7 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
       setDayMatrix(null); // clear stale data before new fetch
       try {
         const results = await Promise.allSettled(
-          dates.map(date => getDailySummary(date))
+          dates.map(date => getDailySummary(date, false))
         );
         if (cancelled) return;
 
@@ -64,6 +72,7 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
           return map;
         });
 
+        cache.current.set(cacheKey, matrix);
         setDayMatrix(matrix);
       } finally {
         if (!cancelled) setLoading(false);

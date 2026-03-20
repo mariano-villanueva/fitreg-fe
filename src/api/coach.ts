@@ -58,8 +58,8 @@ export const updateAssignedWorkoutStatus = (id: number, data: {
 }) =>
   client.put<AssignedWorkout>(`/my-assigned-workouts/${id}/status`, data);
 
-export const getDailySummary = (date: string) =>
-  client.get<DailySummaryItem[]>(`/coach/daily-summary?date=${date}`);
+export const getDailySummary = (date: string, segments = true) =>
+  client.get<DailySummaryItem[]>(`/coach/daily-summary?date=${date}${segments ? '' : '&segments=false'}`);
 
 export const getStudentLoad = (studentId: number, weeks = 8) =>
   client.get<WeeklyLoadEntry[]>(`/coach/students/${studentId}/load?weeks=${weeks}`);
