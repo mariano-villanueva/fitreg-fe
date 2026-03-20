@@ -72,7 +72,7 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
 
     loadWeek();
     return () => { cancelled = true; };
-  }, [weekSelection, students.length]); // use students.length to avoid reference instability
+  }, [weekSelection, students.map(s => s.id).join(',')]); // stable derived key to avoid array reference instability while catching roster changes
 
   if (students.length === 0) return null;
 
@@ -130,6 +130,7 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
         </div>
       </div>
 
+      {!loading && dayMatrix && (
       <div className="weekly-compliance-stats">
         <div className="weekly-compliance-stat weekly-compliance-stat--green">
           <span className="weekly-compliance-stat-value">{stats.on_track}</span>
@@ -148,6 +149,7 @@ export default function WeeklyComplianceDashboard({ students }: Props) {
           <span className="weekly-compliance-stat-label">{t('weekly_compliance_total')}</span>
         </div>
       </div>
+      )}
 
       {loading ? (
         <div className="loading">{t('loading')}</div>
