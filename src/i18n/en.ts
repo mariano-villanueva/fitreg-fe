@@ -576,6 +576,20 @@ export default {
     daily_modal_notes: 'Notes',
     daily_retry: 'Retry',
 
+    // Weekly compliance dashboard
+    weekly_compliance_title: 'Weekly compliance',
+    weekly_compliance_prev_week: '← Prev. week',
+    weekly_compliance_current_week: 'This week',
+    weekly_compliance_on_track: 'ON TRACK',
+    weekly_compliance_has_pending: 'HAS PENDING',
+    weekly_compliance_no_activity: 'NO ACTIVITY',
+    weekly_compliance_total: 'TOTAL',
+    weekly_compliance_student_col: 'Athlete',
+    weekly_compliance_no_workout: 'no workout',
+    status_completed: 'completed',
+    status_skipped: 'skipped',
+    status_pending: 'pending',
+
     // Training load
     load_title: 'Weekly load',
     load_planned: 'Planned',
@@ -587,5 +601,8 @@ export default {
     load_personal_workouts_tooltip: 'Had personal workouts this week',
     load_km: '{{km}} km',
     load_compliance: '{{pct}}% compliance',
+    load_compliance_label: 'Compliance',
+    load_skipped: 'skipped',
+    load_unmarked: 'unmarked',
   }
 };
